@@ -62,7 +62,7 @@
         <div class="mt-10">
           <h2 class="mb-3 text-md font-light">Tests &amp; exercises:</h2>
           <Table
-            :head="['Test', 'Number of exercises', 'Total time (minutes)']"
+            :head="['Test', 'Number of exercises', 'Total time (seconds)']"
             :body="tests"
           />
           <button

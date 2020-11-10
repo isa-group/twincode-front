@@ -18,7 +18,7 @@
         <div class="mt-5">
           <h2 class="mb-3 text-md font-light">Tests list:</h2>
           <Table
-            :head="['Test', 'Number of exercises', 'Total time (minutes)']"
+            :head="['Test', 'Number of exercises', 'Total time (seconds)']"
             :body="orderedTests"
             v-model="selectedTest"
           />
