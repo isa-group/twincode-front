@@ -59,6 +59,12 @@ const routes = [
     meta: { title: "Twincode" },
   },
   {
+    path: "/playground",
+    component: Playground,
+    name: "Playground",
+    meta: { title: "Playground - Twincode" },
+  },
+  {
     path: "/ide",
     component: IDE,
     name: "IDE",

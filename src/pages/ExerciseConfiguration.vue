@@ -255,7 +255,14 @@ export default {
     };
   },
   methods: {
-    playDemoExercise() {},
+    playDemoExercise() {
+      localStorage.demoExercise = JSON.stringify(
+        this.tests[this.selectedTest].exercises[this.selectedExerciseIndex]
+      );
+      this.$router.push({
+        path: `/playground`,
+      });
+    },
     loadSession() {
       fetch(
         `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
