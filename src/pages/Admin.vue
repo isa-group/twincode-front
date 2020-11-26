@@ -168,7 +168,7 @@ export default {
       }, 1000);
     },
     logIn() {
-      fetch("https://twincode.herokuapp.com/sessions", {
+      fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
         method: "GET",
         headers: {
           Authorization: localStorage.adminSecret,
