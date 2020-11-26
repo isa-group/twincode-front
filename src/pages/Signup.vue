@@ -129,6 +129,7 @@
                 id="maleGender"
                 value="Male"
                 v-model="details.gender"
+                class="mr-1"
               />
               <label for="maleGender">Male</label>
               <br />
@@ -136,10 +137,30 @@
                 type="radio"
                 id="femaleGender"
                 value="Female"
+                class="mr-1"
                 v-model="details.gender"
               />
               <label for="femaleGender">Female</label>
-             
+              <br />
+              <input
+                type="radio"
+                id="otherGender"
+                value="true"
+                class="mr-1"
+                v-model="otherGenderSelected"
+                @click="selectOtherGender"
+              />
+              <label for="otherGender">Other</label>
+              <transition name="fade">
+              <input
+                v-if="details.gender !== 'Male' && details.gender !== 'Female' && details.gender != null"
+                type="text"
+                id="otherGenderText"
+                v-model="details.gender"
+                class="block mt-2 appearance-none w-full bg-white border border-gray-200 hover:border-grey px-2 py-2 rounded shadow"
+                placeholder="Enter the gender that better describes yourself."
+              />
+              </transition>
             </div>
 
             <div class="mb-4">
@@ -248,6 +269,7 @@ export default {
       },
       submitionOk: false,
       registrationText: "",
+      otherGenderSelected: false,
     };
   },
   methods: {
@@ -339,8 +361,26 @@ export default {
 
       return this.details.birthDate != "Invalid Date";
     },
+    selectOtherGender() {
+      this.details.gender = "";
+      this.otherGenderSelected = true;
+    }
   },
+  watch: {
+    'details.gender': function(newVal) {
+      if (newVal == "Male" || newVal == "Female") {
+        this.otherGenderSelected = false;
+      }
+    }
+  }
 };
 </script>
 
-<style></style>
+<style>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+</style>
