@@ -178,9 +178,9 @@
             <div class="mb-4">
               <label class="text-gray-700">
                 <input type="checkbox" required /> I accept to participate in
-                the experiment knowing that all the personal data I provide will
-                be kept confidential and will not be publicly available. Though
-                some aggregated and annonimized data could be analized for
+                the study knowing that all the personal data I provide will
+                be kept confidential and will not be publicly available but
+                some aggregated and annonimized data could be analyzed for
                 research purposes.</label
               >
             </div>
