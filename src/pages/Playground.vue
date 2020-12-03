@@ -8,6 +8,11 @@
           style="transition: 1s; width: 100%;"
         ></div>
       </div>
+      <div v-if="exerciseType == 'DEMO'" >
+          <div class="m-3 p-1 bg-yellow-200 border border-yellow-700 rounded-sm">
+            <a class="ml-2 text-sm text-yellow-900 underline cursor-pointer" @click="exitDemo()">Click here to end the demo.</a>
+          </div>
+      </div>
       <div class="flex h-full flex-wrap">
         <div class="w-2/3 p-2">
           <div>{{ (maxTime - timePassed) | secondsToString }}</div>
@@ -379,23 +384,28 @@ export default {
       this.logs = window.logs;
     },
     valid(v) {
-      fetch(process.env.VUE_APP_TC_API + "/verify", {
-        method: "POST",
-        body: JSON.stringify({
-          solution: v,
-          user: Number(localStorage.token),
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then((response) => {
-        if (response.status == 200) {
-          response.json().then((data) => {
-            this.isExerciseCorrect = data.result;
-            this.returnValue = v;
-          });
-        }
-      });
+      if (this.exerciseType != 'DEMO') {
+        fetch(process.env.VUE_APP_TC_API + "/verify", {
+          method: "POST",
+          body: JSON.stringify({
+            solution: v,
+            user: Number(localStorage.token),
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then((response) => {
+          if (response.status == 200) {
+            response.json().then((data) => {
+              this.isExerciseCorrect = data.result;
+              this.returnValue = v;
+            });
+          }
+        });
+      } else {
+        this.isExerciseCorrect = JSON.parse(localStorage.demoExercise).solution === v;
+        this.returnValue = v;
+      }
     },
     onCmBlur(cm) {
       console.log("cm blur!", cm);
@@ -406,23 +416,33 @@ export default {
     onCmReady(cm) {
       console.log("cm ready!", cm);
     },
-    loadExercise() {
-      this.onTimesUp();
-      fetch("/test?code=" + localStorage.token, {
-        method: "GET",
-      }).then((response) => {
-        if (response.status == 200) {
-          response.json().then((data) => {
-            if (data.finished) {
-              window.location.href = "/finished";
-            } else {
-              this.exerciseDescription = data.description;
-              this.maxTime = data.time;
-              this.startTimer();
-            }
-          });
+    exitDemo() {
+      clearInterval(this.timeInterval);
+      this.$router.go(-1);
+    },
+    loadDemoExercise() {
+      const demoExercise = JSON.parse(localStorage.demoExercise);
+      this.starting = false;
+      this.maxTime = demoExercise.time;
+      this.exerciseDescription = demoExercise.description;
+      this.exerciseType = "DEMO"
+      this.timeInterval = setInterval(() => {
+        this.timePassed++;
+        console.log("Counting down!");
+        let factor = 100 / this.maxTime;
+        let width = parseFloat(this.$refs.timeBar.style.width, 10) - factor;
+        this.$refs.timeBar.style.width = width + "%";
+        if (width < 20) {
+          this.$refs.timeBar.classList.remove("bg-yellow-500");
+          this.$refs.timeBar.classList.add("bg-red-500");
+        } else if (width < 40) {
+          this.$refs.timeBar.classList.remove("bg-green-500");
+          this.$refs.timeBar.classList.add("bg-yellow-500");
         }
-      });
+        if (this.timePassed > this.maxTime) {
+          clearInterval(this.timeInterval);
+        }
+      },1000);
     },
     pack(data) {
       return {
@@ -552,15 +572,20 @@ export default {
     });
 
     console.log("the codemirror instance object", this.cm);
-    //this.loadExercise();
     this.$refs.timeBar.style.width = `${((this.maxTime - this.timePassed) /
       this.maxTime) *
       100}%`;
+
+    if (localStorage.demoExercise) {
+      this.loadDemoExercise();
+    }
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleScroll);
     const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
-    elemento.removeEventListener("scroll", this.handleScroll);
+    if (elemento) {
+      elemento.removeEventListener("scroll", this.handleScroll);
+    }
   },
 };
 </script>

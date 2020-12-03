@@ -202,6 +202,18 @@
             </div>
             <div class="mt-4 max-w-xl mx-auto relative">
               <button
+                class="mt-3 mr-3 rounded-full bg-gray-200 p-2 px-5 hover:bg-gray-300 focus:outline-none focus:shadow-outline"
+                @click="playDemoExercise()"
+              >
+                <img
+                  src="@/assets/icons/play_icon.png"
+                  class="w-5 inline-block mr-1"
+                />
+                <p class="inline-block text-green-900 align-middle font-medium">
+                  Play demo exercise
+                </p>
+              </button>
+              <button
                 class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
                 @click="updateTest()"
               >
@@ -243,7 +255,14 @@ export default {
     };
   },
   methods: {
-    updateSession() {},
+    playDemoExercise() {
+      localStorage.demoExercise = JSON.stringify(
+        this.tests[this.selectedTest].exercises[this.selectedExerciseIndex]
+      );
+      this.$router.push({
+        path: `/playground`,
+      });
+    },
     loadSession() {
       fetch(
         `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
