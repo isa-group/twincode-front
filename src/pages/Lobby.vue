@@ -147,6 +147,7 @@ export default {
   methods: {
     onSubmit() {
       console.log(this.$socket.client.id);
+      localStorage.removeItem("demoExercise");
       fetch(process.env.VUE_APP_TC_API + "/registerUser", {
         method: "POST",
         body: JSON.stringify({
