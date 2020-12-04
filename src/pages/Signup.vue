@@ -65,7 +65,6 @@
                 placeholder="In case is different from your personal email"
               />
             </div>
-            <!-- TODO: Personal email -->
             <div class="mb-4">
               <label class="font-bold text-gray-800 block mb-2"
                 >Session <span class="text-red-600">*</span></label
@@ -76,7 +75,11 @@
                 class="block appearance-none w-full bg-white border border-gray-200 hover:border-grey px-2 py-2 rounded shadow"
                 placeholder="This code should have been provided to you by the organizers."
               />
+              <p v-if="sessionStatus.canJoin != null && !sessionStatus.canJoin" class="ml-3 mt-2 text-sm text-red-700">{{sessionStatus.message}}</p>
+              <p v-if="sessionStatus.canJoin != null && sessionStatus.canJoin" class="ml-3 mt-2 text-sm text-green-700">Session found!</p>
+
             </div>
+
 
             <div class="mb-4">
               <label class="font-bold text-gray-800 block mb-2"
@@ -270,6 +273,10 @@ export default {
       submitionOk: false,
       registrationText: "",
       otherGenderSelected: false,
+      sessionStatus: {
+        canJoin: null,
+        message: ""
+      }
     };
   },
   methods: {
@@ -333,11 +340,23 @@ export default {
         if (response.status === 200) {
           this.submitionOk = true;
           return response.json();
+        } else if (response.status === 400) {
+          this.submitionOk = false;
+          return response.json();
         } else {
-          this.errors.push("There was an error in the request. Check the form.");
+          this.errors.push("There was an unexpected error.");
         }
       }).then((data) => {
-        this.registrationText = data.registrationText;
+        if (this.submitionOk) {
+          this.registrationText = data.registrationText;
+        } else {
+          if (data.code === "DUPLICATE") {
+            this.errors.push("You already registered in the session. Please check you inbox or spam folder.");
+          } else {
+            this.errors.push("Error in the request. Please check the form.");
+          }
+          
+        }
       });
     },
     dateValid() {
@@ -370,6 +389,31 @@ export default {
     'details.gender': function(newVal) {
       if (newVal == "Male" || newVal == "Female") {
         this.otherGenderSelected = false;
+      }
+    },
+    'details.subject': function(newVal) {
+      if (newVal != "") {
+        fetch(process.env.VUE_APP_TC_API + "/status/" + newVal, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+          },
+        }).then((response) => {
+          return response.json()
+        }).then((data) => {
+          if (data.exists && data.active && !data.running) {
+            this.sessionStatus.canJoin = true;
+          } else {
+            this.sessionStatus.canJoin = false;
+            if (!data.exists) {
+              this.sessionStatus.message = "This session doesn't exist."
+            } else if (!data.active) {
+              this.sessionStatus.message = "This session is not active yet."
+            } else if (data.running) {
+              this.sessionStatus.message = "This session is running. You cannot join it."
+            }
+          }
+        });
       }
     }
   }
