@@ -18,6 +18,17 @@
         <td v-for="(cell, index) in row" :key="index" class="border px-4 py-2">
           {{ cell }}
         </td>
+        <td
+          v-for="(action, index) in actions"
+          :key="index"
+          class="border px-4 py-2"
+        >
+          <img
+            @click="$emit(action.eventName, row[action.key])"
+            :src="action.icon"
+            class="w-5 cursor-pointer"
+          />
+        </td>
       </tr>
       <tr v-if="body.length == 0">
         <td
@@ -38,6 +49,7 @@ export default {
     head: Array,
     body: Array,
     value: Number,
+    actions: Array,
   },
   data() {
     return {

@@ -54,7 +54,14 @@
         </form>
         <div class="mt-10">
           <h2 class="mb-3 text-md font-light">Participant list:</h2>
-          <Table :head="['Code', 'Name', 'Email']" :body="participants" />
+          <Table
+            :head="['Code', 'Name', 'Email']"
+            :body="participants"
+            :actions="[
+              { eventName: 'delete', icon: deleteIconUrl, key: 'mail' },
+            ]"
+            @delete="deleteUser($event)"
+          />
           <p class="mt-3 font-bold">
             Total: {{ this.participants.length }} participants.
           </p>
@@ -97,6 +104,8 @@
 import Header from "../components/Header";
 import Table from "../components/Table";
 import ToggleSwitch from "../components/ToggleSwitch";
+import deleteIcon from "@/assets/icons/delete_bin.png";
+
 export default {
   components: {
     Header,
@@ -113,10 +122,33 @@ export default {
       },
       participants: [],
       tests: [],
+      deleteIconUrl: deleteIcon,
     };
   },
   methods: {
     updateSession() {},
+    deleteUser(userEmail) {
+      var r = confirm(
+        "You are going to remove the participant with email " +
+          userEmail +
+          ". This action cannot be undone. Are you sure?"
+      );
+      if (r) {
+        fetch(
+          `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/${userEmail}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: localStorage.adminSecret,
+            },
+          }
+        ).then((response) => {
+          if (response.status == 200) {
+            this.loadParticipants();
+          }
+        });
+      }
+    },
     loadSession() {
       fetch(
         `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
