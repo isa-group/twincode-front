@@ -55,7 +55,7 @@
         <div class="mt-10">
           <h2 class="mb-3 text-md font-light">Participant list:</h2>
           <Table
-            :head="['Code', 'Name', 'Email']"
+            :head="['Code', 'Name', 'Email', 'Room', 'Status', 'Delete']"
             :body="participants"
             :actions="[
               { eventName: 'delete', icon: deleteIconUrl, key: 'mail' },
@@ -125,6 +125,20 @@ export default {
       deleteIconUrl: deleteIcon,
     };
   },
+  sockets: {
+    clientConnected(code) {
+      console.log("Participant " + code + " joined");
+      setTimeout(() => {
+        this.loadParticipants();
+      }, 500);
+    },
+    clientDisconnected(code) {
+      console.log("Participant " + code + " disconnected");
+      setTimeout(() => {
+        this.loadParticipants();
+      }, 500);
+    },
+  },
   methods: {
     updateSession() {},
     deleteUser(userEmail) {
@@ -174,6 +188,7 @@ export default {
         });
     },
     loadParticipants() {
+      console.log("loading participants");
       fetch(
         `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}`,
         {
@@ -283,6 +298,7 @@ export default {
     this.loadSession();
     this.loadParticipants();
     this.loadTests();
+    this.$socket.client.emit("adminConnected", this.$route.params.sessionName);
   },
 };
 </script>
