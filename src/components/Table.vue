@@ -16,7 +16,15 @@
         @click="clickOnRow"
       >
         <td v-for="(cell, index) in row" :key="index" class="border px-4 py-2">
-          {{ cell }}
+          <span v-if="cell !== true && cell !== false">
+            {{ cell }}
+          </span>
+          <span v-else>
+            <div
+              class="rounded-full w-3 h-3 mx-auto"
+              :class="cell === true ? 'bg-green-500' : 'bg-gray-500'"
+            ></div>
+          </span>
         </td>
         <td
           v-for="(action, index) in actions"
@@ -26,7 +34,7 @@
           <img
             @click="$emit(action.eventName, row[action.key])"
             :src="action.icon"
-            class="w-5 cursor-pointer"
+            class="w-5 cursor-pointer mx-auto"
           />
         </td>
       </tr>

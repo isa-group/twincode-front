@@ -160,6 +160,10 @@ export default {
       }).then((response) => {
         if (response.status == 200) {
           this.$socket.client.emit("clientReady", localStorage.getItem("code"));
+          this.$socket.client.emit(
+            "clientConnected",
+            localStorage.getItem("code")
+          );
           localStorage.setItem("token", localStorage.getItem("code"));
           this.waitingForPeer = true;
         } else if (response.status == 404) {
