@@ -18,7 +18,7 @@
           v-model="session.active"
           @input="toggleActivation()"
         />
-        <form @submit.prevent="updateSession()">
+        <form>
           <div class="mt-5">
             <label>Name:</label>
             <input
@@ -58,8 +58,20 @@
               >Participants with the same token cannot be paired together</label
             >
           </div>
+          <div class="mt-5">
+            <input
+              v-model="session.blindParticipant"
+              type="checkbox"
+              class="border rounded-sm mr-2"
+            />
+            <label
+              >One participant should not see avatar during the session</label
+            >
+          </div>
           <button
             class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            type="button"
+            @click="updateSession()"
           >
             Save
           </button>
@@ -151,6 +163,7 @@ export default {
         name: null,
         tokens: null,
         tokenPairing: null,
+        blindParticipant: null,
         active: null,
         running: null,
         pairingMode: null,
@@ -176,7 +189,6 @@ export default {
     },
   },
   methods: {
-    updateSession() {},
     deleteUser(userEmail) {
       var r = confirm(
         "You are going to remove the participant with email " +
@@ -248,6 +260,7 @@ export default {
             this.session.name = retrievedSession.name;
             this.session.tokens = retrievedSession.tokens;
             this.session.tokenPairing = retrievedSession.tokenPairing;
+            this.session.blindParticipant = retrievedSession.blindParticipant;
             this.session.active = retrievedSession.active;
             this.session.running = retrievedSession.running;
             this.session.pairingMode = retrievedSession.pairingMode;
@@ -355,6 +368,27 @@ export default {
           }
         });
       }
+    },
+    updateSession() {
+      console.log("Updating session... "+this.$route.params.sessionName);
+      console.log("Data: "+JSON.stringify(this.session,null,2));
+      fetch(
+        `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(this.session),
+          headers: {
+            Authorization: localStorage.adminSecret,
+            "Content-Type": "application/json",
+          },
+        }
+      ).then((response) => {
+        if (response.status == 200) {
+          alert(
+            `Session Updated!`
+          );
+        }
+      });
     },
     toggleActivation() {
       fetch(
