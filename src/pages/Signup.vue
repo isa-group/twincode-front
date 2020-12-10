@@ -125,6 +125,59 @@
 
             <div class="mb-4">
               <label class="font-bold text-gray-800 block mb-2"
+                >Experience with JavaScript<span class="text-red-600">*</span></label
+              >
+              <input
+                type="radio"
+                id="jsexp1"
+                value="1"
+                v-model="details.jsexp"
+                class="mr-1"
+              />
+              <label for="jsexp1">Very Low</label>
+              <br />
+              <input
+                type="radio"
+                id="jsexp2"
+                value="2"
+                v-model="details.jsexp"
+                class="mr-1"
+              />
+              <label for="jsexp2">Low</label>
+              <br />
+              <input
+                type="radio"
+                id="jsexp3"
+                value="3"
+                v-model="details.jsexp"
+                class="mr-1"
+              />
+              <label for="jsexp3">Medium</label>
+              <br />
+              <input
+                type="radio"
+                id="jsexp4"
+                value="4"
+                v-model="details.jsexp"
+                class="mr-1"
+              />
+              <label for="jsexp4">High</label>
+              <br />
+              <input
+                type="radio"
+                id="jsexp5"
+                value="5"
+                v-model="details.jsexp"
+                class="mr-1"
+              />
+              <label for="jsexp5">Very High</label>
+              <br />
+            </div>
+
+
+
+            <div class="mb-4">
+              <label class="font-bold text-gray-800 block mb-2"
                 >Gender <span class="text-red-600">*</span></label
               >
               <input
@@ -165,6 +218,7 @@
               />
               </transition>
             </div>
+
 
             <div class="mb-4">
               <label class="font-bold text-gray-800 block mb-2"
@@ -264,6 +318,7 @@ export default {
         mail: "",
         academicMail: "",
         gender: null,
+        jsexp: null,
         birthDate: null,
         subject: "",
         beganStudying: null,
@@ -286,6 +341,7 @@ export default {
         this.details.surname &&
         this.details.mail &&
         this.details.gender &&
+        this.details.jsexp &&
         this.details.birthDate &&
         this.details.subject &&
         this.details.beganStudying &&
@@ -310,6 +366,9 @@ export default {
       }
       if (!this.details.gender) {
         this.errors.push("Gender required.");
+      }
+      if (!this.details.jsexp) {
+        this.errors.push("Experience with JavaScript required.");
       }
       if (!this.details.birthDate) {
         this.errors.push("Date of birth required.");
