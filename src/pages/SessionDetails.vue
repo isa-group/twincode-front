@@ -83,6 +83,26 @@
         <div class="mt-10 border p-3 rounded-md">
           <h2 class="mb-3 text-md font-light">Actions:</h2>
           <button
+            class="mt-3 ml-2 p-3 rounded-md bg-gray-100 border px-5 text-gray-800 w-36"
+            :class="
+              session.running
+                ? 'cursor-not-allowed'
+                : 'hover:bg-green-200 hover:border-green-300 hover:text-green-800'
+            "
+            :disabled="session.running == true"
+            @click="startSession()"
+          >
+            <img
+              v-if="waitingStartResponse"
+              src="@/assets/icons/loading.gif"
+              class="h-5 inline"
+            />
+            <span v-if="!waitingStartResponse && session.running == false"
+              >Start session</span
+            >
+            <span v-if="session.running">Session running...</span>
+          </button>
+          <button
             class="mt-3 ml-2 p-3 rounded-md bg-gray-100 border px-5 text-gray-800 hover:bg-yellow-200 hover:border-yellow-300 hover:text-yellow-800"
             @click="goToReports()"
           >
@@ -119,10 +139,12 @@ export default {
         tokens: null,
         tokenPairing: null,
         active: null,
+        running: null,
       },
       participants: [],
       tests: [],
       deleteIconUrl: deleteIcon,
+      waitingStartResponse: false,
     };
   },
   sockets: {
@@ -163,6 +185,26 @@ export default {
         });
       }
     },
+    startSession() {
+      console.log("Session starting...");
+      this.waitingStartResponse = true;
+      fetch(
+        `${process.env.VUE_APP_TC_API}/startSession/${this.$route.params.sessionName}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      ).then((response) => {
+        if (response.status == 200) {
+          this.waitingStartResponse = false;
+
+          this.session.running = true;
+          return response.json();
+        }
+      });
+    },
     loadSession() {
       fetch(
         `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
@@ -184,6 +226,7 @@ export default {
             this.session.tokens = retrievedSession.tokens;
             this.session.tokenPairing = retrievedSession.tokenPairing;
             this.session.active = retrievedSession.active;
+            this.session.running = retrievedSession.running;
           }
         });
     },
