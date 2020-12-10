@@ -83,14 +83,13 @@
         <div class="mt-10 border p-3 rounded-md">
           <h2 class="mb-3 text-md font-light">Actions:</h2>
           <button
-            class="mt-3 ml-2 p-3 rounded-md bg-gray-100 border px-5 text-gray-800 w-36"
+            class="mt-3 ml-2 p-3 rounded-md bg-gray-100 border px-5 text-gray-800 w-48"
             :class="
               session.running
-                ? 'cursor-not-allowed'
+                ? 'hover:bg-gray-200 hover:border-gray-300 hover:text-gray-800'
                 : 'hover:bg-green-200 hover:border-green-300 hover:text-green-800'
             "
-            :disabled="session.running == true"
-            @click="startSession()"
+            @click="toggleSessionMethod()"
           >
             <img
               v-if="waitingStartResponse"
@@ -100,7 +99,9 @@
             <span v-if="!waitingStartResponse && session.running == false"
               >Start session</span
             >
-            <span v-if="session.running">Session running...</span>
+            <span v-if="!waitingStartResponse && session.running == true"
+              >Reset session</span
+            >
           </button>
           <button
             class="mt-3 ml-2 p-3 rounded-md bg-gray-100 border px-5 text-gray-800 hover:bg-yellow-200 hover:border-yellow-300 hover:text-yellow-800"
@@ -185,6 +186,15 @@ export default {
         });
       }
     },
+    toggleSessionMethod() {
+      if (!this.waitingStartResponse) {
+        if (this.session.running) {
+          this.resetSession();
+        } else {
+          this.startSession();
+        }
+      }
+    },
     startSession() {
       console.log("Session starting...");
       this.waitingStartResponse = true;
@@ -198,9 +208,9 @@ export default {
         }
       ).then((response) => {
         if (response.status == 200) {
-          this.waitingStartResponse = false;
-
-          this.session.running = true;
+          setTimeout(() => {
+            this.loadSession();
+          }, 1000);
           return response.json();
         }
       });
@@ -228,7 +238,25 @@ export default {
             this.session.active = retrievedSession.active;
             this.session.running = retrievedSession.running;
           }
+          this.waitingStartResponse = false;
         });
+    },
+    resetSession() {
+      this.waitingStartResponse = true;
+      fetch(process.env.VUE_APP_TC_API + "/resetSession", {
+        method: "POST",
+        body: JSON.stringify({ session: this.$route.params.sessionName }), // data can be `string` or {object}!
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.adminSecret,
+        },
+      }).then((response) => {
+        if (response.status == 200) {
+          setTimeout(() => {
+            this.loadSession();
+          }, 1000);
+        }
+      });
     },
     loadParticipants() {
       console.log("loading participants");
