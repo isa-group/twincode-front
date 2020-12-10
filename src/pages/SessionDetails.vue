@@ -24,7 +24,7 @@
             <input
               v-model="session.name"
               type="text"
-              class="border rounded-sm ml-2"
+              class="border rounded-sm ml-2 p-1"
             />
           </div>
 
@@ -33,9 +33,21 @@
             <input
               v-model="session.tokens"
               type="text"
-              class="border rounded-sm ml-2"
+              class="border rounded-sm ml-2 p-1"
             />
           </div>
+
+          <div class="mt-5">
+            <label>Pairing mode:</label>
+            <select
+              class="border rounded-sm ml-2 p-1"
+              v-model="session.pairingMode"
+            >
+              <option value="MANUAL">Manual</option>
+              <option value="AUTO">Automatic</option>
+            </select>
+          </div>
+
           <div class="mt-5">
             <input
               v-model="session.tokenPairing"
@@ -141,6 +153,7 @@ export default {
         tokenPairing: null,
         active: null,
         running: null,
+        pairingMode: null,
       },
       participants: [],
       tests: [],
@@ -237,6 +250,7 @@ export default {
             this.session.tokenPairing = retrievedSession.tokenPairing;
             this.session.active = retrievedSession.active;
             this.session.running = retrievedSession.running;
+            this.session.pairingMode = retrievedSession.pairingMode;
           }
           this.waitingStartResponse = false;
         });
