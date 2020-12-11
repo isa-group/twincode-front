@@ -17,6 +17,12 @@ npm install
 ```
 npm run serve
 ```
+By default it is listening on port 8080, to use a custom port:
+
+```
+npm run serve --port CUSTOM_PORT
+```
+
 
 ### Compiles and minifies for production
 
