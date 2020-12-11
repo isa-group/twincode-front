@@ -24,7 +24,7 @@
             <input
               v-model="session.name"
               type="text"
-              class="border rounded-sm ml-2"
+              class="border rounded-sm ml-2 p-1"
             />
           </div>
 
@@ -33,9 +33,21 @@
             <input
               v-model="session.tokens"
               type="text"
-              class="border rounded-sm ml-2"
+              class="border rounded-sm ml-2 p-1"
             />
           </div>
+
+          <div class="mt-5">
+            <label>Pairing mode:</label>
+            <select
+              class="border rounded-sm ml-2 p-1"
+              v-model="session.pairingMode"
+            >
+              <option value="MANUAL">Manual</option>
+              <option value="AUTO">Automatic</option>
+            </select>
+          </div>
+
           <div class="mt-5">
             <input
               v-model="session.tokenPairing"
@@ -83,6 +95,27 @@
         <div class="mt-10 border p-3 rounded-md">
           <h2 class="mb-3 text-md font-light">Actions:</h2>
           <button
+            class="mt-3 ml-2 p-3 rounded-md bg-gray-100 border px-5 text-gray-800 w-48"
+            :class="
+              session.running
+                ? 'hover:bg-gray-200 hover:border-gray-300 hover:text-gray-800'
+                : 'hover:bg-green-200 hover:border-green-300 hover:text-green-800'
+            "
+            @click="toggleSessionMethod()"
+          >
+            <img
+              v-if="waitingStartResponse"
+              src="@/assets/icons/loading.gif"
+              class="h-5 inline"
+            />
+            <span v-if="!waitingStartResponse && session.running == false"
+              >Start session</span
+            >
+            <span v-if="!waitingStartResponse && session.running == true"
+              >Reset session</span
+            >
+          </button>
+          <button
             class="mt-3 ml-2 p-3 rounded-md bg-gray-100 border px-5 text-gray-800 hover:bg-yellow-200 hover:border-yellow-300 hover:text-yellow-800"
             @click="goToReports()"
           >
@@ -119,10 +152,13 @@ export default {
         tokens: null,
         tokenPairing: null,
         active: null,
+        running: null,
+        pairingMode: null,
       },
       participants: [],
       tests: [],
       deleteIconUrl: deleteIcon,
+      waitingStartResponse: false,
     };
   },
   sockets: {
@@ -163,6 +199,35 @@ export default {
         });
       }
     },
+    toggleSessionMethod() {
+      if (!this.waitingStartResponse) {
+        if (this.session.running) {
+          this.resetSession();
+        } else {
+          this.startSession();
+        }
+      }
+    },
+    startSession() {
+      console.log("Session starting...");
+      this.waitingStartResponse = true;
+      fetch(
+        `${process.env.VUE_APP_TC_API}/startSession/${this.$route.params.sessionName}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      ).then((response) => {
+        if (response.status == 200) {
+          setTimeout(() => {
+            this.loadSession();
+          }, 1000);
+          return response.json();
+        }
+      });
+    },
     loadSession() {
       fetch(
         `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
@@ -184,8 +249,28 @@ export default {
             this.session.tokens = retrievedSession.tokens;
             this.session.tokenPairing = retrievedSession.tokenPairing;
             this.session.active = retrievedSession.active;
+            this.session.running = retrievedSession.running;
+            this.session.pairingMode = retrievedSession.pairingMode;
           }
+          this.waitingStartResponse = false;
         });
+    },
+    resetSession() {
+      this.waitingStartResponse = true;
+      fetch(process.env.VUE_APP_TC_API + "/resetSession", {
+        method: "POST",
+        body: JSON.stringify({ session: this.$route.params.sessionName }), // data can be `string` or {object}!
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.adminSecret,
+        },
+      }).then((response) => {
+        if (response.status == 200) {
+          setTimeout(() => {
+            this.loadSession();
+          }, 1000);
+        }
+      });
     },
     loadParticipants() {
       console.log("loading participants");
