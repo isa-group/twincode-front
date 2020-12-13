@@ -235,7 +235,7 @@ export default {
         if (response.status == 200) {
           setTimeout(() => {
             this.loadSession();
-          }, 1000);
+          }, 6000);
           return response.json();
         }
       });
@@ -384,9 +384,7 @@ export default {
         }
       ).then((response) => {
         if (response.status == 200) {
-          alert(
-            `Session Updated!`
-          );
+          alert(`Session Updated!`);
         }
       });
     },
