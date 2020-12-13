@@ -137,8 +137,7 @@
           class="bg-teal-100 border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5"
         >
           <h1 class="font-bold text-2xl mb-4">Congratulations!</h1>
-          <p class="font-medium">
-            {{ finishMessage }}
+          <p class="font-medium" v-html="finishMessage">
           </p>
         </div>
         <div class="text-center">
