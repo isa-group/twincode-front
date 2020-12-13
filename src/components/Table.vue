@@ -16,7 +16,10 @@
         @click="clickOnRow"
       >
         <td v-for="(cell, index) in row" :key="index" class="border px-4 py-2">
-          <span v-if="cell !== true && cell !== false">
+          <span
+            v-if="cell !== true && cell !== false"
+            style="pointer-events: none"
+          >
             {{ cell }}
           </span>
           <span v-else>

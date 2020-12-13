@@ -345,11 +345,14 @@ export default {
     },
     newMessage(msg, mine) {
       const MessageClass = Vue.extend(Message);
+      let gender = localStorage.getItem("pairedTo") === 'Female';
+      gender = this.peerChange ? !gender : gender;
+      gender = JSON.parse(localStorage.getItem("user")).blind ? null : gender;
       const msgInstance = new MessageClass({
         propsData: {
           mine: mine,
           message: msg,
-          girl: this.peerChange,
+          girl: gender,
         },
       });
 

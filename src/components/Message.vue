@@ -1,6 +1,6 @@
 <template>
   <div class="flex mb-1 mt-1" :class="mine ? 'justify-end' : 'justify-start'">
-    <div class="flex-shrink-0" v-if="!mine">
+    <div class="flex-shrink-0" v-if="!mine && girl != null">
       <img class="rounded-full w-12 h-12" :src="getImages()" />
     </div>
     <div

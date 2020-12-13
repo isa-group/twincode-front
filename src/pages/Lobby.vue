@@ -142,6 +142,10 @@ export default {
     sessionStart(val) {
       console.log("Session started!");
       window.location.href = "/rooms/controlled/" + val.room;
+      console.log("Converting to string: " + val.user);
+      console.log(JSON.stringify(val.user));
+      localStorage.setItem("user", JSON.stringify(val.user));
+      localStorage.setItem("pairedTo", val.pairedTo);
     },
   },
   methods: {
