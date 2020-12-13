@@ -16,13 +16,15 @@
       <div class="flex h-full flex-wrap">
         <div class="w-2/3 p-2">
           <div>{{ (maxTime - timePassed) | secondsToString }}</div>
-          <div>{{ exerciseDescription }}</div>
-          <div style="height: 60vh;" @keyup.ctrl.83="validate" >
+          <div v-html="exerciseDescription"></div>
+          <div style="height: 70vh;" @keyup.ctrl.83="validate" >
             <div
               ref="pairCursor"
               id="pairCursor"
               class="absolute bg-yellow-500 hidden"
             ></div>
+            <br/>
+            <pre><p class="text-purple-800 inline">function</p> main(input) {</pre>
             <codemirror
               ref="cmEditor"
               v-model="code"
@@ -30,6 +32,9 @@
               :options="cmOption"
               :events="['inputRead', 'change']"
             ></codemirror>
+            <pre>     <p class="text-pink-700 inline">return</p> output;</pre>
+            <pre>}</pre>
+            <br/>
           </div>
           <div
             v-if="isExerciseCorrect"
@@ -218,6 +223,7 @@ export default {
       token: localStorage.getItem("code"),
       println: window.println,
       logs: window.logs,
+      inputs: null
     };
   },
   filters: {
@@ -288,7 +294,6 @@ export default {
     newExercise(pack) {
       this.loadingTest = false;
       this.starting = false;
-      this.maxTime = pack.data.maxTime;
       this.timePassed = 0;
       this.isExerciseCorrect = null;
       this.$refs.timeBar.style.width = "100%";
@@ -296,6 +301,8 @@ export default {
       this.$refs.timeBar.classList.add("bg-green-500");
       this.exerciseDescription = pack.data.exerciseDescription;
       this.exerciseType = pack.data.exerciseType;
+      this.maxTime = pack.data.maxTime;
+      this.inputs = pack.data.inputs;
       this.clearResult();
     },
     reconnect() {
@@ -365,13 +372,22 @@ export default {
     validate() {
       this.clearResult();
       try {
-        const ret = this.evaluateCode(this.code);
-        if (ret) {
+        var solutions = [];
+        this.inputs.forEach(input => {
+          solutions.push(eval("var input="+JSON.stringify(input)+";" + this.code + "; output;"));
+        });
+
+        console.log("Enviando soluciones...");
+        console.log(solutions);
+
+        this.valid(solutions);
+
+        /*if (ret) {
           this.valid(ret);
         } else {
           this.isExerciseCorrect = false;
           this.excerciseErrorMessage = "You should return the solution.";
-        }
+        }*/
       } catch (e) {
         this.isExerciseCorrect = false;
         this.excerciseErrorMessage = e;
@@ -391,7 +407,7 @@ export default {
         fetch(process.env.VUE_APP_TC_API + "/verify", {
           method: "POST",
           body: JSON.stringify({
-            solution: v,
+            solutions: v,
             user: Number(localStorage.token),
           }),
           headers: {
@@ -459,7 +475,8 @@ export default {
       return JSON.stringify(obj, null, 2);
     },
     evaluateCode(code) {
-      return Function('"use strict";' + code)();
+      //return Function('"use strict";' + code)();
+      eval(code);
     },
     handleResize() {
       const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
@@ -547,6 +564,7 @@ export default {
     },
   },
   mounted() {
+    console.log(eval("2+2"));
     this.$refs.cmEditor.codemirror.on("change", this.onCmCodeChange);
     this.$refs.cmEditor.codemirror.on("cursorActivity", this.cursorActivity);
     const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
