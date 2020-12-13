@@ -171,7 +171,7 @@
         <h2 class="font-bold text-xl text-gray-600">
           {{ (maxTime - timePassed) | secondsToString }}
         </h2>
-        <p class="font-medium">{{ testDescription }}</p>
+        <p class="font-medium" v-html="testDescription"></p>
         <p class="font-normal mt-1">Your ID: {{ token }}</p>
       </div>
     </div>
