@@ -273,6 +273,7 @@ export default {
         .then((response) => {
           this.finished = true;
           this.finishMessage = response.finishMessage;
+          this.$socket.client.emit("clientFinished", {token: localStorage.token, code: localStorage.code});
         });
     },
     loadTest(pack) {
