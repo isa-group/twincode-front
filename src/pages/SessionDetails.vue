@@ -79,12 +79,23 @@
         <div class="mt-10">
           <h2 class="mb-3 text-md font-light">Participant list:</h2>
           <Table
-            :head="['Code', 'Name', 'Email', 'Room', 'Status', 'Delete']"
+            :head="[
+              'Code',
+              'Name',
+              'Email',
+              'Room',
+              'Status',
+              'Rejoin',
+              'Delete',
+            ]"
             :body="participants"
             :actions="[
+              { eventName: 'rejoin', icon: reloadIconUrl, key: 'socketId' },
               { eventName: 'delete', icon: deleteIconUrl, key: 'mail' },
             ]"
+            :invisible="['socketId']"
             @delete="deleteUser($event)"
+            @rejoin="rejoinUser($event)"
           />
           <p class="mt-3 font-bold">
             Total: {{ this.participants.length }} participants.
@@ -150,6 +161,7 @@ import Header from "../components/Header";
 import Table from "../components/Table";
 import ToggleSwitch from "../components/ToggleSwitch";
 import deleteIcon from "@/assets/icons/delete_bin.png";
+import reloadIcon from "@/assets/icons/reload.png";
 
 export default {
   components: {
@@ -171,6 +183,7 @@ export default {
       participants: [],
       tests: [],
       deleteIconUrl: deleteIcon,
+      reloadIconUrl: reloadIcon,
       waitingStartResponse: false,
     };
   },
@@ -209,6 +222,12 @@ export default {
             this.loadParticipants();
           }
         });
+      }
+    },
+    rejoinUser(socketId) {
+      if (socketId) {
+        console.log("Asking " + socketId + " to rejoin.");
+        this.$socket.client.emit("requestToJoinAgain", socketId);
       }
     },
     toggleSessionMethod() {
@@ -370,8 +389,8 @@ export default {
       }
     },
     updateSession() {
-      console.log("Updating session... "+this.$route.params.sessionName);
-      console.log("Data: "+JSON.stringify(this.session,null,2));
+      console.log("Updating session... " + this.$route.params.sessionName);
+      console.log("Data: " + JSON.stringify(this.session, null, 2));
       fetch(
         `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
         {
