@@ -9,13 +9,18 @@
     </thead>
     <tbody ref="table">
       <tr
-        v-for="(row, index) in body"
-        :key="index"
-        :id="index"
-        :class="computeRowClass(index)"
+        v-for="(row, indexRow) in body"
+        :key="indexRow"
+        :id="indexRow"
+        :class="computeRowClass(indexRow)"
         @click="clickOnRow"
       >
-        <td v-for="(cell, index) in row" :key="index" class="border px-4 py-2">
+        <td
+          v-for="(cell, index) in row"
+          :key="index"
+          class="border px-4 py-2"
+          :class="invisible.includes(index) ? 'hidden' : ''"
+        >
           <span
             v-if="cell !== true && cell !== false"
             style="pointer-events: none"
@@ -35,7 +40,7 @@
           class="border px-4 py-2"
         >
           <img
-            @click="$emit(action.eventName, row[action.key])"
+            @click="$emit(action.eventName, body[indexRow][action.key])"
             :src="action.icon"
             class="w-5 cursor-pointer mx-auto"
           />
@@ -61,6 +66,10 @@ export default {
     body: Array,
     value: Number,
     actions: Array,
+    invisible: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {

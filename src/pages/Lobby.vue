@@ -147,6 +147,9 @@ export default {
       localStorage.setItem("user", JSON.stringify(val.user));
       localStorage.setItem("pairedTo", val.pairedTo);
     },
+    clientJoinAgain() {
+      this.performConnection();
+    },
   },
   methods: {
     onSubmit() {
@@ -163,17 +166,18 @@ export default {
         },
       }).then((response) => {
         if (response.status == 200) {
-          this.$socket.client.emit("clientReady", localStorage.getItem("code"));
-          this.$socket.client.emit(
-            "clientConnected",
-            localStorage.getItem("code")
-          );
-          localStorage.setItem("token", localStorage.getItem("code"));
-          this.waitingForPeer = true;
+          this.performConnection();
         } else if (response.status == 404) {
           this.invalidToken = true;
         }
       });
+    },
+    performConnection() {
+      console.log("Performing connection...");
+      this.$socket.client.emit("clientReady", localStorage.getItem("code"));
+      this.$socket.client.emit("clientConnected", localStorage.getItem("code"));
+      localStorage.setItem("token", localStorage.getItem("code"));
+      this.waitingForPeer = true;
     },
   },
 };
