@@ -184,6 +184,38 @@ import { codemirror } from "vue-codemirror";
 import "codemirror/mode/javascript/javascript.js";
 import "codemirror/lib/codemirror.css";
 
+function dbg(msg, obj, fields) {
+  
+  function replacer(key, value) {
+    const originalObject = this[key];
+    if(originalObject instanceof Map) {
+      return {
+        dataType: 'Map',
+        value: Array.from(originalObject.entries()), 
+      };
+    } else {
+      return value;
+    }
+  }
+
+  if(obj){
+    if(fields && Array.isArray(fields)){
+      var logObj = {};
+      for (const field in obj) {
+        if(fields.includes(field))
+          logObj[field] = obj[field];
+      }       
+      console.log("DEBUG - "+msg+" <"+JSON.stringify(logObj,replacer).slice(0, -1)+",...}>"); 
+    }else{
+      console.log("DEBUG - "+msg+" <"+JSON.stringify(obj,replacer)+">");
+    }
+
+  } else{
+      console.log("DEBUG - "+msg);
+  }
+
+}
+
 export default {
   components: {
     codemirror,
@@ -222,7 +254,9 @@ export default {
       token: localStorage.getItem("code"),
       println: window.println,
       logs: window.logs,
-      inputs: null
+      inputs: null,
+      peerSocketId: null,
+      updateCodeEventActive: true
     };
   },
   filters: {
@@ -235,6 +269,7 @@ export default {
   },
   sockets: {
     msg(pack) {
+      dbg("EVENT msg",pack);
       if (pack.uid != this.uid && pack.rid == this.rid) {
         console.log(
           "newMsg event triggered with data <" + this.toJSON(pack) + "> "
@@ -243,24 +278,22 @@ export default {
       }
     },
     refreshCode(pack) {
-      console.log(
-        "text event triggered with data <" + this.toJSON(pack) + "> "
-      );
+      dbg("EVENT refreshCode",pack);
+
+      // Too expensive Debug log
+      //console.log("text event triggered with data <" + this.toJSON(pack) + "> ");
+
       this.$refs.cmEditor.codemirror.replaceRange(
         pack.change.text,
         pack.change.from,
         pack.change.to,
         "server"
       );
-      /*if (pack.uid != this.uid && pack.rid == this.rid) {
-        this.lastReceived = pack.data;
-        this.code = pack.data;
-        console.log("  --> Updating code!");
-      } else {
-        console.log("  --> Ignored!");
-      }*/
+     
     },
     finish() {
+      dbg("EVENT finish");
+      console.log("EVENT finish trigered!");
       fetch(
         process.env.VUE_APP_TC_API + "/finishMessage?code=" + localStorage.code,
         {
@@ -277,6 +310,7 @@ export default {
         });
     },
     loadTest(pack) {
+      dbg("EVENT loadTest",pack);
       this.finished = false;
       this.loadingTest = true;
       this.starting = false;
@@ -287,11 +321,14 @@ export default {
       this.clearResult();
     },
     cursorActivity(data) {
+      dbg("EVENT cursorActivity",data);      
       this.cursorLeftPosition = data.left;
       this.cursorTopPosition = data.top;
       this.updateCursorLocation();
     },
     newExercise(pack) {
+      dbg("EVENT newExercise",pack);  
+
       this.loadingTest = false;
       this.starting = false;
       this.timePassed = 0;
@@ -306,11 +343,12 @@ export default {
       this.clearResult();
     },
     reconnect() {
+      dbg("EVENT reconnect");
       this.$socket.client.emit("clientReconnection", localStorage.token);
     },
     countDown(pack) {
+      //dbg("EVENT countDown",pack);
       this.timePassed = this.maxTime - pack.data;
-      console.log("Counting down!");
       let factor = 100 / this.maxTime;
       let width = parseFloat(this.$refs.timeBar.style.width, 10) - factor;
       this.$refs.timeBar.style.width = width + "%";
@@ -322,8 +360,35 @@ export default {
         this.$refs.timeBar.classList.add("bg-yellow-500");
       }
     },
+    requestBulkCodeEvent(peerSocketId){
+      dbg("EVENT requestBulkCodeEvent");
+      var currentCode =  this.$refs.cmEditor.codemirror.getValue();
+      dbg("EVENT requestBulkCodeEvent - code : \""+currentCode+"\"");
+      if(this.peerSocketId != peerSocketId){
+        this.peerSocketId = peerSocketId;
+        this.$socket.client.emit("bulkCode", this.pack({
+          peerSocketId:peerSocketId, 
+          code: currentCode
+        }));
+
+      }else{
+        dbg("EVENT requestBulkCodeEvent - IGNORED because peerSocketId didn't changed");
+      }
+    },
+    bulkCodeUpdate(code){
+      dbg("EVENT bulkCodeUpdate",code);
+      var currentCode =  this.$refs.cmEditor.codemirror.getValue();
+      console.log
+      if(currentCode != code){
+        this.updateCodeEventActive = false;
+        this.$refs.cmEditor.codemirror.setValue(code);
+        this.updateCodeEventActive = true;
+
+      }
+    }
   },
   created() {
+    dbg("created - init");
     var pathParams = window.location.pathname.split("/");
     this.rid = pathParams[3] + ":" + pathParams[2];
 
@@ -343,6 +408,7 @@ export default {
   },
   methods: {
     sendMessage() {
+      dbg("method sendMessage - init",this.myMessage);
       if (this.exerciseType == "PAIR") {
         this.newMessage(this.myMessage, true);
         this.$socket.client.emit("msg", this.pack(this.myMessage));
@@ -351,6 +417,7 @@ export default {
       }
     },
     newMessage(msg, mine) {
+      dbg("method newMessage - init",msg);
       const MessageClass = Vue.extend(Message);
       let gender = localStorage.getItem("pairedTo") === 'Female';
       gender = this.peerChange ? !gender : gender;
@@ -370,14 +437,18 @@ export default {
       container.scrollTop = container.scrollHeight;
     },
     validate() {
+      dbg("method validate - init",this.code);
       this.clearResult();
       try {
         var solutions = [];
+
         this.inputs.forEach(input => {
           solutions.push(eval("var input="+JSON.stringify(input)+";" + this.code + "; output;"));
         });
 
-        console.log("Enviando soluciones...");
+        console.log("Inputs: "+JSON.stringify(this.inputs));
+        console.log("Outputs: "+JSON.stringify(solutions));
+        
         console.log(solutions);
 
         this.valid(solutions);
@@ -395,6 +466,7 @@ export default {
       }
     },
     clearResult() {
+      dbg("method clearResult - init");
       this.isExerciseCorrect = null;
       this.excerciseErrorMessage  = "";
       this.returnValue = "";
@@ -403,12 +475,13 @@ export default {
       this.logs = window.logs;
     },
     valid(v) {
+      dbg("method valid - init",v);
       if (this.exerciseType != 'DEMO') {
         fetch(process.env.VUE_APP_TC_API + "/verify", {
           method: "POST",
           body: JSON.stringify({
             solutions: v,
-            user: Number(localStorage.token),
+            user: localStorage.token,
           }),
           headers: {
             "Content-Type": "application/json",
@@ -436,10 +509,12 @@ export default {
       console.log("cm ready!", cm);
     },
     exitDemo() {
+      dbg("method exitDemo - init");
       clearInterval(this.timeInterval);
       this.$router.go(-1);
     },
     loadDemoExercise() {
+      dbg("method loadDemoExercise - init");
       const demoExercise = JSON.parse(localStorage.demoExercise);
       this.starting = false;
       this.maxTime = demoExercise.time;
@@ -464,6 +539,7 @@ export default {
       },1000);
     },
     pack(data) {
+      dbg("method pack - init",data);
       return {
         rid: this.rid,
         uid: this.uid,
@@ -475,7 +551,6 @@ export default {
       return JSON.stringify(obj, null, 2);
     },
     evaluateCode(code) {
-      //return Function('"use strict";' + code)();
       eval(code);
     },
     handleResize() {
@@ -513,9 +588,11 @@ export default {
       console.log(elemento.scrollTop);
     },
     inputRead(i, c) {
-      this.$socket.client.emit("updateCode", c);
+      if(this.updateCodeEventActive)
+        this.$socket.client.emit("updateCode", c);
     },
     cursorActivity(doc) {
+      dbg("method cursorActivity - init");
       this.$socket.client.emit(
         "cursorActivity",
         doc.cursorCoords(false, "relative")
@@ -527,7 +604,8 @@ export default {
         change: c,
       };
       if (c.origin != "server") {
-        this.$socket.client.emit("updateCode", this.pack(changeObj));
+        if(this.updateCodeEventActive)
+          this.$socket.client.emit("updateCode", this.pack(changeObj));
       }
       this.firstLoad = false;
     },
@@ -564,7 +642,8 @@ export default {
     },
   },
   mounted() {
-    console.log(eval("2+2"));
+    dbg("mounted - init");
+
     this.$refs.cmEditor.codemirror.on("change", this.onCmCodeChange);
     this.$refs.cmEditor.codemirror.on("cursorActivity", this.cursorActivity);
     const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
@@ -592,7 +671,6 @@ export default {
      }
     });
 
-    console.log("the codemirror instance object", this.cm);
     this.$refs.timeBar.style.width = `${((this.maxTime - this.timePassed) /
       this.maxTime) *
       100}%`;
@@ -602,6 +680,7 @@ export default {
     }
   },
   beforeDestroy() {
+    dbg("beforeDestroy - init");
     window.removeEventListener("resize", this.handleScroll);
     const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
     if (elemento) {
