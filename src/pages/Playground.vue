@@ -41,7 +41,7 @@
             class="flex bg-green-200 p-3 mt-5 rounded-md border text-gray-800"
           >
             <p class="mt-1 text-black-900">
-              You got it right! Value returned: {{ returnValue }}
+              You got it right! Value returned: {{ returnValue }} <br/> Quality Score: <b>{{ twcc }}</b>
             </p>
             <div class="flex-grow text-right">
               <button @click="clearResult">
@@ -249,6 +249,7 @@ export default {
       maxTime: 0,
       timePassed: 0,
       isExerciseCorrect: null,
+      twcc:null,
       excerciseErrorMessage: "",
       returnValue: "",
       token: localStorage.getItem("code"),
@@ -482,6 +483,10 @@ export default {
           body: JSON.stringify({
             solutions: v,
             user: localStorage.token,
+            source: "function main(input) { "+
+                        this.$refs.cmEditor.codemirror.getValue()+
+                        "return output;"+
+                    "}"
           }),
           headers: {
             "Content-Type": "application/json",
@@ -490,6 +495,7 @@ export default {
           if (response.status == 200) {
             response.json().then((data) => {
               this.isExerciseCorrect = data.result;
+              this.twcc = data.twcc;
               this.returnValue = v;
             });
           }
