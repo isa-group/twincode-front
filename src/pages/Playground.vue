@@ -41,7 +41,7 @@
             class="flex bg-green-200 p-3 mt-5 rounded-md border text-gray-800"
           >
             <p class="mt-1 text-black-900">
-              You got it right! Value returned: {{ returnValue }} <br/> Quality Score: <b>{{ twcc }}</b>
+              You got it right! Value returned: {{ returnValue }} <br/> Quality Score: <strong>{{ twcc }}</strong> (the lower the better)
             </p>
             <div class="flex-grow text-right">
               <button @click="clearResult">
