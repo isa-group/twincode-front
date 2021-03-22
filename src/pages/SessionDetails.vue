@@ -210,7 +210,7 @@ export default {
       );
       if (r) {
         fetch(
-          `https://twincode-back-preprod.herokuapp.com//participants/${this.$route.params.sessionName}/${userEmail}`,
+          `https://twincode-back-preprod.herokuapp.com/participants/${this.$route.params.sessionName}/${userEmail}`,
           {
             method: "DELETE",
             headers: {
@@ -243,7 +243,7 @@ export default {
       console.log("Session starting...");
       this.waitingStartResponse = true;
       fetch(
-        `https://twincode-back-preprod.herokuapp.com//startSession/${this.$route.params.sessionName}`,
+        `https://twincode-back-preprod.herokuapp.com/startSession/${this.$route.params.sessionName}`,
         {
           method: "POST",
           headers: {
@@ -261,7 +261,7 @@ export default {
     },
     loadSession() {
       fetch(
-        `https://twincode-back-preprod.herokuapp.com//sessions/${this.$route.params.sessionName}`,
+        `https://twincode-back-preprod.herokuapp.com/sessions/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -307,7 +307,7 @@ export default {
     loadParticipants() {
       console.log("loading participants");
       fetch(
-        `https://twincode-back-preprod.herokuapp.com//participants/${this.$route.params.sessionName}`,
+        `https://twincode-back-preprod.herokuapp.com/participants/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -328,7 +328,7 @@ export default {
     },
     loadTests() {
       fetch(
-        `https://twincode-back-preprod.herokuapp.com//tests/${this.$route.params.sessionName}`,
+        `https://twincode-back-preprod.herokuapp.com/tests/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -372,7 +372,7 @@ export default {
       );
       if (r) {
         fetch(
-          `https://twincode-back-preprod.herokuapp.com//sessions/${this.$route.params.sessionName}`,
+          `https://twincode-back-preprod.herokuapp.com/sessions/${this.$route.params.sessionName}`,
           {
             method: "DELETE",
             headers: {
@@ -392,7 +392,7 @@ export default {
       console.log("Updating session... " + this.$route.params.sessionName);
       console.log("Data: " + JSON.stringify(this.session, null, 2));
       fetch(
-        `https://twincode-back-preprod.herokuapp.com//sessions/${this.$route.params.sessionName}`,
+        `https://twincode-back-preprod.herokuapp.com/sessions/${this.$route.params.sessionName}`,
         {
           method: "PUT",
           body: JSON.stringify(this.session),
@@ -409,7 +409,7 @@ export default {
     },
     toggleActivation() {
       fetch(
-        `https://twincode-back-preprod.herokuapp.com//sessions/${this.$route.params.sessionName}/toggleActivation`,
+        `https://twincode-back-preprod.herokuapp.com/sessions/${this.$route.params.sessionName}/toggleActivation`,
         {
           method: "PUT",
           headers: {
