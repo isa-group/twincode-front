@@ -148,7 +148,7 @@ export default {
   methods: {
     loadTests() {
       fetch(
-        `https://twincode-preprod.netlify.app//tests/${this.$route.params.sessionName}`,
+        `https://twincode-preprod.netlify.app/tests/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -179,7 +179,7 @@ export default {
     },
     loadReport(test, exercise) {
       fetch(
-        `https://twincode-preprod.netlify.app//tests/${this.$route.params.sessionName}/${test}/${exercise}/reports`,
+        `https://twincode-preprod.netlify.app/tests/${this.$route.params.sessionName}/${test}/${exercise}/reports`,
         {
           method: "GET",
           headers: {
@@ -212,7 +212,7 @@ export default {
         });
     },
     loadReports(user, room) {
-      fetch(`https://twincode-preprod.netlify.app//users/${user}/reports`, {
+      fetch(`https://twincode-preprod.netlify.app/users/${user}/reports`, {
         method: "GET",
         headers: {
           Authorization: localStorage.adminSecret,
@@ -230,7 +230,7 @@ export default {
         });
     },
     callData(sessionName, type) {
-      fetch(`https://twincode-preprod.netlify.app//sessions/${sessionName}/${type}`, {
+      fetch(`https://twincode-preprod.netlify.app/sessions/${sessionName}/${type}`, {
         method: "GET",
         headers: {
           Authorization: localStorage.adminSecret,

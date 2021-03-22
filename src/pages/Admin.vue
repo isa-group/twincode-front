@@ -132,7 +132,7 @@ export default {
       session.name = this.newSession.name;
       session.tokenPairing = this.newSession.tokenPairing;
       console.log(session);
-      fetch(`https://twincode-preprod.netlify.app//sessions`, {
+      fetch(`https://twincode-preprod.netlify.app/sessions`, {
         method: "POST",
         headers: {
           Authorization: localStorage.adminSecret,
@@ -168,7 +168,7 @@ export default {
       }, 1000);
     },
     logIn() {
-      fetch(`https://twincode-preprod.netlify.app//sessions`, {
+      fetch(`https://twincode-preprod.netlify.app/sessions`, {
         method: "GET",
         headers: {
           Authorization: localStorage.adminSecret,
