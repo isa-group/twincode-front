@@ -151,21 +151,59 @@
                 "
               />
             </div>
-            <div class="mt-4 max-w-xl mx-auto">
+            <div class="mt-4 max-w-xl mx-auto border: 1px">
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
                 for="solution"
               >
-                Solution:
+                Validations:
               </label>
-              <input
+              <button
+                class="inline right-0 p-2 rounded-md bg-gray-100 border px-9 text-gray-800"
+                @click="newSolution()"
+              >New Solution</button>
+              <div
+                ><br>
+               
+                <li v-for="(val,index) in tests[selectedTest].exercises[selectedExerciseIndex].validations" :key="index">                   
+                    <label
+                      :id="`inputLabel-${index}`"
+                      class="align-middle text-gray-700 text-sm font-bold mb-2"
+                      for="type">
+                      Inputs:
+                    </label>
+                    <input 
+                      class="ml-2 appearance-none border rounded py-2 px-2 w-30 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      :id="`inputInput-${index}`"
+                      type="text"
+                      :value="val.input"
+                    />
+                    <label
+                      :id="`solutionLabel-${index}`"
+                      class="align-middle text-gray-700 text-sm font-bold mb-2"
+                      for="type"
+                    >
+                      Solutions:
+                    </label>
+                    <input
+                      :id="`solutionInput-${index}`" 
+                      class="ml-2 appearance-none border rounded py-2 px-1 w-30 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      type="text"
+                      :value="val.solution"
+
+                    />
+<br>
+                </li>
+              </div>
+               
+              <!-- <input
                 class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="solution"
                 type="number"
                 v-model.number="
                   tests[selectedTest].exercises[selectedExerciseIndex].solution
                 "
-              />
+              /> -->
             </div>
             <div class="mt-4 max-w-xl mx-auto">
               <label
@@ -249,9 +287,11 @@ export default {
       participants: [],
       orderedTests: [],
       tests: [],
+      validations: [{input:"",solution:""}],
       selectedTest: 0,
       selectedExerciseIndex: 0,
       selectedExercise: {},
+      selectedValidation: {},
     };
   },
   methods: {
@@ -332,6 +372,7 @@ export default {
               let totalTime = 0;
               test.exercises.forEach((exercise) => {
                 totalTime += exercise.time;
+                console.log(exercise);
               });
               orderedTest.totalTime = totalTime;
               orderedTests.push(orderedTest);
@@ -342,11 +383,49 @@ export default {
         });
     },
     createExercise() {
+      // console.log(this.tests);
       this.selectedExercise = this.tests[this.selectedTest].exercises.push({
         name: "New exercise",
         description: "",
-        solution: 0,
         time: 100,
+        validations: [{input:"",solution:""}]
+        // validations: [inputs,validations]
+      });
+    },
+    newSolution() {
+      // console.log(
+      //   this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].validations
+      // );
+      // console.log(this.tests[selectedTest].exercises[selectedExerciseIndex]);
+      this.selectedValidation = this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].validations.push({
+        input: "",
+        solution: ""
+      });
+
+      // console.log(
+      //   this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].validations
+      // );
+    },
+    postValidations() {
+       fetch(`${process.env.VUE_APP_TC_API}/tests`, {
+        method: "POST",
+        headers: {
+          Authorization: localStorage.adminSecret,
+          "Content-Type": "application/json",
+       },
+        body: JSON.stringify({
+          session: this.$route.params.sessionName,
+          name: "New Test",
+          description: "A new test begins",
+          time: 5,
+          peerChange: false,
+          orderNumber: this.orderedTests.length,
+          exercises: [],
+        }),
+      }).then((response) => {
+        if (response.status == 200) {
+          this.loadTests();
+        }
       });
     },
     createTest() {
