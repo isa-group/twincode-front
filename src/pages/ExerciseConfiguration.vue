@@ -305,7 +305,7 @@ export default {
     },
     loadSession() {
       fetch(
-        `https://twincode-preprod.netlify.app/sessions/${this.$route.params.sessionName}`,
+        `https://twincode-back-preprod.herokuapp.com//sessions/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -328,7 +328,7 @@ export default {
     },
     loadParticipants() {
       fetch(
-        `https://twincode-preprod.netlify.app/participants/${this.$route.params.sessionName}`,
+        `https://twincode-back-preprod.herokuapp.com//participants/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -349,7 +349,7 @@ export default {
     },
     loadTests() {
       fetch(
-        `https://twincode-preprod.netlify.app/tests/${this.$route.params.sessionName}`,
+        `https://twincode-back-preprod.herokuapp.com//tests/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -407,7 +407,7 @@ export default {
       // );
     },
     postValidations() {
-       fetch(`https://twincode-preprod.netlify.app/tests`, {
+       fetch(`https://twincode-back-preprod.herokuapp.com//tests`, {
         method: "POST",
         headers: {
           Authorization: localStorage.adminSecret,
@@ -429,7 +429,7 @@ export default {
       });
     },
     createTest() {
-      fetch(`https://twincode-preprod.netlify.app/tests`, {
+      fetch(`https://twincode-back-preprod.herokuapp.com//tests`, {
         method: "POST",
         headers: {
           Authorization: localStorage.adminSecret,
@@ -452,7 +452,7 @@ export default {
     },
     updateTest() {
       fetch(
-        `https://twincode-preprod.netlify.app/tests/${this.$route.params.sessionName}`,
+        `https://twincode-back-preprod.herokuapp.com//tests/${this.$route.params.sessionName}`,
         {
           method: "PUT",
           headers: {
@@ -475,7 +475,7 @@ export default {
     },
     removeTest() {
       fetch(
-        `https://twincode-preprod.netlify.app/tests/${this.$route.params.sessionName}/${this.selectedTest}`,
+        `https://twincode-back-preprod.herokuapp.com//tests/${this.$route.params.sessionName}/${this.selectedTest}`,
         {
           method: "DELETE",
           headers: {
