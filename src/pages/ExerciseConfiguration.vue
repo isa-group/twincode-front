@@ -305,7 +305,7 @@ export default {
     },
     loadSession() {
       fetch(
-        `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
+        `https://twincode-preprod.netlify.app//sessions/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -328,7 +328,7 @@ export default {
     },
     loadParticipants() {
       fetch(
-        `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}`,
+        `https://twincode-preprod.netlify.app//participants/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -349,7 +349,7 @@ export default {
     },
     loadTests() {
       fetch(
-        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
+        `https://twincode-preprod.netlify.app//tests/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -407,7 +407,7 @@ export default {
       // );
     },
     postValidations() {
-       fetch(`${process.env.VUE_APP_TC_API}/tests`, {
+       fetch(`https://twincode-preprod.netlify.app//tests`, {
         method: "POST",
         headers: {
           Authorization: localStorage.adminSecret,
@@ -429,7 +429,7 @@ export default {
       });
     },
     createTest() {
-      fetch(`${process.env.VUE_APP_TC_API}/tests`, {
+      fetch(`https://twincode-preprod.netlify.app//tests`, {
         method: "POST",
         headers: {
           Authorization: localStorage.adminSecret,
@@ -452,7 +452,7 @@ export default {
     },
     updateTest() {
       fetch(
-        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
+        `https://twincode-preprod.netlify.app//tests/${this.$route.params.sessionName}`,
         {
           method: "PUT",
           headers: {
@@ -475,7 +475,7 @@ export default {
     },
     removeTest() {
       fetch(
-        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}/${this.selectedTest}`,
+        `https://twincode-preprod.netlify.app//tests/${this.$route.params.sessionName}/${this.selectedTest}`,
         {
           method: "DELETE",
           headers: {

@@ -210,7 +210,7 @@ export default {
       );
       if (r) {
         fetch(
-          `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/${userEmail}`,
+          `https://twincode-preprod.netlify.app//participants/${this.$route.params.sessionName}/${userEmail}`,
           {
             method: "DELETE",
             headers: {
@@ -243,7 +243,7 @@ export default {
       console.log("Session starting...");
       this.waitingStartResponse = true;
       fetch(
-        `${process.env.VUE_APP_TC_API}/startSession/${this.$route.params.sessionName}`,
+        `https://twincode-preprod.netlify.app//startSession/${this.$route.params.sessionName}`,
         {
           method: "POST",
           headers: {
@@ -261,7 +261,7 @@ export default {
     },
     loadSession() {
       fetch(
-        `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
+        `https://twincode-preprod.netlify.app//sessions/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -307,7 +307,7 @@ export default {
     loadParticipants() {
       console.log("loading participants");
       fetch(
-        `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}`,
+        `https://twincode-preprod.netlify.app//participants/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -328,7 +328,7 @@ export default {
     },
     loadTests() {
       fetch(
-        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
+        `https://twincode-preprod.netlify.app//tests/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -372,7 +372,7 @@ export default {
       );
       if (r) {
         fetch(
-          `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
+          `https://twincode-preprod.netlify.app//sessions/${this.$route.params.sessionName}`,
           {
             method: "DELETE",
             headers: {
@@ -392,7 +392,7 @@ export default {
       console.log("Updating session... " + this.$route.params.sessionName);
       console.log("Data: " + JSON.stringify(this.session, null, 2));
       fetch(
-        `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
+        `https://twincode-preprod.netlify.app//sessions/${this.$route.params.sessionName}`,
         {
           method: "PUT",
           body: JSON.stringify(this.session),
@@ -409,7 +409,7 @@ export default {
     },
     toggleActivation() {
       fetch(
-        `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}/toggleActivation`,
+        `https://twincode-preprod.netlify.app//sessions/${this.$route.params.sessionName}/toggleActivation`,
         {
           method: "PUT",
           headers: {
