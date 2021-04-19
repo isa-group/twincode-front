@@ -255,6 +255,7 @@ export default {
       token: localStorage.getItem("code"),
       println: window.println,
       logs: window.logs,
+      validations: null,
       inputs: null,
       peerSocketId: null,
       updateCodeEventActive: true
@@ -318,6 +319,7 @@ export default {
       this.testDescription = pack.data.testDescription;
       this.peerChange = pack.data.peerChange;
       this.$refs.messageContainer.innerHTML = "";
+      this.validations = pack.data.validations;
       this.code = "";
       this.clearResult();
     },
@@ -442,17 +444,21 @@ export default {
       this.clearResult();
       try {
         var solutions = [];
-
-        this.inputs.forEach(input => {
-          solutions.push(eval("var input="+JSON.stringify(input)+";" + this.code + "; output;"));
+        this.validations.forEach(val => {
+          solutions.push(eval("var input="+JSON.stringify(val.input)+";" + this.code + "; output;"));
         });
+        // this.inputs.forEach(input => {
+        //   solutions.push(eval("var input="+JSON.stringify(input)+";" + this.code + "; output;"));
+        // });
+        this.validations.forEach((input) => {
+          console.log("Input: "+JSON.stringify(input.input));
 
-        console.log("Inputs: "+JSON.stringify(this.inputs));
+        });
         console.log("Outputs: "+JSON.stringify(solutions));
         
         console.log(solutions);
 
-        this.valid(solutions);
+        this.valid(solutions[0]);
 
         /*if (ret) {
           this.valid(ret);
@@ -501,7 +507,12 @@ export default {
           }
         });
       } else {
-        this.isExerciseCorrect = JSON.parse(localStorage.demoExercise).solution === v;
+        this.isExerciseCorrect = false;
+        JSON.parse(localStorage.demoExercise).validations.forEach((val) => {
+          if(val.solution == v){
+            this.isExerciseCorrect = true;
+          }
+        });
         this.returnValue = v;
       }
     },
@@ -525,6 +536,7 @@ export default {
       this.starting = false;
       this.maxTime = demoExercise.time;
       this.exerciseDescription = demoExercise.description;
+      this.validations = demoExercise.validations;
       this.exerciseType = "DEMO"
       this.timeInterval = setInterval(() => {
         this.timePassed++;

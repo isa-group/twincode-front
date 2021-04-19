@@ -127,7 +127,7 @@
               </label>
               <input
                 class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description"
+                :id="`exerciseName${selectedExerciseIndex}`"
                 type="text"
                 v-model="
                   tests[selectedTest].exercises[selectedExerciseIndex].name
@@ -143,7 +143,7 @@
               </label>
               <textarea
                 class="ml-2 appearance-none border rounded py-2 px-3 w-10/12 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="description"
+                :id="`exerciseDescription${selectedExerciseIndex}`"
                 type="text"
                 v-model="
                   tests[selectedTest].exercises[selectedExerciseIndex]
@@ -158,44 +158,61 @@
               >
                 Validations:
               </label>
+              <input
+                class="ml-2 appearance-none border rounded py-1 px-2 w-20 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                :id="`inputNewInput`"
+                type="text"
+              />
+              <input
+                class="ml-2 appearance-none border rounded py-1 px-2 w-20 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                :id="`inputNewSolution`"
+                type="text"
+              />
               <button
                 class="inline right-0 p-2 rounded-md bg-gray-100 border px-9 text-gray-800"
                 @click="newSolution()"
-              >New Solution</button>
-              <div
-                ><br>
-               
-                <li v-for="(val,index) in tests[selectedTest].exercises[selectedExerciseIndex].validations" :key="index">                   
-                    <label
-                      :id="`inputLabel-${index}`"
-                      class="align-middle text-gray-700 text-sm font-bold mb-2"
-                      for="type">
-                      Inputs:
-                    </label>
-                    <input 
-                      class="ml-2 appearance-none border rounded py-2 px-2 w-30 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                      :id="`inputInput-${index}`"
-                      type="text"
-                      :value="val.input"
-                    />
-                    <label
-                      :id="`solutionLabel-${index}`"
-                      class="align-middle text-gray-700 text-sm font-bold mb-2"
-                      for="type"
-                    >
-                      Solutions:
-                    </label>
-                    <input
-                      :id="`solutionInput-${index}`" 
-                      class="ml-2 appearance-none border rounded py-2 px-1 w-30 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                      type="text"
-                      :value="val.solution"
+              >
+                New Solution
+              </button>
+              <div :id="`ex${selectedExerciseIndex}validations`">
+                <br />
 
-                    />
-<br>
+                <li
+                  v-for="(val, index) in tests[selectedTest].exercises[
+                    selectedExerciseIndex
+                  ].validations"
+                  :key="index"
+                >
+                  <label
+                    :id="`inputLabel-${index}`"
+                    class="align-middle text-gray-700 text-sm font-bold mb-2"
+                    for="type"
+                  >
+                    Input:
+                  </label>
+                  <input
+                    class="ml-2 appearance-none border rounded py-2 px-2 w-30 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    :id="`ex${selectedExerciseIndex}validationInput-${index}`"
+                    type="text"
+                    :value="val.input"
+                  />
+                  <label
+                    :id="`solutionLabel-${index}`"
+                    class="align-middle text-gray-700 text-sm font-bold mb-2"
+                    for="type"
+                  >
+                    Solution:
+                  </label>
+                  <input
+                    :id="`ex${selectedExerciseIndex}validationSolution-${index}`"
+                    class="ml-2 appearance-none border rounded py-2 px-1 w-30 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="text"
+                    :value="val.solution"
+                  />
+                  <br />
                 </li>
               </div>
-               
+
               <!-- <input
                 class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="solution"
@@ -214,7 +231,7 @@
               </label>
               <input
                 class="ml-2 appearance-none border rounded py-2 px-3 w-20 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="time"
+                :id="`ex${selectedExerciseIndex}Time`"
                 type="number"
                 v-model.number="
                   tests[selectedTest].exercises[selectedExerciseIndex].time
@@ -231,7 +248,7 @@
               </label>
               <input
                 class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="type"
+                :id="`ex${selectedExerciseIndex}Type`"
                 type="text"
                 v-model="
                   tests[selectedTest].exercises[selectedExerciseIndex].type
@@ -252,12 +269,6 @@
                 </p>
               </button>
               <button
-                class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
-                @click="updateTest()"
-              >
-                Update exercise
-              </button>
-              <button
                 class="mt-3 rounded-full bg-gray-100 hover:bg-red-200 border hover:border-red-300 p-2 px-5 absolute right-0 bottom-0 focus:outline-none focus:shadow-outline"
                 @click="removeExercise()"
               >
@@ -265,6 +276,12 @@
               </button>
             </div>
           </div>
+          <button
+            class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            @click="updateTest()"
+          >
+            Update test
+          </button>
         </div>
       </div>
     </div>
@@ -287,7 +304,6 @@ export default {
       participants: [],
       orderedTests: [],
       tests: [],
-      validations: [{input:"",solution:""}],
       selectedTest: 0,
       selectedExerciseIndex: 0,
       selectedExercise: {},
@@ -305,7 +321,7 @@ export default {
     },
     loadSession() {
       fetch(
-        `https://twincode-back-preprod.herokuapp.com/sessions/${this.$route.params.sessionName}`,
+        `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -328,7 +344,7 @@ export default {
     },
     loadParticipants() {
       fetch(
-        `https://twincode-back-preprod.herokuapp.com/participants/${this.$route.params.sessionName}`,
+        `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -349,7 +365,7 @@ export default {
     },
     loadTests() {
       fetch(
-        `https://twincode-back-preprod.herokuapp.com/tests/${this.$route.params.sessionName}`,
+        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -372,7 +388,6 @@ export default {
               let totalTime = 0;
               test.exercises.forEach((exercise) => {
                 totalTime += exercise.time;
-                console.log(exercise);
               });
               orderedTest.totalTime = totalTime;
               orderedTests.push(orderedTest);
@@ -386,33 +401,26 @@ export default {
       // console.log(this.tests);
       this.selectedExercise = this.tests[this.selectedTest].exercises.push({
         name: "New exercise",
-        description: "",
+        description: "New description",
         time: 100,
-        validations: [{input:"",solution:""}]
-        // validations: [inputs,validations]
+        validations: [{ input: "", solution: "" }],
       });
     },
     newSolution() {
-      // console.log(
-      //   this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].validations
-      // );
-      // console.log(this.tests[selectedTest].exercises[selectedExerciseIndex]);
-      this.selectedValidation = this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].validations.push({
-        input: "",
-        solution: ""
+      this.selectedValidation = this.tests[this.selectedTest].exercises[
+        this.selectedExerciseIndex
+      ].validations.push({
+        input: document.getElementById("inputNewInput").value,
+        solution: document.getElementById("inputNewSolution").value,
       });
-
-      // console.log(
-      //   this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].validations
-      // );
     },
     postValidations() {
-       fetch(`https://twincode-back-preprod.herokuapp.com/tests`, {
+      fetch(`${process.env.VUE_APP_TC_API}/tests`, {
         method: "POST",
         headers: {
           Authorization: localStorage.adminSecret,
           "Content-Type": "application/json",
-       },
+        },
         body: JSON.stringify({
           session: this.$route.params.sessionName,
           name: "New Test",
@@ -429,7 +437,7 @@ export default {
       });
     },
     createTest() {
-      fetch(`https://twincode-back-preprod.herokuapp.com/tests`, {
+      fetch(`${process.env.VUE_APP_TC_API}/tests`, {
         method: "POST",
         headers: {
           Authorization: localStorage.adminSecret,
@@ -451,17 +459,81 @@ export default {
       });
     },
     updateTest() {
+      try {
+        var array = Array.from(
+          document
+            .getElementById("ex" + this.selectedExerciseIndex + "validations")
+            .getElementsByTagName("li")
+        );
+        var finalValidations = [];
+        array.forEach((e) => {
+          finalValidations.push({
+            input: Array.from(e.getElementsByTagName("input"))[0].value,
+            solution: Array.from(e.getElementsByTagName("input"))[1].value,
+          });
+        });
+      } catch (e) {
+        console.log("No exercises found: " + e.toString());
+        fetch(
+          `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: localStorage.adminSecret,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              session: this.$route.params.sessionName,
+              name: document.getElementById("name").value,
+              description: document.getElementById("description").value,
+              time: document.getElementById("time").value,
+              peerChange: document.getElementById("peerChange").checked,
+              orderNumber: this.selectedTest,
+              exercises: [],
+            }),
+          }
+        ).then((response) => {
+          if (response.status == 200) {
+            this.loadTests();
+          }
+        });
+      }
       fetch(
-        `https://twincode-back-preprod.herokuapp.com/tests/${this.$route.params.sessionName}`,
+        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
         {
           method: "PUT",
           headers: {
             Authorization: localStorage.adminSecret,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(this.tests[this.selectedTest]),
+          body: JSON.stringify({
+            session: this.$route.params.sessionName,
+            name: document.getElementById("name").value,
+            description: document.getElementById("description").value,
+            time: document.getElementById("time").value,
+            peerChange: document.getElementById("peerChange").checked,
+            orderNumber: this.selectedTest,
+            exercises: [
+              {
+                name: document.getElementById(
+                  "exerciseName" + this.selectedExerciseIndex
+                ).value,
+                description: document.getElementById(
+                  "exerciseDescription" + this.selectedExerciseIndex
+                ).value,
+                time: document.getElementById(
+                  "ex" + this.selectedExerciseIndex + "Time"
+                ).value,
+                type: document.getElementById(
+                  "ex" + this.selectedExerciseIndex + "Type"
+                ).value,
+                validations: finalValidations,
+              },
+            ],
+          }),
         }
       ).then((response) => {
+        console.log("whatever");
         if (response.status == 200) {
           this.loadTests();
         }
@@ -475,7 +547,7 @@ export default {
     },
     removeTest() {
       fetch(
-        `https://twincode-back-preprod.herokuapp.com/tests/${this.$route.params.sessionName}/${this.selectedTest}`,
+        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}/${this.selectedTest}`,
         {
           method: "DELETE",
           headers: {

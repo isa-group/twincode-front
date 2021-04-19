@@ -148,7 +148,7 @@ export default {
   methods: {
     loadTests() {
       fetch(
-        `https://twincode-back-preprod.herokuapp.com/tests/${this.$route.params.sessionName}`,
+        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
         {
           method: "GET",
           headers: {
@@ -179,7 +179,7 @@ export default {
     },
     loadReport(test, exercise) {
       fetch(
-        `https://twincode-back-preprod.herokuapp.com/tests/${this.$route.params.sessionName}/${test}/${exercise}/reports`,
+        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}/${test}/${exercise}/reports`,
         {
           method: "GET",
           headers: {
@@ -212,7 +212,7 @@ export default {
         });
     },
     loadReports(user, room) {
-      fetch(`https://twincode-back-preprod.herokuapp.com/users/${user}/reports`, {
+      fetch(`${process.env.VUE_APP_TC_API}/users/${user}/reports`, {
         method: "GET",
         headers: {
           Authorization: localStorage.adminSecret,
@@ -230,7 +230,7 @@ export default {
         });
     },
     callData(sessionName, type) {
-      fetch(`https://twincode-back-preprod.herokuapp.com/sessions/${sessionName}/${type}`, {
+      fetch(`${process.env.VUE_APP_TC_API}/sessions/${sessionName}/${type}`, {
         method: "GET",
         headers: {
           Authorization: localStorage.adminSecret,
