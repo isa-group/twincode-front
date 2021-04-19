@@ -168,7 +168,6 @@ export default {
       }, 1000);
     },
     logIn() {
-      console.log(localStorage.adminSecret);
       fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
         method: "GET",
         headers: {
