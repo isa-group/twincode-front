@@ -170,9 +170,9 @@
               />
               <button
                 class="inline right-0 p-2 rounded-md bg-gray-100 border px-9 text-gray-800"
-                @click="newSolution()"
+                @click="newValidation()"
               >
-                New Solution
+                New Validation
               </button>
               <div :id="`ex${selectedExerciseIndex}validations`">
                 <br />
@@ -191,7 +191,7 @@
                     Input:
                   </label>
                   <input
-                    class="ml-2 appearance-none border rounded py-2 px-2 w-30 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    class="ml-2 appearance-none border rounded py-2 px-2 w-20 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     :id="`ex${selectedExerciseIndex}validationInput-${index}`"
                     type="text"
                     :value="val.input"
@@ -205,11 +205,17 @@
                   </label>
                   <input
                     :id="`ex${selectedExerciseIndex}validationSolution-${index}`"
-                    class="ml-2 appearance-none border rounded py-2 px-1 w-30 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    class="ml-2 appearance-none border rounded py-2 px-2 w-10 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                     type="text"
                     :value="val.solution"
                   />
-                  <br />
+
+                  <button
+                    class="btn-3 rounded-full hover:bg-red-200 right-0 p-2 px-3"
+                    @click="removeValidation(`${index}`)"
+                  >
+                    <img src="@/assets/icons/delete_bin.png" class="w-5" />
+                  </button>
                 </li>
               </div>
 
@@ -254,6 +260,20 @@
                   tests[selectedTest].exercises[selectedExerciseIndex].type
                 "
               />
+              <label
+                class="align-middle text-gray-700 text-sm font-bold mb-2"
+                for="type"
+              >
+                Language:
+              </label>
+              <select
+                class="ml-2 appearance-none border rounded py-2 px-3 w-30 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                name="Choose the Language"
+                id="language"
+              >
+                <option selected value="JavaScript">JavaScript</option>
+                <option value="Python">Python</option>
+              </select>
             </div>
             <div class="mt-4 max-w-xl mx-auto relative">
               <button
@@ -306,8 +326,9 @@ export default {
       tests: [],
       selectedTest: 0,
       selectedExerciseIndex: 0,
-      selectedExercise: {},
+      selectedExercise: 0,
       selectedValidation: {},
+      language: "",
     };
   },
   methods: {
@@ -315,6 +336,9 @@ export default {
       localStorage.demoExercise = JSON.stringify(
         this.tests[this.selectedTest].exercises[this.selectedExerciseIndex]
       );
+      var language = document.getElementById("language").value;
+      console.log(language);
+      localStorage.setItem("language", language);
       this.$router.push({
         path: `/playground`,
       });
@@ -398,43 +422,79 @@ export default {
         });
     },
     createExercise() {
-      // console.log(this.tests);
-      this.selectedExercise = this.tests[this.selectedTest].exercises.push({
-        name: "New exercise",
-        description: "New description",
-        time: 100,
-        validations: [{ input: "", solution: "" }],
-      });
-    },
-    newSolution() {
-      this.selectedValidation = this.tests[this.selectedTest].exercises[
-        this.selectedExerciseIndex
-      ].validations.push({
-        input: document.getElementById("inputNewInput").value,
-        solution: document.getElementById("inputNewSolution").value,
-      });
-    },
-    postValidations() {
-      fetch(`${process.env.VUE_APP_TC_API}/tests`, {
-        method: "POST",
+      var name = this.tests[this.selectedTest].name;
+      fetch(`${process.env.VUE_APP_TC_API}/tests/` + name + "/exercises", {
+        method: "PUT",
         headers: {
           Authorization: localStorage.adminSecret,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          session: this.$route.params.sessionName,
-          name: "New Test",
-          description: "A new test begins",
+          name: "New Exercise",
+          description: "A new exercise",
           time: 5,
-          peerChange: false,
-          orderNumber: this.orderedTests.length,
-          exercises: [],
+          type: "",
+          validations: [],
         }),
       }).then((response) => {
         if (response.status == 200) {
           this.loadTests();
         }
       });
+      this.selectedExercise = this.tests[this.selectedTest].exercises.push({
+        name: "New exercise",
+        description: "New description",
+        time: 100,
+        validations: [],
+      });
+    },
+    newValidation() {
+      var input = parseInt(document.getElementById("inputNewInput").value);
+      var solution = parseInt(document.getElementById("inputNewSolution").value);
+      var contains = false;
+      Array.from(
+        this.tests[this.selectedTest].exercises[
+          this.selectedExerciseIndex
+        ].validations).forEach((e) => {
+          if (e.input == input) {
+            contains= true;
+          }
+        }
+      );
+      if (input == "" || isNaN( input) || solution == "" || isNaN(solution)) {
+        console.error("Input or Solution cannot be empty");
+      } else if (contains) {
+        console.error("That input already exists");
+      } else {
+        fetch(
+          `${process.env.VUE_APP_TC_API}/tests/` +
+            this.tests[this.selectedTest].name +
+            "/exercises/" +
+            this.selectedExerciseIndex +
+            "/validations",
+          {
+            method: "POST",
+            headers: {
+              Authorization: localStorage.adminSecret,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              input: input,
+              solution: solution,
+            }),
+          }
+        ).then((response) => {
+          if (response.status == 200) {
+            this.selectedValidation = this.tests[this.selectedTest].exercises[
+              this.selectedExerciseIndex
+            ].validations.push({
+              input: document.getElementById("inputNewInput").value,
+              solution: document.getElementById("inputNewSolution").value,
+            });
+            this.loadTests();
+          }
+        });
+      }
     },
     createTest() {
       fetch(`${process.env.VUE_APP_TC_API}/tests`, {
@@ -460,17 +520,27 @@ export default {
     },
     updateTest() {
       try {
-        var array = Array.from(
-          document
-            .getElementById("ex" + this.selectedExerciseIndex + "validations")
-            .getElementsByTagName("li")
-        );
         var finalValidations = [];
-        array.forEach((e) => {
-          finalValidations.push({
-            input: Array.from(e.getElementsByTagName("input"))[0].value,
-            solution: Array.from(e.getElementsByTagName("input"))[1].value,
+
+        this.tests[this.selectedTest].exercises.forEach((exercise, index) => {
+          var array = Array.from(
+            document
+              .getElementById("ex" + index + "validations")
+              .getElementsByTagName("li")
+          );
+          array.forEach((e) => {
+            finalValidations.push({
+              input: Array.from(e.getElementsByTagName("input"))[0].value,
+              solution: Array.from(e.getElementsByTagName("input"))[1].value,
+            });
           });
+          exercise.name = document.getElementById("exerciseName" + index).value;
+          exercise.description = document.getElementById(
+            "exerciseDescription" + index
+          ).value;
+          exercise.time = document.getElementById("ex" + index + "Time").value;
+          exercise.type = document.getElementById("ex" + index + "Type").value;
+          exercise.validations = finalValidations;
         });
       } catch (e) {
         console.log("No exercises found: " + e.toString());
@@ -513,23 +583,7 @@ export default {
             time: document.getElementById("time").value,
             peerChange: document.getElementById("peerChange").checked,
             orderNumber: this.selectedTest,
-            exercises: [
-              {
-                name: document.getElementById(
-                  "exerciseName" + this.selectedExerciseIndex
-                ).value,
-                description: document.getElementById(
-                  "exerciseDescription" + this.selectedExerciseIndex
-                ).value,
-                time: document.getElementById(
-                  "ex" + this.selectedExerciseIndex + "Time"
-                ).value,
-                type: document.getElementById(
-                  "ex" + this.selectedExerciseIndex + "Type"
-                ).value,
-                validations: finalValidations,
-              },
-            ],
+            exercises: this.tests[this.selectedTest].exercises,
           }),
         }
       ).then((response) => {
@@ -540,10 +594,49 @@ export default {
       });
     },
     removeExercise() {
-      this.tests[this.selectedTest].exercises.splice(
-        this.selectedExerciseIndex,
-        1
-      );
+      // var id = this.tests[this.selectedTest].exercises[this.selectedExerciseIndex]
+      fetch(
+        `${process.env.VUE_APP_TC_API}/tests/` +
+          this.tests[this.selectedTest].name +
+          "/exercises/" +
+          this.selectedExerciseIndex,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      ).then((response) => {
+        if (response.status == 200) {
+          this.tests[this.selectedTest].exercises.splice(
+            this.selectedExerciseIndex,
+            1
+          );
+          this.loadTests();
+        }
+      });
+    },
+    removeValidation(id) {
+      var name = this.tests[this.selectedTest].name;
+      fetch(
+        `${process.env.VUE_APP_TC_API}/tests/` +
+          name +
+          "/exercises/" +
+          this.selectedExerciseIndex+
+          "/validations/" +id,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      ).then((response) => {
+        if (response.status == 200) {
+          this.tests[this.selectedTest].exercises[this.selectedExercise]
+          .validations.splice(parseInt(id), 1);
+          this.loadTests();
+        }
+      });
     },
     removeTest() {
       fetch(
