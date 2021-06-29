@@ -191,14 +191,15 @@
               >
                 Type of exercise:
               </label>
-              <input
-                class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="type"
-                type="text"
+              <select
+                class="border rounded-sm ml-2 p-1"
                 v-model="
                   tests[selectedTest].exercises[selectedExerciseIndex].type
                 "
-              />
+              >
+                <option value="INDIVIDUAL">INDIVIDUAL</option>
+                <option value="PAIR">PAIR</option>
+              </select>
             </div>
             <div class="mt-4 max-w-xl mx-auto relative">
               <button
@@ -397,6 +398,7 @@ export default {
       ).then((response) => {
         if (response.status == 200) {
           this.loadTests();
+          window.alert("Exercise updated succesfully!");
         }
       });
     },
