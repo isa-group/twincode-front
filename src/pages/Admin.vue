@@ -9,14 +9,14 @@
           </h1>
         </div>
         <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-10 p-5">
-          <Card
-            v-for="(session, index) in sessions"
-            :key="index"
-            :environment="session.environment"
-            :sessionName="session.name"
-            :active="session.active"
-            :registeredUsers="session.users.length"
-          />
+            <Card 
+              v-for="(session, index) in sessions"
+              :key="index"
+              :environment="session.environment"
+              :sessionName="session.name"
+              :active="session.active"
+              :registeredUsers="session.users.length"
+            />
           <NewCard @newSession="showNewSessionModal()" />
         </div>
       </div>
@@ -145,6 +145,7 @@ export default {
             alert("Session created successfully");
             this.showModal = false;
           }
+          this.logIn();
           return response.json();
         })
         .then((response) => {
