@@ -38,27 +38,6 @@
           </div>
 
           <div class="mt-5">
-            <label>Pairing mode:</label>
-            <select
-              class="border rounded-sm ml-2 p-1"
-              v-model="session.pairingMode"
-            >
-              <option value="MANUAL">Manual</option>
-              <option value="AUTO">Automatic</option>
-            </select>
-          </div>
-
-          <div class="mt-5">
-            <input
-              v-model="session.tokenPairing"
-              type="checkbox"
-              class="border rounded-sm mr-2"
-            />
-            <label
-              >Participants with the same token cannot be paired together</label
-            >
-          </div>
-          <div class="mt-5">
             <input
               v-model="session.blindParticipant"
               type="checkbox"
