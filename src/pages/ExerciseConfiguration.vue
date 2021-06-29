@@ -228,6 +228,13 @@
             </div>
           </div>
         </div>
+          <button
+            class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            type="button"
+            @click="goBack()"
+          >
+            Go Back
+          </button>
       </div>
     </div>
   </div>
@@ -255,6 +262,11 @@ export default {
     };
   },
   methods: {
+    goBack() {
+      this.$router.push({
+        path: `/administration/sessions/${this.$route.params.sessionName}`,
+      });
+    },
     playDemoExercise() {
       localStorage.demoExercise = JSON.stringify(
         this.tests[this.selectedTest].exercises[this.selectedExerciseIndex]
