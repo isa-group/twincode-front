@@ -158,14 +158,8 @@
               >
                 Solution:
               </label>
-              <input
-                class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="solution"
-                type="number"
-                v-model.number="
-                  tests[selectedTest].exercises[selectedExerciseIndex].solution
-                "
-              />
+            <div id="loopSolutions"> </div>
+
             </div>
             <div class="mt-4 max-w-xl mx-auto">
               <label
@@ -352,7 +346,22 @@ export default {
             this.orderedTests = orderedTests;
           }
           this.tests = tests;
+          /*
+          var divLoop = "";
+          for (let i = 0; i < this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions.length; i++) {
+            divLoop += '<input'+
+                'class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"'+
+                'id="solution"'+
+                'type="number"'+
+                'v-model.number="' + this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions[i]+
+                '"/>';
+          }
+          window.alert(divLoop);
+          //document.getElementById("loopSolutions").innerHTML = "hola";
+          //window.alert(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions);
+          */
         });
+          
     },
     createExercise() {
       this.selectedExercise = this.tests[this.selectedTest].exercises.push({
