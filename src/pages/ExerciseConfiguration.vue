@@ -370,6 +370,7 @@ export default {
           }
           this.tests = tests;
 
+          this.inputsSolutions = []
           for (let i = 0; i < this.tests[this.selectedTest].exercises.length; i++) {
             this.inputsSolutions.push(this.tests[this.selectedTest].exercises[i].solutions);
           }
