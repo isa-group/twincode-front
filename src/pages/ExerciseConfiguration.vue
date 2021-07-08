@@ -158,26 +158,29 @@
               >
                 Inputs / Solutions:
               </label>
-              <div v-for="(item, index) in loopSolutions" :key="item"> 
+              
+              <div v-for="(item, index) in inputsSolutions[this.selectedExerciseIndex]" :key="item"> 
                 <div>
                   <label style="font-weight: bold;" for="item">Input {{ index +1}}:   </label>
                   <input
-                class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="input"
-                v-model="
-                  tests[selectedTest].exercises[selectedExerciseIndex].inputs[index]
-                "
-              />
+                    class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="input"
+                    v-model="
+                      tests[selectedTest].exercises[selectedExerciseIndex].inputs[index]
+                    "
+                  />
                   <label style="font-weight: bold;" for="item">Solution {{ index +1}}:   </label>
                   <input
-                class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="solution"
-                v-model="
-                  tests[selectedTest].exercises[selectedExerciseIndex].solutions[index]
-                "
-              />
+                    class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="solution"
+                    v-model="
+                      tests[selectedTest].exercises[selectedExerciseIndex].solutions[index]
+                    "
+                  />
                 </div>
               </div>
+
+
             </div>
             <div class="mt-4 max-w-xl mx-auto">
               <label
@@ -266,7 +269,7 @@ export default {
   },
   data() {
     return {
-      loopSolutions: [],
+      inputsSolutions: [],
       loopText: "",
       participants: [],
       orderedTests: [],
@@ -366,11 +369,10 @@ export default {
             this.orderedTests = orderedTests;
           }
           this.tests = tests;
-          
-          if (this.loopSolutions.length == 0) {
-            for (let i = 0; i < this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions.length; i++) {
-              this.loopSolutions.push(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions[i]);
-            }
+
+          this.inputsSolutions = []
+          for (let i = 0; i < this.tests[this.selectedTest].exercises.length; i++) {
+            this.inputsSolutions.push(this.tests[this.selectedTest].exercises[i].solutions);
           }
         });
           
