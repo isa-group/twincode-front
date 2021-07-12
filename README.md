@@ -38,4 +38,4 @@ npm run lint
 
 ### Customize configuration
 
-See [Configuration Reference](https://cli.vuejs.org/config/) for a detailed info.
+See [Configuration Reference](https://cli.vuejs.org/config/).

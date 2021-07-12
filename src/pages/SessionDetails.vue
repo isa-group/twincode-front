@@ -130,8 +130,7 @@
             Delete session
           </button>
         </div>
-        
-          <button
+        <button
             class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
             type="button"
             @click="goBack()"
@@ -169,7 +168,6 @@
   50% { border-color: orange; }
 }
 </style>
-
 <script>
 import Header from "../components/Header";
 import Table from "../components/Table";
@@ -294,9 +292,10 @@ export default {
           if (response.status == 200) {
             this.sessionExists = true;
             return response.json();
-          } 
+          }
         })
         .then((retrievedSession) => {
+          console.log("Retrieved Session: ",JSON.stringify(retrievedSession));
           if (retrievedSession) {
             this.session.name = retrievedSession.name;
             this.session.tokens = retrievedSession.tokens;
@@ -327,7 +326,7 @@ export default {
       });
     },
     loadParticipants() {
-      fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
+       fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
         method: "GET",
         headers: {
           Authorization: localStorage.adminSecret,
