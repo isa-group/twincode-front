@@ -67,16 +67,6 @@
             class="border rounded-sm ml-2"
           />
         </div>
-        <div class="mt-5 mb-5">
-          <input
-            v-model="newSession.tokenPairing"
-            type="checkbox"
-            class="border rounded-sm mr-2"
-          />
-          <label
-            >Participants with the same token cannot be paired together</label
-          >
-        </div>
       </form>
       <div v-if="newSession.errors" class="mb-5">
         <p class="text-red-700">{{ this.newSession.errors }}</p>
