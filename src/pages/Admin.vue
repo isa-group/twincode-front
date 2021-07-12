@@ -130,7 +130,7 @@ export default {
       let session = {};
       session.tokens = this.newSession.tokens.split(",");
       session.name = this.newSession.name;
-      session.tokenPairing = this.newSession.tokenPairing;
+      session.tokenPairing = false;
       console.log(session);
       fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
         method: "POST",
@@ -145,6 +145,7 @@ export default {
             alert("Session created successfully");
             this.showModal = false;
           }
+          this.logIn();
           return response.json();
         })
         .then((response) => {

@@ -413,52 +413,12 @@
               >
                 Type of exercise:
               </label>
-              <input
-                class="
-                  ml-2
-                  appearance-none
-                  border
-                  rounded
-                  py-2
-                  px-3
-                  w-40
-                  text-gray-700
-                  leading-tight
-                  focus:outline-none
-                  focus:shadow-outline
-                "
-                :id="`ex${selectedExerciseIndex}Type`"
-                type="text"
-                v-model="
-                  tests[selectedTest].exercises[selectedExerciseIndex].type
-                "
-              />
-              <!-- <label
-                class="align-middle text-gray-700 text-sm font-bold mb-2"
-                for="type"
-              >
-                Language:
-              </label>
               <select
-                class="
-                  ml-2
-                  appearance-none
-                  border
-                  rounded
-                  py-2
-                  px-3
-                  w-30
-                  text-gray-700
-                  leading-tight
-                  focus:outline-none
-                  focus:shadow-outline
-                "
-                name="Choose the Language"
-                id="language"
-              >
-                <option selected value="JavaScript">JavaScript</option>
-                <option value="Python">Python</option>
-              </select> -->
+                class="border rounded-sm ml-2 p-1"
+                v-model="tests[selectedTest].exercises[selectedExerciseIndex].type">
+                  <option value="INDIVIDUAL">INDIVIDUAL</option>
+                  <option value="PAIR">PAIR</option>
+              </select>
             </div>
             <div class="mt-4 max-w-xl mx-auto relative">
               <button
@@ -520,6 +480,12 @@
             Update test
           </button>
         </div>
+         <button
+            class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            type="button"
+            @click="goBack()">
+            Go Back
+          </button>
       </div>
     </div>
     <div
@@ -621,6 +587,11 @@ export default {
     };
   },
   methods: {
+    goBack() {
+      this.$router.push({
+        path: `/administration/sessions/${this.$route.params.sessionName}`,
+      });
+    },
     playDemoExercise() {
       localStorage.demoExercise = JSON.stringify(
         this.tests[this.selectedTest].exercises[this.selectedExerciseIndex]
@@ -882,7 +853,8 @@ export default {
       ).then((response) => {
         console.log("whatever");
         if (response.status == 200) {
-          this.loadTests();
+          this.loadTests(); 
+          window.alert("Exercise updated succesfully!");
         }
       });
     },
