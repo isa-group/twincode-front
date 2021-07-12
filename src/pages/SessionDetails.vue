@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Header v-if="loggedIn && sessionExists" />
-    <div v-if="loggedIn && sessionExists" class="text-center align-middle">
+    <Header />
+    <div class="text-center align-middle">
       <div class="inline-block w-full max-w-screen-xl">
         <div class="text-left">
           <h1 class="p-5 text-2xl md:text-3xl md:ml-3 font-semibold">
@@ -37,6 +37,27 @@
             />
           </div>
 
+          <div class="mt-5">
+            <label>Pairing mode:</label>
+            <select
+              class="border rounded-sm ml-2 p-1"
+              v-model="session.pairingMode"
+            >
+              <option value="MANUAL">Manual</option>
+              <option value="AUTO">Automatic</option>
+            </select>
+          </div>
+
+          <div class="mt-5">
+            <input
+              v-model="session.tokenPairing"
+              type="checkbox"
+              class="border rounded-sm mr-2"
+            />
+            <label
+              >Participants with the same token cannot be paired together</label
+            >
+          </div>
           <div class="mt-5">
             <input
               v-model="session.blindParticipant"
@@ -130,45 +151,10 @@
             Delete session
           </button>
         </div>
-        
-          <button
-            class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
-            type="button"
-            @click="goBack()"
-          >
-            Go Back
-          </button>
       </div>
-    </div>
-    <div style="width: 320px; margin-left: auto; margin-right: auto; margin-top: 200px;" class="typewriter" v-if="!loggedIn || !sessionExists">
-      <h1>Sorry! This page is not available</h1>
     </div>
   </div>
 </template>
-<style>
-.typewriter h1 {
-  overflow: hidden; /* Ensures the content is not revealed until the animation */
-  border-right: .15em solid orange; /* The typwriter cursor */
-  white-space: nowrap; /* Keeps the content on a single line */
-  margin: 0 auto; /* Gives that scrolling effect as the typing happens */
-  letter-spacing: .15em; /* Adjust as needed */
-  animation: 
-    typing 3s steps(50, end),
-    blink-caret .75s step-end infinite;
-}
- 
-/* The typing effect */
-@keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
-}
- 
-/* The typewriter cursor effect */
-@keyframes blink-caret {
-  from, to { border-color: transparent }
-  50% { border-color: orange; }
-}
-</style>
 
 <script>
 import Header from "../components/Header";
@@ -185,8 +171,6 @@ export default {
   },
   data() {
     return {
-      loggedIn: false,
-      sessionExists: false,
       session: {
         name: null,
         tokens: null,
@@ -218,11 +202,6 @@ export default {
     },
   },
   methods: {
-    goBack() {
-      this.$router.push({
-        path: `/administration`,
-      });
-    },
     deleteUser(userEmail) {
       var r = confirm(
         "You are going to remove the participant with email " +
@@ -292,11 +271,11 @@ export default {
       )
         .then((response) => {
           if (response.status == 200) {
-            this.sessionExists = true;
             return response.json();
-          } 
+          }
         })
         .then((retrievedSession) => {
+          console.log("Retrieved Session: ",JSON.stringify(retrievedSession));
           if (retrievedSession) {
             this.session.name = retrievedSession.name;
             this.session.tokens = retrievedSession.tokens;
@@ -327,18 +306,6 @@ export default {
       });
     },
     loadParticipants() {
-      fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
-        method: "GET",
-        headers: {
-          Authorization: localStorage.adminSecret,
-        },
-      })
-        .then((response) => {
-          if (response.status == 200) {
-            this.loggedIn = true;
-          }
-          return response.json();
-        });
       console.log("loading participants");
       fetch(
         `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}`,

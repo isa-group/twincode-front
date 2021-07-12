@@ -9,14 +9,14 @@
           </h1>
         </div>
         <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-10 p-5">
-            <Card 
-              v-for="(session, index) in sessions"
-              :key="index"
-              :environment="session.environment"
-              :sessionName="session.name"
-              :active="session.active"
-              :registeredUsers="session.users.length"
-            />
+          <Card
+            v-for="(session, index) in sessions"
+            :key="index"
+            :environment="session.environment"
+            :sessionName="session.name"
+            :active="session.active"
+            :registeredUsers="session.users.length"
+          />
           <NewCard @newSession="showNewSessionModal()" />
         </div>
       </div>
@@ -66,6 +66,16 @@
             type="text"
             class="border rounded-sm ml-2"
           />
+        </div>
+        <div class="mt-5 mb-5">
+          <input
+            v-model="newSession.tokenPairing"
+            type="checkbox"
+            class="border rounded-sm mr-2"
+          />
+          <label
+            >Participants with the same token cannot be paired together</label
+          >
         </div>
       </form>
       <div v-if="newSession.errors" class="mb-5">
@@ -120,7 +130,7 @@ export default {
       let session = {};
       session.tokens = this.newSession.tokens.split(",");
       session.name = this.newSession.name;
-      session.tokenPairing = false;
+      session.tokenPairing = this.newSession.tokenPairing;
       console.log(session);
       fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
         method: "POST",
@@ -135,7 +145,6 @@ export default {
             alert("Session created successfully");
             this.showModal = false;
           }
-          this.logIn();
           return response.json();
         })
         .then((response) => {
