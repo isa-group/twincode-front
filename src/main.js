@@ -6,9 +6,6 @@ import routes from "./routes";
 import VueSocketIOExt from "vue-socket.io-extended";
 import io from "socket.io-client";
 
-
-require('@/assets/css/style.css')
-
 Vue.config.productionTip = false;
 
 Vue.use(VueRouter);
