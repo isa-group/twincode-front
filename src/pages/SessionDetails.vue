@@ -131,7 +131,12 @@
           </button>
         </div>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <button
+=======
+        
+          <button
+>>>>>>> parent of c220eb7 (first update rodrigos code)
 =======
         
           <button
@@ -174,7 +179,10 @@
 }
 </style>
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of c220eb7 (first update rodrigos code)
 
 >>>>>>> parent of c220eb7 (first update rodrigos code)
 <script>
@@ -335,7 +343,11 @@ export default {
     },
     loadParticipants() {
 <<<<<<< HEAD
+<<<<<<< HEAD
        fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
+=======
+      fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
+>>>>>>> parent of c220eb7 (first update rodrigos code)
 =======
       fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
 >>>>>>> parent of c220eb7 (first update rodrigos code)

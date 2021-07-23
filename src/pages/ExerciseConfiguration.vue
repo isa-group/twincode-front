@@ -209,16 +209,22 @@
               <select
                 class="border rounded-sm ml-2 p-1"
 <<<<<<< HEAD
+<<<<<<< HEAD
                 v-model="tests[selectedTest].exercises[selectedExerciseIndex].type">
                   <option value="INDIVIDUAL">INDIVIDUAL</option>
                   <option value="PAIR">PAIR</option>
 =======
+=======
+>>>>>>> parent of c220eb7 (first update rodrigos code)
                 v-model="
                   tests[selectedTest].exercises[selectedExerciseIndex].type
                 "
               >
                 <option value="INDIVIDUAL">INDIVIDUAL</option>
                 <option value="PAIR">PAIR</option>
+<<<<<<< HEAD
+>>>>>>> parent of c220eb7 (first update rodrigos code)
+=======
 >>>>>>> parent of c220eb7 (first update rodrigos code)
               </select>
             </div>
@@ -257,6 +263,7 @@
           >
             Go Back
           </button>
+<<<<<<< HEAD
 <<<<<<< HEAD
         </div>
          <button
@@ -335,6 +342,8 @@
         >
           close
         </button>
+=======
+>>>>>>> parent of c220eb7 (first update rodrigos code)
 =======
 >>>>>>> parent of c220eb7 (first update rodrigos code)
       </div>
@@ -510,6 +519,9 @@ export default {
           this.loadTests(); 
 =======
           this.loadTests();
+<<<<<<< HEAD
+>>>>>>> parent of c220eb7 (first update rodrigos code)
+=======
 >>>>>>> parent of c220eb7 (first update rodrigos code)
           window.alert("Exercise updated succesfully!");
         }
