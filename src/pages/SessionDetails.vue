@@ -130,7 +130,12 @@
             Delete session
           </button>
         </div>
+<<<<<<< HEAD
         <button
+=======
+        
+          <button
+>>>>>>> parent of c220eb7 (first update rodrigos code)
             class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
             type="button"
             @click="goBack()"
@@ -168,6 +173,10 @@
   50% { border-color: orange; }
 }
 </style>
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of c220eb7 (first update rodrigos code)
 <script>
 import Header from "../components/Header";
 import Table from "../components/Table";
@@ -292,10 +301,9 @@ export default {
           if (response.status == 200) {
             this.sessionExists = true;
             return response.json();
-          }
+          } 
         })
         .then((retrievedSession) => {
-          console.log("Retrieved Session: ",JSON.stringify(retrievedSession));
           if (retrievedSession) {
             this.session.name = retrievedSession.name;
             this.session.tokens = retrievedSession.tokens;
@@ -326,7 +334,11 @@ export default {
       });
     },
     loadParticipants() {
+<<<<<<< HEAD
        fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
+=======
+      fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
+>>>>>>> parent of c220eb7 (first update rodrigos code)
         method: "GET",
         headers: {
           Authorization: localStorage.adminSecret,
