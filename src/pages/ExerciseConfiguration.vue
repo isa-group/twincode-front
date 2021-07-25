@@ -152,6 +152,33 @@
               />
             </div>
             <div class="mt-4 max-w-xl mx-auto">
+              
+              <label class="align-middle text-gray-700 text-sm font-bold mb-2"> Inputs type:</label>
+              
+              <select
+                class="border rounded-sm ml-2 p-1"
+                v-model="
+                  inputsType
+                "
+              >
+                <option value="number">number</option>
+                <option value="String">String</option>
+                <option value="Boolean">Boolean</option>
+              </select>
+              <br>
+              <label class="align-middle text-gray-700 text-sm font-bold mb-2"> Solutions type:</label>
+              
+              <select
+                class="border rounded-sm ml-2 p-1"
+                v-model="
+                  solutionsType
+                "
+              >
+                <option value="number">number</option>
+                <option value="String">String</option>
+                <option value="Boolean">Boolean</option>
+              </select>
+              <br>
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
                 for="solution"
@@ -269,6 +296,8 @@ export default {
   },
   data() {
     return {
+      solutionsType: "",
+      inputsType: "",
       inputsSolutions: [],
       loopText: "",
       participants: [],
@@ -374,6 +403,8 @@ export default {
           for (let i = 0; i < this.tests[this.selectedTest].exercises.length; i++) {
             this.inputsSolutions.push(this.tests[this.selectedTest].exercises[i].solutions);
           }
+          this.inputsType = typeof this.inputsSolutions[0][0];
+          this.solutionsType = typeof this.inputsSolutions[0][1];
         });
           
     },
@@ -408,6 +439,21 @@ export default {
       });
     },
     updateTest() {
+      // TODO usar los inputsType y solutionsType para almacenarlos parseados en la base de datos
+      var bodyJson = JSON.stringify(this.tests[this.selectedTest]);
+      console.log(bodyJson["exercise"])
+      for (let i = 0; i < bodyJson["exercise"].length; i++) {
+        const inputsExercise = bodyJson["exercise"][i]["inputs"];
+        for (let inputIndex = 0; inputIndex < inputsExercise.length; inputIndex++) {
+          var inputElement = inputsExercise[inputIndex];
+          console.log(inputElement);
+        }
+        const solutionsExercise = bodyJson["exercise"][i]["solutions"];
+        for (let inputIndex = 0; inputIndex < solutionsExercise.length; inputIndex++) {
+          var solutionElement = inputsExercise[inputIndex];
+          console.log(solutionElement);
+        }
+      }
       fetch(
         `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
         {
