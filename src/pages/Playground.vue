@@ -25,6 +25,7 @@
             ></div>
             <br/>
             <pre><p class="text-purple-800 inline">function</p> main(input) {</pre>
+            <!-- TODO codemirror es el cuadro de texto para código-->
             <codemirror
               ref="cmEditor"
               v-model="code"
