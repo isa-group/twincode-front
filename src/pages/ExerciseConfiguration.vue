@@ -439,21 +439,33 @@ export default {
       });
     },
     updateTest() {
-      // TODO usar los inputsType y solutionsType para almacenarlos parseados en la base de datos
-      var bodyJson = JSON.stringify(this.tests[this.selectedTest]);
-      console.log(bodyJson["exercise"])
-      for (let i = 0; i < bodyJson["exercise"].length; i++) {
-        const inputsExercise = bodyJson["exercise"][i]["inputs"];
+      var bodyJson = JSON.parse(JSON.stringify(this.tests[this.selectedTest]));
+
+        const inputsExercise = bodyJson.exercises[this.selectedExerciseIndex].inputs;
         for (let inputIndex = 0; inputIndex < inputsExercise.length; inputIndex++) {
-          var inputElement = inputsExercise[inputIndex];
-          console.log(inputElement);
+          if (this.inputsType == "number") {
+              inputsExercise[inputIndex] = Number(inputsExercise[inputIndex]);
+          } else if (this.inputsType == "String") {
+              inputsExercise[inputIndex] = "" + inputsExercise[inputIndex];
+          } else if (this.inputsType == "Boolean") {
+              const stringValue = inputsExercise[inputIndex] + "";
+              inputsExercise[inputIndex] = (stringValue.toLowerCase() == 'true' || stringValue.toLowerCase() == 'True')? true : false;
+          }
         }
-        const solutionsExercise = bodyJson["exercise"][i]["solutions"];
-        for (let inputIndex = 0; inputIndex < solutionsExercise.length; inputIndex++) {
-          var solutionElement = inputsExercise[inputIndex];
-          console.log(solutionElement);
+      
+        const solutionsExercise = bodyJson.exercises[this.selectedExerciseIndex].solutions;
+        for (let solutionIndex = 0; solutionIndex < solutionsExercise.length; solutionIndex++) {
+          if (this.solutionsType == "number") {
+              solutionsExercise[solutionIndex] = Number(solutionsExercise[solutionIndex]);
+          } else if (this.solutionsType == "String") {
+              solutionsExercise[solutionIndex] = "" + solutionsExercise[solutionIndex];
+          } else if (this.solutionsType == "Boolean") {
+              const stringValue = solutionsExercise[solutionIndex] + "";
+              solutionsExercise[solutionIndex] = (stringValue.toLowerCase() == 'true' || stringValue.toLowerCase() == 'True')? true : false;
+          }
         }
-      }
+
+      console.log(bodyJson.exercises);
       fetch(
         `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
         {
@@ -462,7 +474,7 @@ export default {
             Authorization: localStorage.adminSecret,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(this.tests[this.selectedTest]),
+          body: JSON.stringify(bodyJson),
         }
       ).then((response) => {
         if (response.status == 200) {
