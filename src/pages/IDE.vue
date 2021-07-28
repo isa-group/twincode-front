@@ -20,6 +20,7 @@
             :options="cmOption"
             :events="['inputRead', 'change']"
           ></codemirror>
+        <pre style="visibility: hidden;" id="codePre">{{code}}</pre>
         </div>
         <div
           v-if="returnValue"
@@ -64,6 +65,15 @@
             @click="validate()"
           >
             Run program (CTRL-S)
+          </button>
+        </div>
+
+        <div class="mt-5">
+          <button
+            class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+            @click="doit()"
+          >
+            Execute python
           </button>
         </div>
       </div>
@@ -125,6 +135,9 @@ export default {
       this.errorMessage = "";
       window.logs = [];
       this.logs = window.logs;
+    },
+    doit() {
+      document.getElementById("brythonButton").click();
     },
   },
   computed: {
