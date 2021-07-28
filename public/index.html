@@ -24,9 +24,17 @@
     <input style="visibility: hidden;" id="brythonButton"/>
     <script type="text/python">
       from browser import *
+      import javascript 
 
       def brythonButton(event):
-        alert(document["codePre"].innerHTML)
+        msg = document["codePre"].innerHTML.split("\n")
+
+        toEval = "def f(inputs):\n"
+        for i in msg:
+          toEval += "\n    " + i
+        toEval += "\n    return outputs\nf([1,2,3,4])"
+        
+        alert(eval(toEval))
 
       document['brythonButton'].bind('click', brythonButton)
     </script>
