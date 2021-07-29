@@ -59,6 +59,7 @@
             <pre>$> {{ log }} </pre>
           </p>
         </div>
+        <pre style="visibility: hidden;" id="resultsToValidate"></pre>
 
         <div class="mt-5">
           <button
@@ -72,7 +73,7 @@
         <div class="mt-5">
           <button
             class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
-            @click="doit()"
+            @click="validPython()"
           >
             Execute python
           </button>
@@ -106,6 +107,7 @@ export default {
       println: window.println,
       logs: window.logs,
       inputs: [1,2,3,4],
+      solutions: [1,4,9,16],
     };
   },
   methods: {
@@ -138,8 +140,16 @@ export default {
       window.logs = [];
       this.logs = window.logs;
     },
-    doit() {
+    validPython() {
       document.getElementById("brythonButton").click();
+
+      if(document.getElementById("resultsToValidate").innerHTML == this.solutions+"") {
+        document.getElementById("resultsToValidate").innerHTML = "Your answer is correct!"
+        document.getElementById("resultsToValidate").style = "visibility: visible; background-color: hsla(89, 43%, 51%, 0.3); border-radius: 7px; color: green; padding: 5px; margin-top: 7px";
+      } else {
+        document.getElementById("resultsToValidate").innerHTML = "Your answer is not correct"
+        document.getElementById("resultsToValidate").style = "visibility: visible; background-color: hsla(0, 100%, 51%, 0.3); border-radius: 7px; color: red; padding: 5px; margin-top: 7px";
+      }
       /*Example:
       outputs = []
       for i in inputs:

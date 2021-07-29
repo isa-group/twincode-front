@@ -37,7 +37,7 @@
         
         toEval += "\n    return outputs\nf(json.loads(x))"
         
-        alert(eval(toEval))
+        document["resultsToValidate"].innerHTML = eval(toEval)
 
       document['brythonButton'].bind('click', brythonButton)
     </script>
