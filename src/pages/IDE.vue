@@ -21,6 +21,7 @@
             :events="['inputRead', 'change']"
           ></codemirror>
         <pre style="visibility: hidden;" id="codePre">{{code}}</pre>
+        <pre style="visibility: hidden;" id="listInputs">{{inputs}}</pre>
         </div>
         <div
           v-if="returnValue"
@@ -104,6 +105,7 @@ export default {
       returnValue: null,
       println: window.println,
       logs: window.logs,
+      inputs: [1,2,3,4],
     };
   },
   methods: {
@@ -138,6 +140,11 @@ export default {
     },
     doit() {
       document.getElementById("brythonButton").click();
+      /*Example:
+      outputs = []
+      for i in inputs:
+        outputs.append(i*i)
+      */
     },
   },
   computed: {

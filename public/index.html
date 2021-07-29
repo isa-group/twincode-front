@@ -25,14 +25,17 @@
     <script type="text/python">
       from browser import *
       import javascript 
+      import json
 
       def brythonButton(event):
         msg = document["codePre"].innerHTML.split("\n")
 
         toEval = "def f(inputs):\n"
-        for i in msg:
-          toEval += "\n    " + i
-        toEval += "\n    return outputs\nf([1,2,3,4])"
+        for ms in msg:
+          toEval += "\n    " + ms
+        x = document["listInputs"].innerHTML
+        
+        toEval += "\n    return outputs\nf(json.loads(x))"
         
         alert(eval(toEval))
 
