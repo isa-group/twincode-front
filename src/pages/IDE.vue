@@ -142,6 +142,7 @@ export default {
     },
     validPython() {
       document.getElementById("brythonButton").click();
+      console.log(this.solutions+"          "+document.getElementById("resultsToValidate").innerHTML);
 
       if(document.getElementById("resultsToValidate").innerHTML == this.solutions+"") {
         document.getElementById("resultsToValidate").innerHTML = "Your answer is correct!"

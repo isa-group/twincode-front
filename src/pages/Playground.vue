@@ -32,6 +32,8 @@
               :options="cmOption"
               :events="['inputRead', 'change']"
             ></codemirror>
+        <pre style="visibility: hidden;" id="codePre">{{code}}</pre>
+        <pre style="visibility: hidden;" id="listInputs">{{inputs}}</pre>
             <pre>     <p class="text-pink-700 inline">return</p> output;</pre>
             <pre>}</pre>
             <br/>
@@ -77,8 +79,9 @@
               <pre>$> {{ log }} </pre>
             </p>
           </div>
+        <pre style="visibility: hidden;" id="resultsToValidate"></pre>
 
-          <div class="mt-2">
+          <div class="mt-2" style="bottom: 5px;">
             <!--<button
                 class="bg-yellow-800 hover:bg-yellow-700 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                 onClick="toggleControlMode();"
@@ -89,8 +92,15 @@
               class="bg-teal-600 hover:bg-teal-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
               @click="validate()"
             >
-              Validate (CTRL-S)
+              Validate in js
             </button>
+
+          <button
+            class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+            @click="validPython()"
+          >
+            Validate in python
+          </button>
           </div>
           <div id="return"></div>
           <div id="result"></div>
@@ -256,6 +266,7 @@ export default {
       println: window.println,
       logs: window.logs,
       inputs: null,
+      solutions: [1,4,9,16],
       peerSocketId: null,
       updateCodeEventActive: true
     };
@@ -436,6 +447,53 @@ export default {
 
       var container = this.$refs.messageContainer;
       container.scrollTop = container.scrollHeight;
+    },
+    validPython() {
+      document.getElementById("brythonButton").click();
+      //console.log(this.solutions+"          "+document.getElementById("resultsToValidate").innerHTML);
+
+      var solutionsCompiled = document.getElementById("resultsToValidate").innerHTML;
+
+      /*
+      if(document.getElementById("resultsToValidate").innerHTML == this.solutions+"") {
+        document.getElementById("resultsToValidate").innerHTML = "Your answer is correct!"
+        document.getElementById("resultsToValidate").style = "visibility: visible; background-color: hsla(89, 43%, 51%, 0.3); border-radius: 7px; color: green; padding: 5px; margin-top: 7px";
+      } else {
+        document.getElementById("resultsToValidate").innerHTML = "Your answer is not correct"
+        document.getElementById("resultsToValidate").style = "visibility: visible; background-color: hsla(0, 100%, 51%, 0.3); border-radius: 7px; color: red; padding: 5px; margin-top: 7px";
+      }
+      */
+      try {
+        var toValidate = [];
+        //console.log(solutionsCompiled.split(","));
+        for(var s = 0; s < solutionsCompiled.split(",").length; s++) {
+          var t = solutionsCompiled.split(",")[s];
+          //console.log(t);
+
+          var sol = Number(t);
+          if (isNaN(sol)) {
+            sol = t.toLowerCase();
+            var sol2 = (sol == 'true' || sol == 'false');
+            if (sol2 == false) {
+              sol = t;
+            } else {
+              sol = t.toLowerCase() == 'true';
+            }
+          }
+          toValidate.push(sol);
+        }
+        //console.log(toValidate);
+        this.valid(toValidate);
+      } catch (e) {
+        this.isExerciseCorrect = false;
+        this.excerciseErrorMessage = e;
+        console.log("ERROR HERE: ", e);
+      }
+      /*Example:
+      outputs = []
+      for i in inputs:
+        outputs.append(i*i)
+      */
     },
     validate() {
       dbg("method validate - init",this.code);
