@@ -470,7 +470,7 @@ export default {
           var t = solutionsCompiled.split(",")[s];
           //console.log(t);
 
-          var sol = Number(t);
+          var sol = Number(t); 
           if (isNaN(sol)) {
             sol = t.toLowerCase();
             var sol2 = (sol == 'true' || sol == 'false');
