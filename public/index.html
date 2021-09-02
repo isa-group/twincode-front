@@ -23,9 +23,8 @@
   <body onload=brython()>
     <input style="visibility: hidden;" id="brythonButton"/>
     <script type="text/python">
-    from browser import *
     import json
-
+    
     def brythonButton(event):
       msg = document["codePre"].innerHTML.split("\n")
 
