@@ -10,6 +10,7 @@
   "dependencies": {
     "apexcharts": "^3.20.2",
     "core-js": "^3.6.4",
+    "sass-loader": "^12.1.0",
     "socket.io-client": "^2.3.0",
     "tailwindcss-toggle": "github:TowelSoftware/tailwindcss-toggle",
     "vue": "^2.6.11",
