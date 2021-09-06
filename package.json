@@ -8,10 +8,9 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "apexcharts": "^3.28.1",
+    "apexcharts": "^3.20.2",
     "core-js": "^3.6.4",
-    "sass-loader": "^12.1.0",
-    "socket.io-client": "^4.2.0",
+    "socket.io-client": "^2.3.0",
     "tailwindcss-toggle": "github:TowelSoftware/tailwindcss-toggle",
     "vue": "^2.6.11",
     "vue-apexcharts": "^1.6.0",
@@ -27,7 +26,7 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
-    "tailwindcss": "^2.2.9",
+    "tailwindcss": "^1.4.5",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {
