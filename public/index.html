@@ -8,11 +8,6 @@
     <meta name="theme-color" content="#1A202C" />
     <!--<title><%= htmlWebpackPlugin.options.title %></title>-->
         
-    <script src="https://cdn.jsdelivr.net/npm/brython@3/brython.min.js">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/brython@3/brython_stdlib.js">
-    </script>
-
     <script>
       window.logs = [];
       function println(log) {
@@ -20,26 +15,8 @@
       }
     </script>
   </head>
-  <body onload=brython()>
+  <body>
     <input style="visibility: hidden;" id="brythonButton"/>
-    <script type="text/python">
-    from browser import *
-    import json
-    
-    def brythonButton(event):
-      msg = document["codePre"].innerHTML.split("\n")
-
-      toEval = "def f(inputs):\n"
-      for ms in msg:
-        toEval += "\n    " + ms
-      x = document["listInputs"].innerHTML
-      
-      toEval += "\n    return outputs\nf(json.loads(x))"
-      
-      document["resultsToValidate"].innerHTML = eval(toEval)
-
-    document['brythonButton'].bind('click', brythonButton)
-    </script>
     <noscript>
       <strong
         >We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work
