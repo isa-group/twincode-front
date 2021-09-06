@@ -24,7 +24,7 @@
               class="absolute bg-yellow-500 hidden"
             ></div>
             <br/>
-            <pre><p class="text-purple-800 inline">function</p> main(inputs) {</pre>
+            <pre><p class="text-purple-800 inline">function</p> main(input) {</pre>
             <codemirror
               ref="cmEditor"
               v-model="code"
@@ -34,7 +34,7 @@
             ></codemirror>
         <pre style="visibility: hidden;" id="codePre">{{code}}</pre>
         <pre style="visibility: hidden;" id="listInputs">{{inputs}}</pre>
-            <pre>     <p class="text-pink-700 inline">return</p> outputs;</pre>
+            <pre>     <p class="text-pink-700 inline">return</p> output;</pre>
             <pre>}</pre>
             <br/>
           </div>
@@ -502,7 +502,7 @@ export default {
         var solutions = [];
 
         this.inputs.forEach(input => {
-          solutions.push(eval("var inputs="+JSON.stringify(input)+";" + this.code + "; outputs;"));
+          solutions.push(eval("var input="+JSON.stringify(input)+";" + this.code + "; output;"));
         });
 
         console.log("Inputs: "+JSON.stringify(this.inputs));
@@ -541,9 +541,9 @@ export default {
           body: JSON.stringify({
             solutions: v,
             user: localStorage.token,
-            source: "function main(inputs) { "+
+            source: "function main(input) { "+
                         this.$refs.cmEditor.codemirror.getValue()+
-                        "return outputs;"+
+                        "return output;"+
                     "}"
           }),
           headers: {
