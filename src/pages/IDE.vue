@@ -66,6 +66,14 @@
           >
             Run program (CTRL-S)
           </button>
+
+          
+          <button
+            class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+            @click="validatePython()"
+          >
+            Run JSPython
+          </button>
         </div>
 
       </div>
@@ -74,6 +82,7 @@
 </template>
 
 <script>
+import { jsPython } from 'jspython-interpreter';
 import { codemirror } from "vue-codemirror";
 import "codemirror/mode/javascript/javascript.js";
 import "codemirror/lib/codemirror.css";
@@ -96,6 +105,7 @@ export default {
       returnValue: null,
       println: window.println,
       logs: window.logs,
+      inputs: [1,2,3],
     };
   },
   methods: {
@@ -117,6 +127,15 @@ export default {
         this.errored = true;
         this.errorMessage = e;
       }
+    },
+    validatePython() {
+      const script = this.code;
+      console.log(this.code);
+
+      const interpreter = jsPython();
+      interpreter.evaluate(script, {input: this.inputs}).then(res => {
+        console.log(res);
+      })
     },
     evaluateCode(code) {
       return Function('"use strict";' + code)();
