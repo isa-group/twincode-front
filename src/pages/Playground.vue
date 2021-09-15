@@ -17,7 +17,7 @@
         <div class="w-2/3 p-2">
           <div>{{ (maxTime - timePassed) | secondsToString }}</div>
           <div v-html="exerciseDescription"></div>
-          <div style="height: 70vh;" @keyup.ctrl.83="validate" >
+          <div style="height: 70vh;" @keyup.ctrl.83="validate" v-if="language == 'javascript'">
             <div
               ref="pairCursor"
               id="pairCursor"
@@ -33,6 +33,25 @@
               :events="['inputRead', 'change']"
             ></codemirror>
             <pre>     <p class="text-pink-700 inline">return</p> output;</pre>
+            <pre>}</pre>
+            <br/>
+          </div>
+          <div style="height: 70vh;" @keyup.ctrl.83="validate" v-if="language == 'python'">
+            <div
+              ref="pairCursor"
+              id="pairCursor"
+              class="absolute bg-yellow-500 hidden"
+            ></div>
+            <br/>
+            <pre><p class="text-purple-800 inline">def</p> main(inputs) {</pre>
+            <codemirror
+              ref="cmEditor"
+              v-model="code"
+              id="codemirror"
+              :options="cmOption"
+              :events="['inputRead', 'change']"
+            ></codemirror>
+            <pre>     <p class="text-pink-700 inline">return</p> outputs</pre>
             <pre>}</pre>
             <br/>
           </div>
@@ -88,16 +107,18 @@
             <button
               class="bg-teal-600 hover:bg-teal-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
               @click="validate()"
+            v-if="language == 'javascript'"
             >
-              Validate in Javascript
+              Validate
             </button>
             
             
           <button
             class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
             @click="validatePython()"
+            v-if="language == 'python'"
           >
-            Run JSPython
+            Validate
           </button>
           </div>
           <div id="return"></div>
@@ -188,7 +209,6 @@
 <script>
 import Vue from "vue";
 import Message from "../components/Message";
-import { jsPython } from 'jspython-interpreter';
 import { codemirror } from "vue-codemirror";
 import "codemirror/mode/javascript/javascript.js";
 import "codemirror/lib/codemirror.css";
@@ -266,6 +286,7 @@ export default {
       logs: window.logs,
       inputs: null,
       peerSocketId: null,
+      language: "",
       updateCodeEventActive: true
     };
   },
@@ -350,6 +371,7 @@ export default {
       this.exerciseType = pack.data.exerciseType;
       this.maxTime = pack.data.maxTime;
       this.inputs = pack.data.inputs;
+      this.language = "python";
       this.clearResult();
     },
     reconnect() {
@@ -476,6 +498,7 @@ export default {
       }
     },
     validatePython() {
+      /*
       const script = this.code + "\nreturn output"; // + '\nif input == output:\n    print("ey")'
       console.log(script);
 
@@ -484,6 +507,20 @@ export default {
         console.log(res);
         this.valid(res);
       })
+      */
+     fetch("http://localhost:8000/tester", {
+          method: "POST",
+          body: JSON.stringify({
+            inputs: this.inputs,
+            solutions: this.inputs, //Aqui hay que meter las soluciones del ejercicio
+            code: "" + this.$refs.cmEditor.codemirror.getValue()
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then((response) => {
+          console.log(response);
+        });
     },
     clearResult() {
       dbg("method clearResult - init");
