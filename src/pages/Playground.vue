@@ -91,6 +91,14 @@
             >
               Validate in Javascript
             </button>
+            
+            
+          <button
+            class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+            @click="validatePython()"
+          >
+            Run JSPython
+          </button>
           </div>
           <div id="return"></div>
           <div id="result"></div>
@@ -180,6 +188,7 @@
 <script>
 import Vue from "vue";
 import Message from "../components/Message";
+import { jsPython } from 'jspython-interpreter';
 import { codemirror } from "vue-codemirror";
 import "codemirror/mode/javascript/javascript.js";
 import "codemirror/lib/codemirror.css";
@@ -465,6 +474,16 @@ export default {
         this.excerciseErrorMessage = e;
         console.log("ERROR HERE: ", e);
       }
+    },
+    validatePython() {
+      const script = this.code + "\nreturn output"; // + '\nif input == output:\n    print("ey")'
+      console.log(script);
+
+      const interpreter = jsPython();
+      interpreter.evaluate(script, {input: this.inputs}).then(res => {
+        console.log(res);
+        this.valid(res);
+      })
     },
     clearResult() {
       dbg("method clearResult - init");

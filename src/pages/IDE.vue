@@ -66,7 +66,6 @@
           >
             Run program (CTRL-S)
           </button>
-
           
           <button
             class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
@@ -134,6 +133,7 @@ export default {
 
       const interpreter = jsPython();
       interpreter.evaluate(script, {input: this.inputs}).then(res => {
+        this.returnValue = res;
         console.log(res);
       })
     },
