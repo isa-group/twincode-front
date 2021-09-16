@@ -371,7 +371,7 @@ export default {
       this.exerciseType = pack.data.exerciseType;
       this.maxTime = pack.data.maxTime;
       this.inputs = pack.data.inputs;
-      this.language = "python";
+      this.language = "javascript"; //pack.data.language
       this.clearResult();
     },
     reconnect() {
