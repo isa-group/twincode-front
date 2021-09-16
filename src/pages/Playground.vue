@@ -285,6 +285,7 @@ export default {
       println: window.println,
       logs: window.logs,
       inputs: null,
+      solutions: null,
       peerSocketId: null,
       language: "",
       updateCodeEventActive: true
@@ -358,6 +359,7 @@ export default {
       this.updateCursorLocation();
     },
     newExercise(pack) {
+      this.loadLanguage();
       dbg("EVENT newExercise",pack);  
 
       this.loadingTest = false;
@@ -439,6 +441,47 @@ export default {
     },
   },
   methods: {
+    loadLanguage() {
+      console.log(this.solutions);
+      fetch(
+        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      )
+        .then((response) => {
+          if (response.status == 200) {
+            return response.json();
+          }
+        })
+        .then((tests) => {
+          if (tests) {
+            console.log(tests);
+          /*
+            tests.forEach((test) => {
+              
+              this.language = test.language;
+              let orderedTest = {};
+              orderedTest.name = test.name;
+              orderedTest.excercises = test.exercises.length;
+              let totalTime = 0;
+              test.exercises.forEach((exercise) => {
+                totalTime += exercise.time;
+              });
+              orderedTest.totalTime = totalTime;
+              orderedTests.push(orderedTest);
+            });
+            this.orderedTests = orderedTests;
+          */
+            
+          }
+          this.tests = tests;
+        });
+          
+    },
     sendMessage() {
       dbg("method sendMessage - init",this.myMessage);
       if (this.exerciseType == "PAIR") {
@@ -498,21 +541,11 @@ export default {
       }
     },
     validatePython() {
-      /*
-      const script = this.code + "\nreturn output"; // + '\nif input == output:\n    print("ey")'
-      console.log(script);
-
-      const interpreter = jsPython();
-      interpreter.evaluate(script, {input: this.inputs}).then(res => {
-        console.log(res);
-        this.valid(res);
-      })
-      */
      fetch("http://localhost:8000/tester", {
           method: "POST",
           body: JSON.stringify({
             inputs: this.inputs,
-            solutions: this.inputs, //Aqui hay que meter las soluciones del ejercicio
+            solutions: this.inputs, //Aqui hay que meter las soluciones del ejercicio (he puesto this.inputs para probar)
             code: "" + this.$refs.cmEditor.codemirror.getValue()
           }),
           headers: {
