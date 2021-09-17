@@ -120,6 +120,14 @@
           >
             Validate
           </button>
+
+
+          <button
+            class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+            @click="changeLanguage()"
+          >
+            Change language
+          </button>
           </div>
           <div id="return"></div>
           <div id="result"></div>
@@ -441,6 +449,10 @@ export default {
     },
   },
   methods: {
+    changeLanguage() {
+      if (this.language == "python") this.language = "javascript"
+      else this.language = "python"
+    },
     loadLanguage() {
       console.log(this.solutions);
       fetch(
@@ -541,8 +553,8 @@ export default {
       }
     },
     validatePython() {
-      var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
-     fetch("http://localhost:8000/tester", {
+     var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
+     fetch("http://dbrincau.pythonanywhere.com/tester", {
           method: "POST",
           body: JSON.stringify({
             inputs: this.inputs,
