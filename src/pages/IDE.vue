@@ -59,19 +59,20 @@
         </div>
         <pre style="visibility: hidden;" id="resultsToValidate"></pre>
 
-        <div class="mt-5">
+        <div class="mt-5" v-if="language == 'javascript'">
           <button
             class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
             @click="validate()"
           >
-            Run program (CTRL-S)
+            Run program
           </button>
-          
+          </div>
+          <div class="mt-5" v-if="language == 'python'">
           <button
             class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
             @click="validatePython()"
           >
-            Run JSPython
+            Run program
           </button>
         </div>
 
@@ -81,7 +82,6 @@
 </template>
 
 <script>
-import { jsPython } from 'jspython-interpreter';
 import { codemirror } from "vue-codemirror";
 import "codemirror/mode/javascript/javascript.js";
 import "codemirror/lib/codemirror.css";
@@ -104,6 +104,7 @@ export default {
       returnValue: null,
       println: window.println,
       logs: window.logs,
+      language: "python",
       inputs: [1,2,3],
     };
   },
@@ -128,14 +129,19 @@ export default {
       }
     },
     validatePython() {
-      const script = this.code;
-      console.log(this.code);
-
-      const interpreter = jsPython();
-      interpreter.evaluate(script, {input: this.inputs}).then(res => {
-        this.returnValue = res;
-        console.log(res);
-      })
+      fetch("http://localhost:8000/tester", {
+          method: "POST",
+          body: JSON.stringify({
+            inputs: this.inputs,
+            solutions: this.inputs, //Aqui hay que meter las soluciones del ejercicio
+            code: "" + this.$refs.cmEditor.codemirror.getValue()
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then((response) => {
+          console.log(response);
+        });
     },
     evaluateCode(code) {
       return Function('"use strict";' + code)();

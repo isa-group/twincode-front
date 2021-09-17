@@ -67,6 +67,21 @@
               />
             </div>
             <div class="mt-4 max-w-xl mx-auto">
+              <label 
+                class="align-middle text-gray-700 text-sm font-bold mb-2"
+                for="name"> 
+                language:
+              </label>
+              <input
+                class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="description"
+                type="text"
+                v-model="
+                  tests[selectedTest].language
+                "
+              />
+            </div>
+            <div class="mt-4 max-w-xl mx-auto">
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
                 for="time"
@@ -306,6 +321,7 @@ export default {
       selectedTest: 0,
       selectedExerciseIndex: 0,
       selectedExercise: {},
+      language: "",
     };
   },
   methods: {
@@ -385,6 +401,7 @@ export default {
           if (tests) {
             let orderedTests = [];
             tests.forEach((test) => {
+              this.language = test.language;
               let orderedTest = {};
               orderedTest.name = test.name;
               orderedTest.excercises = test.exercises.length;

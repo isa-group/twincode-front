@@ -17,7 +17,7 @@
         <div class="w-2/3 p-2">
           <div>{{ (maxTime - timePassed) | secondsToString }}</div>
           <div v-html="exerciseDescription"></div>
-          <div style="height: 70vh;" @keyup.ctrl.83="validate" >
+          <div style="height: 70vh;" @keyup.ctrl.83="validate" v-if="language == 'javascript'">
             <div
               ref="pairCursor"
               id="pairCursor"
@@ -33,6 +33,25 @@
               :events="['inputRead', 'change']"
             ></codemirror>
             <pre>     <p class="text-pink-700 inline">return</p> output;</pre>
+            <pre>}</pre>
+            <br/>
+          </div>
+          <div style="height: 70vh;" @keyup.ctrl.83="validate" v-if="language == 'python'">
+            <div
+              ref="pairCursor"
+              id="pairCursor"
+              class="absolute bg-yellow-500 hidden"
+            ></div>
+            <br/>
+            <pre><p class="text-purple-800 inline">def</p> main(inputs) {</pre>
+            <codemirror
+              ref="cmEditor"
+              v-model="code"
+              id="codemirror"
+              :options="cmOption"
+              :events="['inputRead', 'change']"
+            ></codemirror>
+            <pre>     <p class="text-pink-700 inline">return</p> outputs</pre>
             <pre>}</pre>
             <br/>
           </div>
@@ -88,16 +107,26 @@
             <button
               class="bg-teal-600 hover:bg-teal-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
               @click="validate()"
+            v-if="language == 'javascript'"
             >
-              Validate in Javascript
+              Validate
             </button>
             
             
           <button
             class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
             @click="validatePython()"
+            v-if="language == 'python'"
           >
-            Run JSPython
+            Validate
+          </button>
+
+
+          <button
+            class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+            @click="changeLanguage()"
+          >
+            Change language
           </button>
           </div>
           <div id="return"></div>
@@ -188,7 +217,6 @@
 <script>
 import Vue from "vue";
 import Message from "../components/Message";
-import { jsPython } from 'jspython-interpreter';
 import { codemirror } from "vue-codemirror";
 import "codemirror/mode/javascript/javascript.js";
 import "codemirror/lib/codemirror.css";
@@ -265,7 +293,9 @@ export default {
       println: window.println,
       logs: window.logs,
       inputs: null,
+      solutions: null,
       peerSocketId: null,
+      language: "",
       updateCodeEventActive: true
     };
   },
@@ -337,6 +367,7 @@ export default {
       this.updateCursorLocation();
     },
     newExercise(pack) {
+      this.loadLanguage();
       dbg("EVENT newExercise",pack);  
 
       this.loadingTest = false;
@@ -350,6 +381,7 @@ export default {
       this.exerciseType = pack.data.exerciseType;
       this.maxTime = pack.data.maxTime;
       this.inputs = pack.data.inputs;
+      this.language = "python"; //pack.data.language
       this.clearResult();
     },
     reconnect() {
@@ -417,6 +449,51 @@ export default {
     },
   },
   methods: {
+    changeLanguage() {
+      if (this.language == "python") this.language = "javascript"
+      else this.language = "python"
+    },
+    loadLanguage() {
+      console.log(this.solutions);
+      fetch(
+        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      )
+        .then((response) => {
+          if (response.status == 200) {
+            return response.json();
+          }
+        })
+        .then((tests) => {
+          if (tests) {
+            console.log(tests);
+          /*
+            tests.forEach((test) => {
+              
+              this.language = test.language;
+              let orderedTest = {};
+              orderedTest.name = test.name;
+              orderedTest.excercises = test.exercises.length;
+              let totalTime = 0;
+              test.exercises.forEach((exercise) => {
+                totalTime += exercise.time;
+              });
+              orderedTest.totalTime = totalTime;
+              orderedTests.push(orderedTest);
+            });
+            this.orderedTests = orderedTests;
+          */
+            
+          }
+          this.tests = tests;
+        });
+          
+    },
     sendMessage() {
       dbg("method sendMessage - init",this.myMessage);
       if (this.exerciseType == "PAIR") {
@@ -476,14 +553,22 @@ export default {
       }
     },
     validatePython() {
-      const script = this.code + "\nreturn output"; // + '\nif input == output:\n    print("ey")'
-      console.log(script);
-
-      const interpreter = jsPython();
-      interpreter.evaluate(script, {input: this.inputs}).then(res => {
-        console.log(res);
-        this.valid(res);
-      })
+     var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
+     fetch("http://dbrincau.pythonanywhere.com/tester", {
+          method: "POST",
+          body: JSON.stringify({
+            inputs: this.inputs,
+            solutions: this.inputs,
+            code: codeToSend
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then(response => response.json()).then(data => {
+              this.isExerciseCorrect = data.equal;
+              this.twcc = "NO DATA"; //My API doesn't make an estimation on how good is the code compiled
+              this.returnValue = data.result;
+        });
     },
     clearResult() {
       dbg("method clearResult - init");
