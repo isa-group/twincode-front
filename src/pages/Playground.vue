@@ -373,7 +373,7 @@ export default {
       this.exerciseType = pack.data.exerciseType;
       this.maxTime = pack.data.maxTime;
       this.inputs = pack.data.inputs;
-      this.language = "javascript"; //pack.data.language
+      this.language = "python"; //pack.data.language
       this.clearResult();
     },
     reconnect() {
@@ -541,18 +541,21 @@ export default {
       }
     },
     validatePython() {
+      var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
      fetch("http://localhost:8000/tester", {
           method: "POST",
           body: JSON.stringify({
             inputs: this.inputs,
-            solutions: this.inputs, //Aqui hay que meter las soluciones del ejercicio (he puesto this.inputs para probar)
-            code: "" + this.$refs.cmEditor.codemirror.getValue()
+            solutions: this.inputs,
+            code: codeToSend
           }),
           headers: {
             "Content-Type": "application/json",
           },
-        }).then((response) => {
-          console.log(response);
+        }).then(response => response.json()).then(data => {
+              this.isExerciseCorrect = data.equal;
+              this.twcc = "NO DATA"; //My API doesn't make an estimation on how good is the code compiled
+              this.returnValue = data.result;
         });
     },
     clearResult() {
