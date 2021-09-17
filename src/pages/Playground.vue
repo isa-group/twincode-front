@@ -17,14 +17,14 @@
         <div class="w-2/3 p-2">
           <div>{{ (maxTime - timePassed) | secondsToString }}</div>
           <div v-html="exerciseDescription"></div>
-          <div style="height: 70vh;" @keyup.ctrl.83="validate" v-if="language == 'javascript'">
+          <div style="height: 70vh;" @keyup.ctrl.83="validate">
             <div
               ref="pairCursor"
               id="pairCursor"
               class="absolute bg-yellow-500 hidden"
             ></div>
             <br/>
-            <pre><p class="text-purple-800 inline">function</p> main(input) {</pre>
+            <pre><p class="text-purple-800 inline">{{text1codemirror}}</p>{{text2codemirror}}</pre>
             <codemirror
               ref="cmEditor"
               v-model="code"
@@ -32,26 +32,7 @@
               :options="cmOption"
               :events="['inputRead', 'change']"
             ></codemirror>
-            <pre>     <p class="text-pink-700 inline">return</p> output;</pre>
-            <pre>}</pre>
-            <br/>
-          </div>
-          <div style="height: 70vh;" @keyup.ctrl.83="validate" v-if="language == 'python'">
-            <div
-              ref="pairCursor"
-              id="pairCursor"
-              class="absolute bg-yellow-500 hidden"
-            ></div>
-            <br/>
-            <pre><p class="text-purple-800 inline">def</p> main(inputs) {</pre>
-            <codemirror
-              ref="cmEditor"
-              v-model="code"
-              id="codemirror"
-              :options="cmOption"
-              :events="['inputRead', 'change']"
-            ></codemirror>
-            <pre>     <p class="text-pink-700 inline">return</p> outputs</pre>
+            <pre>     <p class="text-pink-700 inline">return</p> {{text3codemirror}}</pre>
             <pre>}</pre>
             <br/>
           </div>
@@ -288,7 +269,10 @@ export default {
       solutions: null,
       peerSocketId: null,
       language: "",
-      updateCodeEventActive: true
+      updateCodeEventActive: true,
+      text1codemirror: "",
+      text2codemirror: "",
+      text3codemirror: "",
     };
   },
   filters: {
@@ -374,6 +358,15 @@ export default {
       this.inputs = pack.data.inputs;
       this.solutions = pack.data.solutions;
       this.language = pack.data.testLanguage;
+      if(this.language == "python") {
+        this.text1codemirror = "def ";
+        this.text2codemirror = "main(inputs)";
+        this.text3codemirror = "outputs";
+      } else {
+        this.text1codemirror = "function ";
+        this.text2codemirror = "main(input){";
+        this.text3codemirror = "output}";
+      }
       this.clearResult();
     },
     reconnect() {
@@ -501,7 +494,7 @@ export default {
     },
     validatePython() {
      var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
-     fetch("http://dbrincau.pythonanywhere.com/tester", {
+     fetch("https://dbrincau.pythonanywhere.com/tester", {
           method: "POST",
           body: JSON.stringify({
             inputs: this.inputs,
