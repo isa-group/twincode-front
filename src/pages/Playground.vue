@@ -501,7 +501,7 @@ export default {
     },
     validatePython() {
      var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
-     fetch("http://127.0.0.1:8000/tester", {
+     fetch("http://dbrincau.pythonanywhere.com/tester", {
           method: "POST",
           body: JSON.stringify({
             inputs: this.inputs,
