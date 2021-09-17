@@ -120,14 +120,6 @@
           >
             Validate
           </button>
-
-
-          <button
-            class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
-            @click="changeLanguage()"
-          >
-            Change language
-          </button>
           </div>
           <div id="return"></div>
           <div id="result"></div>
@@ -367,7 +359,6 @@ export default {
       this.updateCursorLocation();
     },
     newExercise(pack) {
-      this.loadLanguage();
       dbg("EVENT newExercise",pack);  
 
       this.loadingTest = false;
@@ -381,7 +372,8 @@ export default {
       this.exerciseType = pack.data.exerciseType;
       this.maxTime = pack.data.maxTime;
       this.inputs = pack.data.inputs;
-      this.language = "python"; //pack.data.language
+      this.solutions = pack.data.solutions;
+      this.language = pack.data.testLanguage;
       this.clearResult();
     },
     reconnect() {
@@ -449,51 +441,6 @@ export default {
     },
   },
   methods: {
-    changeLanguage() {
-      if (this.language == "python") this.language = "javascript"
-      else this.language = "python"
-    },
-    loadLanguage() {
-      console.log(this.solutions);
-      fetch(
-        `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: localStorage.adminSecret,
-          },
-        }
-      )
-        .then((response) => {
-          if (response.status == 200) {
-            return response.json();
-          }
-        })
-        .then((tests) => {
-          if (tests) {
-            console.log(tests);
-          /*
-            tests.forEach((test) => {
-              
-              this.language = test.language;
-              let orderedTest = {};
-              orderedTest.name = test.name;
-              orderedTest.excercises = test.exercises.length;
-              let totalTime = 0;
-              test.exercises.forEach((exercise) => {
-                totalTime += exercise.time;
-              });
-              orderedTest.totalTime = totalTime;
-              orderedTests.push(orderedTest);
-            });
-            this.orderedTests = orderedTests;
-          */
-            
-          }
-          this.tests = tests;
-        });
-          
-    },
     sendMessage() {
       dbg("method sendMessage - init",this.myMessage);
       if (this.exerciseType == "PAIR") {
@@ -558,7 +505,7 @@ export default {
           method: "POST",
           body: JSON.stringify({
             inputs: this.inputs,
-            solutions: this.inputs,
+            solutions: this.solutions,
             code: codeToSend
           }),
           headers: {
