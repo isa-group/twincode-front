@@ -397,10 +397,10 @@ export default {
             return response.json();
           }
         })
-        .then((tests) => {
-          if (tests) {
-            let orderedTests = [];
-            tests.forEach((test) => {
+        .then((testsE) => {
+          if (testsE) {
+            let orderedTestsE = [];
+            testsE.forEach((test) => {
               this.language = test.language;
               let orderedTest = {};
               orderedTest.name = test.name;
@@ -410,11 +410,12 @@ export default {
                 totalTime += exercise.time;
               });
               orderedTest.totalTime = totalTime;
-              orderedTests.push(orderedTest);
+              orderedTestsE.push(orderedTest);
             });
-            this.orderedTests = orderedTests;
+            this.orderedTests = orderedTestsE;
           }
-          this.tests = tests;
+          this.tests = testsE;
+
 
           this.inputsSolutions = []
           for (let i = 0; i < this.tests[this.selectedTest].exercises.length; i++) {
@@ -434,6 +435,7 @@ export default {
       });
     },
     createTest() {
+      console.log("LLEGA A AQUI")
       fetch(`${process.env.VUE_APP_TC_API}/tests`, {
         method: "POST",
         headers: {
@@ -448,6 +450,7 @@ export default {
           peerChange: false,
           orderNumber: this.orderedTests.length,
           exercises: [],
+          language: "Javascript"
         }),
       }).then((response) => {
         if (response.status == 200) {
