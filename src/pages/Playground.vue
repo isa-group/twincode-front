@@ -41,7 +41,10 @@
             class="flex bg-green-200 p-3 mt-5 rounded-md border text-gray-800"
           >
             <p class="mt-1 text-black-900">
-              You got it right! Value returned: {{ returnValue }} <br/> Quality Score: <strong>{{ twcc }}</strong> (the lower the better)
+              You got it right! Value returned: {{ returnValue }} <br/> 
+            </p>
+            <p v-if="language == 'javascript'">
+              <br>Quality Score: <strong>{{ twcc }}</strong> (the lower the better)
             </p>
             <div class="flex-grow text-right">
               <button @click="clearResult">
@@ -57,7 +60,8 @@
             v-if="isExerciseCorrect === false"
             class="bg-red-200 p-3 rounded-md border text-gray-800 relative"
           >
-            <p>Sorry, this is not the right solution. Try again!</p>
+            <p v-if="true">Sorry, this is not the right solution. Try again!</p> 
+            <!-- TODO v-if comprobar si estan vacia alguna variable de abajo para mostrar o no el texto de arriba -->
             <p class="mt-1 text-red-900">
               Value returned: {{ excerciseErrorMessage || returnValue }}
             </p>
@@ -71,7 +75,7 @@
             </div>
           </div>
 
-          <div v-if="returnValue" class="p-3 bg-black text-white mt-2 rounded-md">
+          <div v-if="returnValue && language == 'javascript'" class="p-3 bg-black text-white mt-2 rounded-md">
             <p>Your console log:</p>
             <p class="mt-1 text-black-900" v-for="log in logs" :key="log">
               <pre>$> {{ log }} </pre>
@@ -744,6 +748,7 @@ export default {
 .CodeMirror {
   border: 1px solid #eee;
   height: 50vh !important;
+  font-size: 16px;
 }
 #pairCursor {
   width: 2px;
