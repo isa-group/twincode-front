@@ -486,6 +486,8 @@ export default {
         }
 
       console.log(bodyJson.exercises);
+
+
       fetch(
         `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
         {

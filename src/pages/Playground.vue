@@ -60,7 +60,7 @@
             v-if="isExerciseCorrect === false"
             class="bg-red-200 p-3 rounded-md border text-gray-800 relative"
           >
-            <p v-if="true">Sorry, this is not the right solution. Try again!</p> 
+            <p v-if="returnValue != 'Something wrong with the code'">Sorry, this is not the right solution. Try again!</p> 
             <!-- TODO v-if comprobar si estan vacia alguna variable de abajo para mostrar o no el texto de arriba -->
             <p class="mt-1 text-red-900">
               Value returned: {{ excerciseErrorMessage || returnValue }}
@@ -263,6 +263,7 @@ export default {
       maxTime: 0,
       timePassed: 0,
       isExerciseCorrect: null,
+      hasExerciseErrors: null,
       twcc:null,
       excerciseErrorMessage: "",
       returnValue: "",
@@ -353,6 +354,7 @@ export default {
       this.starting = false;
       this.timePassed = 0;
       this.isExerciseCorrect = null;
+      this.hasExerciseErrors = null;
       this.$refs.timeBar.style.width = "100%";
       this.$refs.timeBar.classList.remove("bg-red-500");
       this.$refs.timeBar.classList.add("bg-green-500");
@@ -492,6 +494,7 @@ export default {
         }*/
       } catch (e) {
         this.isExerciseCorrect = false;
+        this.hasExerciseErrors = true;
         this.excerciseErrorMessage = e;
         console.log("ERROR HERE: ", e);
       }
@@ -509,6 +512,7 @@ export default {
             "Content-Type": "application/json",
           },
         }).then(response => response.json()).then(data => {
+          console.log(this.returnValue);
               this.isExerciseCorrect = data.equal;
               this.twcc = "NO DATA"; //My API doesn't make an estimation on how good is the code compiled
               this.returnValue = data.result;
@@ -517,6 +521,7 @@ export default {
     clearResult() {
       dbg("method clearResult - init");
       this.isExerciseCorrect = null;
+        this.hasExerciseErrors = null;
       this.excerciseErrorMessage  = "";
       this.returnValue = "";
       this.errorMessage = "";
