@@ -200,7 +200,6 @@
               >
                 Inputs / Solutions:
               </label>
-              
               <div v-for="(item, index) in inputsSolutions[this.selectedExerciseIndex]" :key="item"> 
                 <div>
                   <label style="font-weight: bold;" for="item">Input {{ index +1}}:   </label>
@@ -219,11 +218,29 @@
                       tests[selectedTest].exercises[selectedExerciseIndex].solutions[index]
                     "
                   />
+                  
+                <button
+                  class="mt-2 rounded-full bg-gray-100 hover:bg-red-200 border hover:border-red-300 p-2 px-3 focus:outline-none focus:shadow-outline"
+                  @click="removeEntrance(index)"
+                >
+                  <img src="@/assets/icons/delete_bin.png" class="w-5" />
+                </button>
+                  
                 </div>
               </div>
 
 
             </div>
+
+            <div class="mt-4 max-w-xl mx-auto relative">
+              <button
+                class="mt-3 rounded-full bg-green-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+                @click="addEntrance()"
+              >
+                Add Entrance
+              </button>
+            </div>
+
             <div class="mt-4 max-w-xl mx-auto">
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
@@ -434,6 +451,28 @@ export default {
         time: 100,
       });
     },
+    addEntrance() {
+      
+      var bodyJson = JSON.parse(JSON.stringify(this.tests[this.selectedTest]));
+      console.log(bodyJson);
+
+      const inputsExercise = bodyJson.exercises[this.selectedExerciseIndex].inputs;
+      const solutionsExercise = bodyJson.exercises[this.selectedExerciseIndex].solutions;
+
+      if(inputsExercise !== undefined) {
+        this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].inputs.push(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].inputs[inputsExercise.length-1]);
+        this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions.push(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions[solutionsExercise.length-1]);
+      } else {
+        this.tests[0].exercises[0].inputs = [""];
+        this.tests[0].exercises[0].solutions = [""];
+      }
+
+      
+    },
+    removeEntrance(index) {
+      this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].inputs.splice(index, 1);
+      this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions.splice(index, 1);
+    },
     createTest() {
       console.log("LLEGA A AQUI")
       fetch(`${process.env.VUE_APP_TC_API}/tests`, {
@@ -512,6 +551,7 @@ export default {
       );
     },
     removeTest() {
+      console.log(`${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}/${this.selectedTest}`);
       fetch(
         `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}/${this.selectedTest}`,
         {
