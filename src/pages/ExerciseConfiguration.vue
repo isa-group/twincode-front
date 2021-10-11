@@ -444,12 +444,17 @@ export default {
           
     },
     createExercise() {
-      this.selectedExercise = this.tests[this.selectedTest].exercises.push({
-        name: "New exercise",
-        description: "",
-        solution: 0,
-        time: 100,
-      });
+      var exercisesBody = JSON.parse(JSON.stringify({
+            name: "New Exercise",
+            description: "",
+            inputs: [""],
+            solutions: [""],
+            time: 300,
+            type: "PAIR"
+          }));
+
+      this.tests[this.selectedTest].exercises.push(exercisesBody);
+      this.selectedExercise = this.tests[this.selectedTest].exercises[this.tests[this.selectedTest].exercises.length-1];
     },
     addEntrance() {
       
@@ -459,22 +464,23 @@ export default {
       const inputsExercise = bodyJson.exercises[this.selectedExerciseIndex].inputs;
       const solutionsExercise = bodyJson.exercises[this.selectedExerciseIndex].solutions;
 
-      if(inputsExercise !== undefined) {
-        this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].inputs.push(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].inputs[inputsExercise.length-1]);
-        this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions.push(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions[solutionsExercise.length-1]);
-      } else {
-        this.tests[0].exercises[0].inputs = [""];
-        this.tests[0].exercises[0].solutions = [""];
-      }
-
-      
+      this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].inputs.push(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].inputs[inputsExercise.length-1]);
+      this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions.push(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions[solutionsExercise.length-1]);
     },
     removeEntrance(index) {
       this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].inputs.splice(index, 1);
       this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions.splice(index, 1);
     },
     createTest() {
-      console.log("LLEGA A AQUI")
+      var exercisesBody = JSON.parse(JSON.stringify({
+            name: "New Exercise",
+            description: "",
+            inputs: [""],
+            solutions: [""],
+            time: 300,
+            type: "PAIR"
+          }));
+
       fetch(`${process.env.VUE_APP_TC_API}/tests`, {
         method: "POST",
         headers: {
@@ -488,8 +494,8 @@ export default {
           time: 5,
           peerChange: false,
           orderNumber: this.orderedTests.length,
-          exercises: [],
-          language: "Javascript"
+          exercises: [exercisesBody],
+          language: "javascript"
         }),
       }).then((response) => {
         if (response.status == 200) {
@@ -508,9 +514,11 @@ export default {
               inputsExercise[inputIndex] = "" + inputsExercise[inputIndex];
           } else if (this.inputsType == "Boolean") {
               const stringValue = inputsExercise[inputIndex] + "";
-              inputsExercise[inputIndex] = (stringValue.toLowerCase() == 'true' || stringValue.toLowerCase() == 'True')? true : false;
+              inputsExercise[inputIndex] = (stringValue.toLowerCase() == 'true' || stringValue.toLowerCase() == 'True') ? true : false;
           }
         }
+
+        bodyJson.exercises[this.selectedExerciseIndex].inputs = inputsExercise;
       
         const solutionsExercise = bodyJson.exercises[this.selectedExerciseIndex].solutions;
         for (let solutionIndex = 0; solutionIndex < solutionsExercise.length; solutionIndex++) {
@@ -520,11 +528,11 @@ export default {
               solutionsExercise[solutionIndex] = "" + solutionsExercise[solutionIndex];
           } else if (this.solutionsType == "Boolean") {
               const stringValue = solutionsExercise[solutionIndex] + "";
-              solutionsExercise[solutionIndex] = (stringValue.toLowerCase() == 'true' || stringValue.toLowerCase() == 'True')? true : false;
+              solutionsExercise[solutionIndex] = (stringValue.toLowerCase() == 'true' || stringValue.toLowerCase() == 'True') ? true : false;
           }
         }
 
-      console.log(bodyJson.exercises);
+      bodyJson.exercises[this.selectedExerciseIndex].solutions = solutionsExercise;
 
 
       fetch(
