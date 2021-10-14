@@ -81,6 +81,12 @@
               <pre>$> {{ log }} </pre>
             </p>
           </div>
+          <div v-if="consoleValue != '' && language == 'python'" class="p-3 bg-black text-white mt-2 rounded-md">
+            <p>Your console log:</p>
+            <p class="mt-1 text-black-900">
+              <pre>$> {{ consoleValue }} </pre>
+            </p>
+          </div>
 
           <div class="mt-2">
             <!--<button
@@ -278,6 +284,7 @@ export default {
       text1codemirror: "",
       text2codemirror: "",
       text3codemirror: "",
+      consoleValue: "",
     };
   },
   filters: {
@@ -363,11 +370,11 @@ export default {
       this.maxTime = pack.data.maxTime;
       this.inputs = pack.data.inputs;
       this.solutions = pack.data.solutions;
-      this.language = pack.data.testLanguage;
+      this.language = pack.data.testLanguage.toLowerCase();
       if(this.language == "python") {
         this.text1codemirror = "def ";
-        this.text2codemirror = "main(inputs)";
-        this.text3codemirror = "outputs";
+        this.text2codemirror = "main(input)";
+        this.text3codemirror = "output";
       } else {
         this.text1codemirror = "function ";
         this.text2codemirror = "main(input){";
@@ -501,6 +508,8 @@ export default {
     },
     validatePython() {
      var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
+     this.consoleValue = "";
+     this.returnValue = "";
      fetch("https://dbrincau.pythonanywhere.com/tester", {
           method: "POST",
           body: JSON.stringify({
@@ -513,9 +522,10 @@ export default {
           },
         }).then(response => response.json()).then(data => {
           console.log(this.returnValue);
-              this.isExerciseCorrect = data.equal;
+              this.isExerciseCorrect = data.result;
               this.twcc = "NO DATA"; //My API doesn't make an estimation on how good is the code compiled
-              this.returnValue = data.result;
+              this.consoleValue = data.console;
+              this.returnValue = data.solution;
         });
     },
     clearResult() {
