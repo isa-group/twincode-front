@@ -118,6 +118,7 @@
             @click="nextExercise()"
           >
             Next Exercise
+          </button>
           </div>
           <div id="return"></div>
           <div id="result"></div>
