@@ -112,13 +112,6 @@
             Validate
           </button>
 
-          
-          <button
-            class="bg-purple-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
-            @click="nextExercise()"
-          >
-            Next Exercise
-          </button>
           </div>
           <div id="return"></div>
           <div id="result"></div>
@@ -483,14 +476,6 @@ export default {
 
       var container = this.$refs.messageContainer;
       container.scrollTop = container.scrollHeight;
-    },
-    nextExercise() {
-      fetch(process.env.VUE_APP_TC_API + `/nextExercise/${this.$route.params.sessionName}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
     },
     validate() {
       dbg("method validate - init",this.code);
