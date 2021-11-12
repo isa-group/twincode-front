@@ -111,6 +111,14 @@
           >
             Validate
           </button>
+            
+            
+          <button
+            class="bg-purple-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+            @click="changeExercise()"
+          >
+            Change Exercise
+          </button>
           </div>
           <div id="return"></div>
           <div id="result"></div>
@@ -381,6 +389,8 @@ export default {
         this.text3codemirror = "output}";
       }
       this.clearResult();
+      
+      this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
     },
     reconnect() {
       dbg("EVENT reconnect");
@@ -455,6 +465,9 @@ export default {
 
         this.myMessage = "";
       }
+    },
+    changeExercise() {
+      this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: false});
     },
     newMessage(msg, mine) {
       dbg("method newMessage - init",msg);
