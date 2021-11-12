@@ -111,7 +111,6 @@
           >
             Validate
           </button>
-
           </div>
           <div id="return"></div>
           <div id="result"></div>
@@ -527,8 +526,6 @@ export default {
               this.twcc = "NO DATA"; //My API doesn't make an estimation on how good is the code compiled
               this.consoleValue = data.console;
               this.returnValue = data.solution;
-              
-              this.$socket.client.emit("resolvedExercise", this.isExerciseCorrect);
         });
     },
     clearResult() {
@@ -563,8 +560,6 @@ export default {
               this.isExerciseCorrect = data.result;
               this.twcc = data.twcc;
               this.returnValue = v;
-              
-              this.$socket.client.emit("resolvedExercise", this.isExerciseCorrect);
             });
           }
         });
