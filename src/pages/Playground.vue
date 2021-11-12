@@ -386,6 +386,11 @@ export default {
       dbg("EVENT reconnect");
       this.$socket.client.emit("clientReconnection", localStorage.token);
     },
+    testExercise(datos) {
+      console.log(datos.data.code);
+      console.log(datos.data.ejercicio);
+      console.log(datos.data.num);
+    },
     countDown(pack) {
       //dbg("EVENT countDown",pack);
       this.timePassed = this.maxTime - pack.data;
