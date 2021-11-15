@@ -33,7 +33,6 @@
               :events="['inputRead', 'change']"
             ></codemirror>
             <pre>     <p class="text-pink-700 inline">return</p> {{text3codemirror}}</pre>
-            <pre>}</pre>
             <br/>
           </div>
           <div
@@ -388,8 +387,8 @@ export default {
         this.text3codemirror = "output";
       } else {
         this.text1codemirror = "function ";
-        this.text2codemirror = "main(input){";
-        this.text3codemirror = "output}";
+        this.text2codemirror = "main(input) {";
+        this.text3codemirror = "output\n}";
       }
       this.clearResult();
       
