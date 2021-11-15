@@ -111,7 +111,7 @@
             Validate
           </button>
             
-            
+        <!--
           <button
             class="bg-purple-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
             @click="changeExercise()"
@@ -119,6 +119,7 @@
           >
             Change Exercise
           </button>
+        -->
           </div>
           <div id="return"></div>
           <div id="result"></div>

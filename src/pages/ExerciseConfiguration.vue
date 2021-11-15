@@ -96,6 +96,22 @@
               />
               <p class="inline text-gray-700 font-light mx-3">seconds</p>
             </div>
+            <div class="mt-4 max-w-xl mx-auto"
+            v-if="standardSession">
+              <label
+                class="align-middle text-gray-700 text-sm font-bold mb-2"
+                for="time"
+              >
+                Time to work:
+              </label>
+              <input
+                class="ml-2 appearance-none border rounded py-2 px-3 w-20 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="time"
+                type="number"
+                v-model="tests[selectedTest].testTime"
+              />
+              <p class="inline text-gray-700 font-light mx-3">seconds</p>
+            </div>
             <div class="mt-4 max-w-xl mx-auto">
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
@@ -339,6 +355,7 @@ export default {
       selectedExerciseIndex: 0,
       selectedExercise: {},
       language: "",
+      standardSession: false,
     };
   },
   methods: {
@@ -372,9 +389,12 @@ export default {
         })
         .then((retrievedSession) => {
           if (retrievedSession) {
+            /*
             this.session.name = retrievedSession.name;
             this.session.tokens = retrievedSession.tokens;
             this.session.tokenPairing = retrievedSession.tokenPairing;
+            */
+            this.standardSession = retrievedSession.isStandard;
           }
         });
     },
@@ -578,6 +598,7 @@ export default {
   },
   mounted() {
     this.loadTests();
+    this.loadSession();
   },
 };
 </script>
