@@ -116,6 +116,7 @@
           <button
             class="bg-purple-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
             @click="changeExercise()"
+            v-if="standardSession"
           >
             Change Exercise
           </button>
@@ -293,6 +294,7 @@ export default {
       text2codemirror: "",
       text3codemirror: "",
       consoleValue: "",
+      standardSession: false,
     };
   },
   filters: {
@@ -354,6 +356,7 @@ export default {
       this.peerChange = pack.data.peerChange;
       this.$refs.messageContainer.innerHTML = "";
       this.code = "";
+      this.standardSession = pack.data.isStandard;
       this.clearResult();
     },
     cursorActivity(data) {
