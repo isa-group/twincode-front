@@ -115,7 +115,7 @@
           <button
             class="bg-purple-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
             @click="changeExercise()"
-            v-if="standardSession"
+            v-if="standardSession && exerciseType == 'PAIR'"
           >
             Change Exercise
           </button>
@@ -542,9 +542,11 @@ export default {
               this.twcc = "NO DATA"; //My API doesn't make an estimation on how good is the code compiled
               this.consoleValue = data.console;
               this.returnValue = data.solution;
+              /*
               if (this.isExerciseCorrect == true) {
-                setTimeout(() => {  console.log("Sssssssssssi."); }, 2000);
+                setTimeout(() => {  console.log("Done"); }, 2000);
               }
+              */
         });
     },
     clearResult() {
@@ -579,9 +581,11 @@ export default {
               this.isExerciseCorrect = data.result;
               this.twcc = data.twcc;
               this.returnValue = v;
+              /*
               if (this.isExerciseCorrect == true) {
-                setTimeout(() => {  console.log("Sssssssssssi."); }, 2000);
+                setTimeout(() => {  console.log("Done"); }, 2000);
               }
+              */
             });
           }
         });
