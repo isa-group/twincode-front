@@ -393,16 +393,19 @@ export default {
       }
       this.clearResult();
 
-      var el = document.createElement("div");
-      el.setAttribute("style","position:absolute;top:50%;left:50%;background-color: rgb(160, 174, 192);");
-      el.innerHTML = "Nuevo ejercicio";
-      setTimeout(function(){
-        el.parentNode.removeChild(el);
-      },2000);
-      document.body.appendChild(el);
-
       dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: true");
       this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
+    },
+    customAlert(pack) {
+      var el = document.createElement("div");
+      el.setAttribute("style","position:absolute;top:50%;left:40%;width: 20%;height: 20%;text-align: center;background-color: rgba(140, 203, 249, 0.2);border: 2px dashed #34d037;line-height: 650%;");
+      el.innerHTML = pack.data.message;
+      setTimeout(function(){
+        el.parentNode.removeChild(el);
+      }, 2000);
+      document.body.appendChild(el);
+
+      dbg("method customAlert - init ");
     },
     reconnect() {
       dbg("EVENT reconnect");
