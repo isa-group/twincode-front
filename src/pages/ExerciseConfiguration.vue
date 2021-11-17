@@ -257,7 +257,7 @@
               </button>
             </div>
 
-            <div class="mt-4 max-w-xl mx-auto">
+            <div class="mt-4 max-w-xl mx-auto" v-if="!standardSession">
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
                 for="time"
