@@ -33,7 +33,6 @@
               :events="['inputRead', 'change']"
             ></codemirror>
             <pre>     <p class="text-pink-700 inline">return</p> {{text3codemirror}}</pre>
-            <pre>}</pre>
             <br/>
           </div>
           <div
@@ -111,6 +110,16 @@
           >
             Validate
           </button>
+            
+        
+          <button
+            class="bg-purple-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+            @click="changeExercise()"
+            v-if="standardSession && exerciseType == 'PAIR'"
+          >
+            Change Exercise
+          </button>
+        
           </div>
           <div id="return"></div>
           <div id="result"></div>
@@ -285,6 +294,7 @@ export default {
       text2codemirror: "",
       text3codemirror: "",
       consoleValue: "",
+      standardSession: false,
     };
   },
   filters: {
@@ -346,6 +356,7 @@ export default {
       this.peerChange = pack.data.peerChange;
       this.$refs.messageContainer.innerHTML = "";
       this.code = "";
+      this.standardSession = pack.data.isStandard;
       this.clearResult();
     },
     cursorActivity(data) {
@@ -377,10 +388,13 @@ export default {
         this.text3codemirror = "output";
       } else {
         this.text1codemirror = "function ";
-        this.text2codemirror = "main(input){";
-        this.text3codemirror = "output}";
+        this.text2codemirror = "main(input) {";
+        this.text3codemirror = "output\n}";
       }
       this.clearResult();
+
+      dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: true");
+      this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
     },
     reconnect() {
       dbg("EVENT reconnect");
@@ -456,6 +470,10 @@ export default {
         this.myMessage = "";
       }
     },
+    changeExercise() {
+      dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: false");
+      this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: false});
+    },
     newMessage(msg, mine) {
       dbg("method newMessage - init",msg);
       const MessageClass = Vue.extend(Message);
@@ -526,6 +544,12 @@ export default {
               this.twcc = "NO DATA"; //My API doesn't make an estimation on how good is the code compiled
               this.consoleValue = data.console;
               this.returnValue = data.solution;
+              
+              if (this.isExerciseCorrect == true) {
+                dbg("validatePython - Correct Exercise - Chhanging Exercise...");
+                setTimeout(() => { this.changeExercise(); }, 2000);
+              }
+              
         });
     },
     clearResult() {
@@ -560,6 +584,11 @@ export default {
               this.isExerciseCorrect = data.result;
               this.twcc = data.twcc;
               this.returnValue = v;
+              
+              if (this.isExerciseCorrect == true) {
+                dbg("validateJavascript - Correct Exercise - Chhanging Exercise...");
+                setTimeout(() => { this.changeExercise(); }, 2000);
+              }
             });
           }
         });

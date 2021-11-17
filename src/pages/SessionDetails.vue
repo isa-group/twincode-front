@@ -47,6 +47,17 @@
               >One participant should not see avatar during the session</label
             >
           </div>
+
+          <div class="mt-5">
+            <input
+              v-model="session.isStandard"
+              type="checkbox"
+              class="border rounded-sm mr-2"
+            />
+            <label
+              >Standard Session</label
+            >
+          </div>
           <button
             class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
             type="button"
@@ -195,6 +206,7 @@ export default {
         active: null,
         running: null,
         pairingMode: null,
+        isStandard: null,
       },
       participants: [],
       tests: [],
@@ -305,6 +317,7 @@ export default {
             this.session.active = retrievedSession.active;
             this.session.running = retrievedSession.running;
             this.session.pairingMode = retrievedSession.pairingMode;
+            this.session.isStandard = retrievedSession.isStandard;
           }
           this.waitingStartResponse = false;
         });
