@@ -392,7 +392,8 @@ export default {
         this.text3codemirror = "output\n}";
       }
       this.clearResult();
-      
+
+      dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: true");
       this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
     },
     reconnect() {
@@ -470,6 +471,7 @@ export default {
       }
     },
     changeExercise() {
+      dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: false");
       this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: false});
     },
     newMessage(msg, mine) {
@@ -542,11 +544,12 @@ export default {
               this.twcc = "NO DATA"; //My API doesn't make an estimation on how good is the code compiled
               this.consoleValue = data.console;
               this.returnValue = data.solution;
-              /*
+              
               if (this.isExerciseCorrect == true) {
-                setTimeout(() => {  console.log("Done"); }, 2000);
+                dbg("validatePython - Correct Exercise - Chhanging Exercise...");
+                setTimeout(() => { this.changeExercise(); }, 2000);
               }
-              */
+              
         });
     },
     clearResult() {
@@ -581,11 +584,11 @@ export default {
               this.isExerciseCorrect = data.result;
               this.twcc = data.twcc;
               this.returnValue = v;
-              /*
+              
               if (this.isExerciseCorrect == true) {
-                setTimeout(() => {  console.log("Done"); }, 2000);
+                dbg("validateJavascript - Correct Exercise - Chhanging Exercise...");
+                setTimeout(() => { this.changeExercise(); }, 2000);
               }
-              */
             });
           }
         });
