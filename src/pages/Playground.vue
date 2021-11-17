@@ -393,6 +393,14 @@ export default {
       }
       this.clearResult();
 
+      var el = document.createElement("div");
+      el.setAttribute("style","position:absolute;top:50%;left:50%;background-color: rgb(160, 174, 192);");
+      el.innerHTML = "Nuevo ejercicio";
+      setTimeout(function(){
+        el.parentNode.removeChild(el);
+      },2000);
+      document.body.appendChild(el);
+
       dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: true");
       this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
     },
