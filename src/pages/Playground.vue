@@ -17,14 +17,14 @@
         <div class="w-2/3 p-2">
           <div>{{ (maxTime - timePassed) | secondsToString }}</div>
           <div v-html="exerciseDescription"></div>
-          <div style="height: 70vh;" @keyup.ctrl.83="validate" >
+          <div style="height: 70vh;" @keyup.ctrl.83="validate">
             <div
               ref="pairCursor"
               id="pairCursor"
               class="absolute bg-yellow-500 hidden"
             ></div>
             <br/>
-            <pre><p class="text-purple-800 inline">function</p> main(input) {</pre>
+            <pre><p class="text-purple-800 inline">{{text1codemirror}}</p>{{text2codemirror}}</pre>
             <codemirror
               ref="cmEditor"
               v-model="code"
@@ -32,8 +32,7 @@
               :options="cmOption"
               :events="['inputRead', 'change']"
             ></codemirror>
-            <pre>     <p class="text-pink-700 inline">return</p> output;</pre>
-            <pre>}</pre>
+            <pre>     <p class="text-pink-700 inline">return</p> {{text3codemirror}}</pre>
             <br/>
           </div>
           <div
@@ -41,7 +40,10 @@
             class="flex bg-green-200 p-3 mt-5 rounded-md border text-gray-800"
           >
             <p class="mt-1 text-black-900">
-              You got it right! Value returned: {{ returnValue }} <br/> Quality Score: <strong>{{ twcc }}</strong> (the lower the better)
+              You got it right! Value returned: {{ returnValue }} <br/> 
+            </p>
+            <p v-if="language == 'javascript'">
+              <br>Quality Score: <strong>{{ twcc }}</strong> (the lower the better)
             </p>
             <div class="flex-grow text-right">
               <button @click="clearResult">
@@ -57,7 +59,8 @@
             v-if="isExerciseCorrect === false"
             class="bg-red-200 p-3 rounded-md border text-gray-800 relative"
           >
-            <p>Sorry, this is not the right solution. Try again!</p>
+            <p v-if="returnValue != 'Something wrong with the code'">Sorry, this is not the right solution. Try again!</p> 
+            <!-- TODO v-if comprobar si estan vacia alguna variable de abajo para mostrar o no el texto de arriba -->
             <p class="mt-1 text-red-900">
               Value returned: {{ excerciseErrorMessage || returnValue }}
             </p>
@@ -71,10 +74,16 @@
             </div>
           </div>
 
-          <div v-if="returnValue" class="p-3 bg-black text-white mt-2 rounded-md">
+          <div v-if="returnValue && language == 'javascript'" class="p-3 bg-black text-white mt-2 rounded-md">
             <p>Your console log:</p>
             <p class="mt-1 text-black-900" v-for="log in logs" :key="log">
               <pre>$> {{ log }} </pre>
+            </p>
+          </div>
+          <div v-if="consoleValue != '' && language == 'python'" class="p-3 bg-black text-white mt-2 rounded-md">
+            <p>Your console log:</p>
+            <p class="mt-1 text-black-900">
+              <pre>$> {{ consoleValue }} </pre>
             </p>
           </div>
 
@@ -88,9 +97,29 @@
             <button
               class="bg-teal-600 hover:bg-teal-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
               @click="validate()"
+            v-if="language == 'javascript'"
             >
-              Validate (CTRL-S)
+              Validate
             </button>
+            
+            
+          <button
+            class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+            @click="validatePython()"
+            v-if="language == 'python'"
+          >
+            Validate
+          </button>
+            
+        
+          <button
+            class="bg-purple-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+            @click="changeExercise()"
+            v-if="standardSession && exerciseType == 'PAIR'"
+          >
+            Change Exercise
+          </button>
+        
           </div>
           <div id="return"></div>
           <div id="result"></div>
@@ -249,6 +278,7 @@ export default {
       maxTime: 0,
       timePassed: 0,
       isExerciseCorrect: null,
+      hasExerciseErrors: null,
       twcc:null,
       excerciseErrorMessage: "",
       returnValue: "",
@@ -256,8 +286,15 @@ export default {
       println: window.println,
       logs: window.logs,
       inputs: null,
+      solutions: null,
       peerSocketId: null,
-      updateCodeEventActive: true
+      language: "",
+      updateCodeEventActive: true,
+      text1codemirror: "",
+      text2codemirror: "",
+      text3codemirror: "",
+      consoleValue: "",
+      standardSession: false,
     };
   },
   filters: {
@@ -319,6 +356,7 @@ export default {
       this.peerChange = pack.data.peerChange;
       this.$refs.messageContainer.innerHTML = "";
       this.code = "";
+      this.standardSession = pack.data.isStandard;
       this.clearResult();
     },
     cursorActivity(data) {
@@ -334,6 +372,7 @@ export default {
       this.starting = false;
       this.timePassed = 0;
       this.isExerciseCorrect = null;
+      this.hasExerciseErrors = null;
       this.$refs.timeBar.style.width = "100%";
       this.$refs.timeBar.classList.remove("bg-red-500");
       this.$refs.timeBar.classList.add("bg-green-500");
@@ -341,7 +380,32 @@ export default {
       this.exerciseType = pack.data.exerciseType;
       this.maxTime = pack.data.maxTime;
       this.inputs = pack.data.inputs;
+      this.solutions = pack.data.solutions;
+      this.language = pack.data.testLanguage.toLowerCase();
+      if(this.language == "python") {
+        this.text1codemirror = "def ";
+        this.text2codemirror = "main(input)";
+        this.text3codemirror = "output";
+      } else {
+        this.text1codemirror = "function ";
+        this.text2codemirror = "main(input) {";
+        this.text3codemirror = "output\n}";
+      }
       this.clearResult();
+
+      dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: true");
+      this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
+    },
+    customAlert(pack) {
+      var el = document.createElement("div");
+      el.setAttribute("style","position:absolute;top:50%;left:40%;width: 20%;height: 20%;text-align: center;background-color: rgba(140, 203, 249, 0.2);border: 2px dashed #34d037;line-height: 650%;");
+      el.innerHTML = pack.data.message;
+      setTimeout(function(){
+        el.parentNode.removeChild(el);
+      }, 2000);
+      document.body.appendChild(el);
+
+      dbg("method customAlert - init ");
     },
     reconnect() {
       dbg("EVENT reconnect");
@@ -417,6 +481,10 @@ export default {
         this.myMessage = "";
       }
     },
+    changeExercise() {
+      dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: false");
+      this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: false});
+    },
     newMessage(msg, mine) {
       dbg("method newMessage - init",msg);
       const MessageClass = Vue.extend(Message);
@@ -462,13 +530,43 @@ export default {
         }*/
       } catch (e) {
         this.isExerciseCorrect = false;
+        this.hasExerciseErrors = true;
         this.excerciseErrorMessage = e;
         console.log("ERROR HERE: ", e);
       }
     },
+    validatePython() {
+     var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
+     this.consoleValue = "";
+     this.returnValue = "";
+     fetch("https://dbrincau.pythonanywhere.com/tester", {
+          method: "POST",
+          body: JSON.stringify({
+            inputs: this.inputs,
+            solutions: this.solutions,
+            code: codeToSend
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }).then(response => response.json()).then(data => {
+          console.log(this.returnValue);
+              this.isExerciseCorrect = data.result;
+              this.twcc = "NO DATA"; //My API doesn't make an estimation on how good is the code compiled
+              this.consoleValue = data.console;
+              this.returnValue = data.solution;
+              
+              if (this.isExerciseCorrect == true) {
+                dbg("validatePython - Correct Exercise - Chhanging Exercise...");
+                setTimeout(() => { this.changeExercise(); }, 2000);
+              }
+              
+        });
+    },
     clearResult() {
       dbg("method clearResult - init");
       this.isExerciseCorrect = null;
+        this.hasExerciseErrors = null;
       this.excerciseErrorMessage  = "";
       this.returnValue = "";
       this.errorMessage = "";
@@ -497,6 +595,11 @@ export default {
               this.isExerciseCorrect = data.result;
               this.twcc = data.twcc;
               this.returnValue = v;
+              
+              if (this.isExerciseCorrect == true) {
+                dbg("validateJavascript - Correct Exercise - Chhanging Exercise...");
+                setTimeout(() => { this.changeExercise(); }, 2000);
+              }
             });
           }
         });
@@ -700,6 +803,7 @@ export default {
 .CodeMirror {
   border: 1px solid #eee;
   height: 50vh !important;
+  font-size: 16px;
 }
 #pairCursor {
   width: 2px;

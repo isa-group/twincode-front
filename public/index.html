@@ -7,12 +7,20 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
     <meta name="theme-color" content="#1A202C" />
     <!--<title><%= htmlWebpackPlugin.options.title %></title>-->
+        
     <script>
       window.logs = [];
       function println(log) {
         window.logs.push(log);
       }
     </script>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/jspython-interpreter/dist/jspython-interpreter.min.js"></script>
+
+    <script>
+    const jsPython = window.jspython.jsPython
+    </script>
+    
   </head>
   <body>
     <noscript>

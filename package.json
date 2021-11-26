@@ -10,11 +10,13 @@
   "dependencies": {
     "apexcharts": "^3.20.2",
     "core-js": "^3.6.4",
+    "jspython-interpreter": "^2.1.5",
     "socket.io-client": "^2.3.0",
     "tailwindcss-toggle": "github:TowelSoftware/tailwindcss-toggle",
     "vue": "^2.6.11",
     "vue-apexcharts": "^1.6.0",
     "vue-codemirror": "^4.0.6",
+    "vue-papa-parse": "^2.0.0",
     "vue-router": "^3.4.3",
     "vue-socket.io-extended": "^4.0.4"
   },

@@ -67,6 +67,21 @@
               />
             </div>
             <div class="mt-4 max-w-xl mx-auto">
+              <label 
+                class="align-middle text-gray-700 text-sm font-bold mb-2"
+                for="name"> 
+                language:
+              </label>
+              <input
+                class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="description"
+                type="text"
+                v-model="
+                  tests[selectedTest].language
+                "
+              />
+            </div>
+            <div class="mt-4 max-w-xl mx-auto">
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
                 for="time"
@@ -78,6 +93,22 @@
                 id="time"
                 type="number"
                 v-model="tests[selectedTest].time"
+              />
+              <p class="inline text-gray-700 font-light mx-3">seconds</p>
+            </div>
+            <div class="mt-4 max-w-xl mx-auto"
+            v-if="standardSession">
+              <label
+                class="align-middle text-gray-700 text-sm font-bold mb-2"
+                for="time"
+              >
+                Time to work:
+              </label>
+              <input
+                class="ml-2 appearance-none border rounded py-2 px-3 w-20 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="time"
+                type="number"
+                v-model="tests[selectedTest].testTime"
               />
               <p class="inline text-gray-700 font-light mx-3">seconds</p>
             </div>
@@ -152,22 +183,81 @@
               />
             </div>
             <div class="mt-4 max-w-xl mx-auto">
+              
+              <label class="align-middle text-gray-700 text-sm font-bold mb-2"> Inputs type:</label>
+              
+              <select
+                class="border rounded-sm ml-2 p-1"
+                v-model="
+                  inputsType
+                "
+              >
+                <option value="number">number</option>
+                <option value="String">String</option>
+                <option value="Boolean">Boolean</option>
+              </select>
+              <br>
+              <label class="align-middle text-gray-700 text-sm font-bold mb-2"> Solutions type:</label>
+              
+              <select
+                class="border rounded-sm ml-2 p-1"
+                v-model="
+                  solutionsType
+                "
+              >
+                <option value="number">number</option>
+                <option value="String">String</option>
+                <option value="Boolean">Boolean</option>
+              </select>
+              <br>
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
                 for="solution"
               >
-                Solution:
+                Inputs / Solutions:
               </label>
-              <input
-                class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="solution"
-                type="number"
-                v-model.number="
-                  tests[selectedTest].exercises[selectedExerciseIndex].solution
-                "
-              />
+              <div v-for="(item, index) in inputsSolutions[this.selectedExerciseIndex]" :key="item"> 
+                <div>
+                  <label style="font-weight: bold;" for="item">Input {{ index +1}}:   </label>
+                  <input
+                    class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="input"
+                    v-model="
+                      tests[selectedTest].exercises[selectedExerciseIndex].inputs[index]
+                    "
+                  />
+                  <label style="font-weight: bold;" for="item">Solution {{ index +1}}:   </label>
+                  <input
+                    class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    id="solution"
+                    v-model="
+                      tests[selectedTest].exercises[selectedExerciseIndex].solutions[index]
+                    "
+                  />
+                  
+                <button
+                  class="mt-2 rounded-full bg-gray-100 hover:bg-red-200 border hover:border-red-300 p-2 px-3 focus:outline-none focus:shadow-outline"
+                  @click="removeEntrance(index)"
+                >
+                  <img src="@/assets/icons/delete_bin.png" class="w-5" />
+                </button>
+                  
+                </div>
+              </div>
+
+
             </div>
-            <div class="mt-4 max-w-xl mx-auto">
+
+            <div class="mt-4 max-w-xl mx-auto relative">
+              <button
+                class="mt-3 rounded-full bg-green-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+                @click="addEntrance()"
+              >
+                Add Entrance
+              </button>
+            </div>
+
+            <div class="mt-4 max-w-xl mx-auto" v-if="!standardSession">
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
                 for="time"
@@ -191,14 +281,15 @@
               >
                 Type of exercise:
               </label>
-              <input
-                class="ml-2 appearance-none border rounded py-2 px-3 w-40 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="type"
-                type="text"
+              <select
+                class="border rounded-sm ml-2 p-1"
                 v-model="
                   tests[selectedTest].exercises[selectedExerciseIndex].type
                 "
-              />
+              >
+                <option value="INDIVIDUAL">INDIVIDUAL</option>
+                <option value="PAIR">PAIR</option>
+              </select>
             </div>
             <div class="mt-4 max-w-xl mx-auto relative">
               <button
@@ -228,6 +319,13 @@
             </div>
           </div>
         </div>
+          <button
+            class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            type="button"
+            @click="goBack()"
+          >
+            Go Back
+          </button>
       </div>
     </div>
   </div>
@@ -246,15 +344,26 @@ export default {
   },
   data() {
     return {
+      solutionsType: "",
+      inputsType: "",
+      inputsSolutions: [],
+      loopText: "",
       participants: [],
       orderedTests: [],
       tests: [],
       selectedTest: 0,
       selectedExerciseIndex: 0,
       selectedExercise: {},
+      language: "",
+      standardSession: false,
     };
   },
   methods: {
+    goBack() {
+      this.$router.push({
+        path: `/administration/sessions/${this.$route.params.sessionName}`,
+      });
+    },
     playDemoExercise() {
       localStorage.demoExercise = JSON.stringify(
         this.tests[this.selectedTest].exercises[this.selectedExerciseIndex]
@@ -280,9 +389,12 @@ export default {
         })
         .then((retrievedSession) => {
           if (retrievedSession) {
+            /*
             this.session.name = retrievedSession.name;
             this.session.tokens = retrievedSession.tokens;
             this.session.tokenPairing = retrievedSession.tokenPairing;
+            */
+            this.standardSession = retrievedSession.isStandard;
           }
         });
     },
@@ -322,10 +434,11 @@ export default {
             return response.json();
           }
         })
-        .then((tests) => {
-          if (tests) {
-            let orderedTests = [];
-            tests.forEach((test) => {
+        .then((testsE) => {
+          if (testsE) {
+            let orderedTestsE = [];
+            testsE.forEach((test) => {
+              this.language = test.language;
               let orderedTest = {};
               orderedTest.name = test.name;
               orderedTest.excercises = test.exercises.length;
@@ -334,22 +447,60 @@ export default {
                 totalTime += exercise.time;
               });
               orderedTest.totalTime = totalTime;
-              orderedTests.push(orderedTest);
+              orderedTestsE.push(orderedTest);
             });
-            this.orderedTests = orderedTests;
+            this.orderedTests = orderedTestsE;
           }
-          this.tests = tests;
+          this.tests = testsE;
+
+
+          this.inputsSolutions = []
+          for (let i = 0; i < this.tests[this.selectedTest].exercises.length; i++) {
+            this.inputsSolutions.push(this.tests[this.selectedTest].exercises[i].solutions);
+          }
+          this.inputsType = typeof this.inputsSolutions[0][0];
+          this.solutionsType = typeof this.inputsSolutions[0][1];
         });
+          
     },
     createExercise() {
-      this.selectedExercise = this.tests[this.selectedTest].exercises.push({
-        name: "New exercise",
-        description: "",
-        solution: 0,
-        time: 100,
-      });
+      var exercisesBody = JSON.parse(JSON.stringify({
+            name: "New Exercise",
+            description: "",
+            inputs: [""],
+            solutions: [""],
+            time: 300,
+            type: "PAIR"
+          }));
+
+      this.tests[this.selectedTest].exercises.push(exercisesBody);
+      this.selectedExercise = this.tests[this.selectedTest].exercises[this.tests[this.selectedTest].exercises.length-1];
+    },
+    addEntrance() {
+      
+      var bodyJson = JSON.parse(JSON.stringify(this.tests[this.selectedTest]));
+      console.log(bodyJson);
+
+      const inputsExercise = bodyJson.exercises[this.selectedExerciseIndex].inputs;
+      const solutionsExercise = bodyJson.exercises[this.selectedExerciseIndex].solutions;
+
+      this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].inputs.push(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].inputs[inputsExercise.length-1]);
+      this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions.push(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions[solutionsExercise.length-1]);
+    },
+    removeEntrance(index) {
+      this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].inputs.splice(index, 1);
+      this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions.splice(index, 1);
     },
     createTest() {
+      var exercisesBody = JSON.parse(JSON.stringify({
+            name: "New Exercise",
+            description: "",
+            inputs: [""],
+            solutions: [""],
+            time: 300,
+            type: "PAIR"
+          }));
+
       fetch(`${process.env.VUE_APP_TC_API}/tests`, {
         method: "POST",
         headers: {
@@ -363,7 +514,8 @@ export default {
           time: 5,
           peerChange: false,
           orderNumber: this.orderedTests.length,
-          exercises: [],
+          exercises: [exercisesBody],
+          language: "javascript"
         }),
       }).then((response) => {
         if (response.status == 200) {
@@ -372,6 +524,37 @@ export default {
       });
     },
     updateTest() {
+      var bodyJson = JSON.parse(JSON.stringify(this.tests[this.selectedTest]));
+
+        const inputsExercise = bodyJson.exercises[this.selectedExerciseIndex].inputs;
+        for (let inputIndex = 0; inputIndex < inputsExercise.length; inputIndex++) {
+          if (this.inputsType == "number") {
+              inputsExercise[inputIndex] = Number(inputsExercise[inputIndex]);
+          } else if (this.inputsType == "String") {
+              inputsExercise[inputIndex] = "" + inputsExercise[inputIndex];
+          } else if (this.inputsType == "Boolean") {
+              const stringValue = inputsExercise[inputIndex] + "";
+              inputsExercise[inputIndex] = (stringValue.toLowerCase() == 'true' || stringValue.toLowerCase() == 'True') ? true : false;
+          }
+        }
+
+        bodyJson.exercises[this.selectedExerciseIndex].inputs = inputsExercise;
+      
+        const solutionsExercise = bodyJson.exercises[this.selectedExerciseIndex].solutions;
+        for (let solutionIndex = 0; solutionIndex < solutionsExercise.length; solutionIndex++) {
+          if (this.solutionsType == "number") {
+              solutionsExercise[solutionIndex] = Number(solutionsExercise[solutionIndex]);
+          } else if (this.solutionsType == "String") {
+              solutionsExercise[solutionIndex] = "" + solutionsExercise[solutionIndex];
+          } else if (this.solutionsType == "Boolean") {
+              const stringValue = solutionsExercise[solutionIndex] + "";
+              solutionsExercise[solutionIndex] = (stringValue.toLowerCase() == 'true' || stringValue.toLowerCase() == 'True') ? true : false;
+          }
+        }
+
+      bodyJson.exercises[this.selectedExerciseIndex].solutions = solutionsExercise;
+
+
       fetch(
         `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}`,
         {
@@ -380,11 +563,12 @@ export default {
             Authorization: localStorage.adminSecret,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(this.tests[this.selectedTest]),
+          body: JSON.stringify(bodyJson),
         }
       ).then((response) => {
         if (response.status == 200) {
           this.loadTests();
+          window.alert("Exercise updated succesfully!");
         }
       });
     },
@@ -395,6 +579,7 @@ export default {
       );
     },
     removeTest() {
+      console.log(`${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}/${this.selectedTest}`);
       fetch(
         `${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}/${this.selectedTest}`,
         {
@@ -413,6 +598,7 @@ export default {
   },
   mounted() {
     this.loadTests();
+    this.loadSession();
   },
 };
 </script>
