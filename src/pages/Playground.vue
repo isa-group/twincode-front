@@ -390,7 +390,7 @@ export default {
       } else {
         this.text1codemirror = "function ";
         this.text2codemirror = "main(input) {";
-        this.text3codemirror = "output\n}";
+        this.text3codemirror = "output;\n}";
       }
       this.clearResult();
 
