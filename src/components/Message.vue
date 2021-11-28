@@ -21,7 +21,7 @@ export default {
   },
   methods: {
     getImages() {
-      const images = require.context("@/assets/", false, /\.svg$/);
+      const images = require.context("@/assets/", false, /\.png$/);
       let image = "";
       if (this.girl) {
         image = images("./girl2.png");
