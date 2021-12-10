@@ -296,6 +296,7 @@ export default {
       text3codemirror: "",
       consoleValue: "",
       standardSession: false,
+      testIndex: 0,
     };
   },
   filters: {
@@ -383,6 +384,7 @@ export default {
       this.inputs = pack.data.inputs;
       this.solutions = pack.data.solutions;
       this.language = pack.data.testLanguage.toLowerCase();
+      this.testIndex = pack.data.testIndex;
       if(this.language == "python") {
         this.text1codemirror = "def ";
         this.text2codemirror = "main(input)";
@@ -490,7 +492,7 @@ export default {
       dbg("method newMessage - init",msg);
       const MessageClass = Vue.extend(Message);
       let gender = localStorage.getItem("pairedTo") === 'Female';
-      gender = this.peerChange ? !gender : gender;
+      gender = (this.testIndex == 2) ? !gender : gender;
       gender = JSON.parse(localStorage.getItem("user")).blind ? null : gender;
       const msgInstance = new MessageClass({
         propsData: {
