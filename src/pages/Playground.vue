@@ -140,6 +140,7 @@
             ></div>
             <div class="p-3 order-1 h-1/6">
               <textarea
+                id="chatbox"
                 :disabled="exerciseType != 'PAIR'"
                 v-model="myMessage"
                 class="border resize-none w-full text-sm p-2"
