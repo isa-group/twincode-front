@@ -1,11 +1,11 @@
 <template>
-  <div class="flex mb-1 mt-1" :class="mine ? 'justify-end msgLine' : 'justify-start msgLine'">
+  <div class="flex mb-1 mt-1" :class="mine ? 'justify-end myMsgLine' : 'justify-start msgLine'">
     <div class="flex-shrink-0" v-if="!mine && girl != null">
       <img class="rounded-full w-12 h-12 msgAvatar" :src="getImages()" />
     </div>
     <div
       class="flex-inital p-3 border rounded-t-lg"
-      :class="mine ? 'rounded-bl-lg bg-white msgText' : 'rounded-br-lg bg-teal-200 msgText'"
+      :class="mine ? 'rounded-bl-lg bg-white myMsgText' : 'rounded-br-lg bg-teal-200 partnerMsgText'"
     >
       <p class="break-words">{{ message }}</p>
     </div>
