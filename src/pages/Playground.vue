@@ -135,6 +135,7 @@
               <p class="p-3">This is a place to chat with your peer</p>
             </div>
             <div
+              id="chatContainer"
               class="flex-grow p-3 order-2 h-3/6 overflow-auto w-full"
               ref="messageContainer"
             ></div>
