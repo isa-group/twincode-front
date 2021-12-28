@@ -357,6 +357,8 @@ export default {
       this.$refs.messageContainer.innerHTML = "";
       this.code = "";
       this.standardSession = pack.data.isStandard;
+      localStorage.sessionIsStandard = pack.data.isStandard;
+      localStorage.testCounterS = pack.data.testCounterS; 
       this.clearResult();
     },
     cursorActivity(data) {
@@ -489,7 +491,8 @@ export default {
       dbg("method newMessage - init",msg);
       const MessageClass = Vue.extend(Message);
       let gender = localStorage.getItem("pairedTo") === 'Female';
-      gender = this.peerChange ? !gender : gender;
+      //gender = this.peerChange ? !gender : gender;
+      gender = this.peerChange || localStorage.getItem("sessionIsStandard") && localStorage.getItem("testCounterS") == 2 ? !gender : gender;
       gender = JSON.parse(localStorage.getItem("user")).blind ? null : gender;
       const msgInstance = new MessageClass({
         propsData: {
