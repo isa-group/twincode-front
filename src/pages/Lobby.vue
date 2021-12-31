@@ -24,6 +24,7 @@
                 >Introduce the token provided by the session coordinator</label
               >
               <input
+                id="tokenInput"
                 type="text"
                 v-model="tokenId"
                 class="block appearance-none w-full bg-white border border-gray-200 hover:border-grey px-2 py-2 rounded shadow"
