@@ -111,7 +111,7 @@
             Validate
           </button>
             
-        
+          <!--
           <button
             class="bg-purple-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
             @click="changeExercise()"
@@ -119,7 +119,8 @@
           >
             Change Exercise
           </button>
-        
+          -->
+
           </div>
           <div id="return"></div>
           <div id="result"></div>
@@ -134,11 +135,13 @@
               <p class="p-3">This is a place to chat with your peer</p>
             </div>
             <div
+              id="chatContainer"
               class="flex-grow p-3 order-2 h-3/6 overflow-auto w-full"
               ref="messageContainer"
             ></div>
             <div class="p-3 order-1 h-1/6">
               <textarea
+                id="chatbox"
                 :disabled="exerciseType != 'PAIR'"
                 v-model="myMessage"
                 class="border resize-none w-full text-sm p-2"
@@ -194,7 +197,7 @@
     >
       <div
         class="border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5 w-2/3"
-        v-if="standardSession == true && testCounter != 3 || standardSession == false"
+        v-if="standardSession == true && testIndex != 3 || standardSession == false"
       >
         <h1 class="font-bold text-2xl mb-4">A new test begins!</h1>
         <h2 class="font-bold text-xl text-gray-600">
@@ -296,7 +299,7 @@ export default {
       text3codemirror: "",
       consoleValue: "",
       standardSession: false,
-      testCounter: 0,
+      testIndex: 0,
     };
   },
   filters: {
@@ -361,7 +364,6 @@ export default {
       this.standardSession = pack.data.isStandard;
       localStorage.sessionIsStandard = pack.data.isStandard;
       localStorage.testCounterS = pack.data.testCounterS; 
-      this.testCounter = pack.data.testCounterS; 
       this.clearResult();
     },
     cursorActivity(data) {
@@ -387,6 +389,7 @@ export default {
       this.inputs = pack.data.inputs;
       this.solutions = pack.data.solutions;
       this.language = pack.data.testLanguage.toLowerCase();
+      this.testIndex = pack.data.testIndex;
       if(this.language == "python") {
         this.text1codemirror = "def ";
         this.text2codemirror = "main(input)";
@@ -394,7 +397,7 @@ export default {
       } else {
         this.text1codemirror = "function ";
         this.text2codemirror = "main(input) {";
-        this.text3codemirror = "output\n}";
+        this.text3codemirror = "output;\n}";
       }
       this.clearResult();
 
@@ -494,8 +497,7 @@ export default {
       dbg("method newMessage - init",msg);
       const MessageClass = Vue.extend(Message);
       let gender = localStorage.getItem("pairedTo") === 'Female';
-      //gender = this.peerChange ? !gender : gender;
-      gender = this.peerChange || localStorage.getItem("sessionIsStandard") && localStorage.getItem("testCounterS") == 2 ? !gender : gender;
+      gender = (this.testIndex == 2) ? !gender : gender;
       gender = JSON.parse(localStorage.getItem("user")).blind ? null : gender;
       const msgInstance = new MessageClass({
         propsData: {

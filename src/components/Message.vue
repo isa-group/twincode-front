@@ -1,11 +1,11 @@
 <template>
-  <div class="flex mb-1 mt-1" :class="mine ? 'justify-end' : 'justify-start'">
+  <div class="flex mb-1 mt-1" :class="mine ? 'justify-end myMsgLine' : 'justify-start msgLine'">
     <div class="flex-shrink-0" v-if="!mine && girl != null">
-      <img class="rounded-full w-12 h-12" :src="getImages()" />
+      <img class="rounded-full w-12 h-12 msgAvatar" :src="getImages()" />
     </div>
     <div
       class="flex-inital p-3 border rounded-t-lg"
-      :class="mine ? 'rounded-bl-lg bg-white' : 'rounded-br-lg bg-teal-200'"
+      :class="mine ? 'rounded-bl-lg bg-white myMsgText' : 'rounded-br-lg bg-teal-200 partnerMsgText'"
     >
       <p class="break-words">{{ message }}</p>
     </div>
@@ -21,12 +21,12 @@ export default {
   },
   methods: {
     getImages() {
-      const images = require.context("@/assets/", false, /\.svg$/);
+      const images = require.context("@/assets/", false, /\.png$/);
       let image = "";
       if (this.girl) {
-        image = images("./girl.svg");
+        image = images("./girl2.png");
       } else {
-        image = images("./boy.svg");
+        image = images("./boy2.png");
       }
       return image;
     },
