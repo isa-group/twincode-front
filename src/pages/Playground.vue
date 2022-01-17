@@ -197,7 +197,7 @@
     >
       <div
         class="border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5 w-2/3"
-        v-if="standardSession == true && testIndex != 3 || standardSession == false"
+        v-if="standardSession == true && testCounter != 3 || standardSession == false"
       >
         <h1 class="font-bold text-2xl mb-4">A new test begins!</h1>
         <h2 class="font-bold text-xl text-gray-600">
@@ -300,6 +300,7 @@ export default {
       consoleValue: "",
       standardSession: false,
       testIndex: 0,
+      testCounter: 0,
     };
   },
   filters: {
@@ -364,6 +365,7 @@ export default {
       this.standardSession = pack.data.isStandard;
       localStorage.sessionIsStandard = pack.data.isStandard;
       localStorage.testCounterS = pack.data.testCounterS; 
+      this.testCounter = pack.data.testCounterS; 
       this.clearResult();
     },
     cursorActivity(data) {
