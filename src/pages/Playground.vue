@@ -206,6 +206,11 @@
         <p class="font-medium" v-html="testDescription"></p>
         <p class="font-normal mt-1">Your ID: {{ token }}</p>
       </div>
+      <div
+        class="border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5 w-2/3"
+        id="customAlert"
+      >
+       </div>
     </div>
   </div>
 </template>
@@ -407,11 +412,11 @@ export default {
       this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
     },
     customAlert(pack) {
-      var el = document.createElement("div");
-      el.setAttribute("class","border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5 w-2/3");
+      var el = document.getElementById("customAlert");
+      el.setAttribute("style", "visibility: visible;");
       el.innerHTML = pack.data.message;
       setTimeout(function(){
-        el.parentNode.removeChild(el);
+        el.setAttribute("style", "visibility: hidden;");
       }, 2000);
       document.body.appendChild(el);
 
