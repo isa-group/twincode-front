@@ -206,12 +206,6 @@
         <p class="font-medium" v-html="testDescription"></p>
         <p class="font-normal mt-1">Your ID: {{ token }}</p>
       </div>
-      <div
-        class="border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5 w-2/3"
-        style="visibility: {{alertVisibility}}"
-      >
-      {{alertText}}
-       </div>
     </div>
   </div>
 </template>
@@ -307,8 +301,6 @@ export default {
       standardSession: false,
       testIndex: 0,
       testCounter: 0,
-      alertVisibility: "hidden",
-      alertText: "",
     };
   },
   filters: {
@@ -415,11 +407,13 @@ export default {
       this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
     },
     customAlert(pack) {
-      this.alertVisibility = "visible";
-      this.alertText = pack.data.message;
+      var el = document.createElement("div");
+      el.setAttribute("style","position:absolute;top:50%;left:40%;width: 20%;height: 20%;text-align: center;background-color: white; border-radius: 15px;line-height: 650%; box-shadow: 0px 0px 5px #666;");
+      el.innerHTML = pack.data.message;
       setTimeout(function(){
-        this.alertVisibility = "hidden";
+        el.parentNode.removeChild(el);
       }, 2000);
+      document.body.appendChild(el);
 
       dbg("method customAlert - init ");
     },
