@@ -191,12 +191,13 @@
       <img src="@/assets/tc_color.png" class="w-48" />
     </div>
     <div
-      v-if="loadingTest"
+      v-if="loadingTest && (standardSession == true && testCounter != 3 || standardSession == false)"
       class="fixed h-full w-full top-0 z-50 flex justify-center items-center"
       style="backdrop-filter: blur(2px);"
     >
       <div
         class="border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5 w-2/3"
+        v-if="standardSession == true && testCounter != 3 || standardSession == false"
       >
         <h1 class="font-bold text-2xl mb-4">A new test begins!</h1>
         <h2 class="font-bold text-xl text-gray-600">
@@ -407,7 +408,7 @@ export default {
     },
     customAlert(pack) {
       var el = document.createElement("div");
-      el.setAttribute("style","position:absolute;top:50%;left:40%;width: 20%;height: 20%;text-align: center;background-color: rgba(140, 203, 249, 0.2);border: 2px dashed #34d037;line-height: 650%;");
+      el.setAttribute("class","border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5 w-2/3");
       el.innerHTML = pack.data.message;
       setTimeout(function(){
         el.parentNode.removeChild(el);
