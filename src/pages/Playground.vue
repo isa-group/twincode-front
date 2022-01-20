@@ -208,8 +208,9 @@
       </div>
       <div
         class="border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5 w-2/3"
-        id="customAlert"
+        style="visibility: {{alertVisibility}}"
       >
+      {{alertText}}
        </div>
     </div>
   </div>
@@ -306,6 +307,8 @@ export default {
       standardSession: false,
       testIndex: 0,
       testCounter: 0,
+      alertVisibility: "hidden",
+      alertText: "",
     };
   },
   filters: {
@@ -412,13 +415,11 @@ export default {
       this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
     },
     customAlert(pack) {
-      var el = document.getElementById("customAlert");
-      el.setAttribute("style", "visibility: visible;");
-      el.innerHTML = pack.data.message;
+      this.alertVisibility = "visible";
+      this.alertText = pack.data.message;
       setTimeout(function(){
-        el.setAttribute("style", "visibility: hidden;");
+        this.alertVisibility = "hidden";
       }, 2000);
-      document.body.appendChild(el);
 
       dbg("method customAlert - init ");
     },
