@@ -560,15 +560,20 @@ export default {
             "Content-Type": "application/json",
           },
         }).then(response => response.json()).then(data => {
-          console.log(this.returnValue);
+              console.log("Data returned from tester:\n"+JSON.stringify(data,null,2));
               this.isExerciseCorrect = data.result;
               this.twcc = "NO DATA"; //My API doesn't make an estimation on how good is the code compiled
               this.consoleValue = data.console;
               this.returnValue = data.solution;
               
+              
               if (this.isExerciseCorrect == true) {
-                dbg("validatePython - Correct Exercise - Chhanging Exercise...");
+                dbg("validatePython - Correct Exercise - Changing Exercise...");
+                console.log("Valid exercise.");
+
                 setTimeout(() => { this.changeExercise(); }, 2000);
+              }else{
+                 console.log("Invalid exercise.");
               }
               
         });
