@@ -14,9 +14,9 @@ export default {
     console.clear();
     console.log(this.$tours["myTour"]);
 
-    //setTimeout(() => {
-    //  return this.$tours["firstQ"].start();
-    //}, 25000) 
+    setTimeout(() => {
+      return this.$tours["myTour"].start();
+    }, 37000) 
   },
 };
 </script>
