@@ -5,11 +5,14 @@ import VueRouter from "vue-router";
 import routes from "./routes";
 import VueSocketIOExt from "vue-socket.io-extended";
 import io from "socket.io-client";
+import VueTour from 'vue-tour'
+require('vue-tour/dist/vue-tour.css');
 
 Vue.config.productionTip = false;
 
 Vue.use(VueRouter);
-
+Vue.config.productionTip = false;
+Vue.use(VueTour);
 const DEFAULT_TITLE = "Twincode";
 
 const router = new VueRouter({

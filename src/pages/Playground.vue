@@ -1,5 +1,7 @@
 <template>
   <div>
+    <Onboard :steps="steps" :options="options"/>
+    <Start :firstSteps="firstSteps" :firstOptions="firstOptions"/>
     <div id="mainscreen" class="container h-screen mx-auto" v-if="!finished">
       <!--<div class="shadow w-full bg-grey-light h-3">
         <div
@@ -16,7 +18,7 @@
       <div id="header" class="h-15 w-full bg-gray-900 flex content-center items-center justify-between">
           <div id="introbox">
             <a  class="cta" @click="seeInstructions()">
-              <span class="spanning">START GUIDE  </span>
+              <span class="spanning"> Instructions  </span>
               <span class="spaning">
                 <svg width="47px" height="48px" viewBox="0 0 66 43" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
                   <g id="arrow" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -170,18 +172,34 @@
           </div>
 
           <div id="outputbox">
-          <div v-if="returnValue && language == 'javascript'" class="p-3 bg-black text-white mt-2 rounded-md">
-            <p>Your console log:</p>
-            <p class="mt-1 text-black-900" v-for="log in logs" :key="log">
-              <pre>$> {{ log }} </pre>
-            </p>
+            <div v-if="returnValue && language == 'javascript'" class="p-3 bg-black text-white mt-2 rounded-md">
+              <p>Your console log:</p>
+              <p class="mt-1 text-black-900" v-for="log in logs" :key="log">
+                <pre>$> {{ log }} </pre>
+              </p>
+            </div>
+            <div v-if="returnValue && language == 'python'" class="p-3 bg-black text-white mt-2 rounded-md"> 
+                      <p> <b> Running Tests: </b></p>
+                      <p class="mt-1 text-black-900">
+                        <pre>{{consoleValue }} </pre>
+                      </p>
+                    </div>
           </div>
-          <div v-if="returnValue && language == 'python'" class="p-3 bg-black text-white mt-2 rounded-md"> 
-                    <p> <b> Running Tests: </b></p>
-                    <p class="mt-1 text-black-900">
-                      <pre>{{consoleValue }} </pre>
-                    </p>
+          <div id="clearbox">
+                  <div v-if="returnValue" class="mt-2">
+                    <button id="clearbutton" type="button" class="bg-orange-500" @click="clearResult()"> Clear  
+                  </button>
                   </div>
+                  <!--<button
+                      class="bg-yellow-800 hover:bg-yellow-700 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+                      onClick="toggleControlMode();"
+                    >
+                      Give control
+                    </button>-->
+                  
+                  
+                  
+                
                 </div>
 
 
@@ -243,22 +261,22 @@
     >
       <div class="max-w-lg">
         <h1 class="mb-6 text-center font-hairline text-3xl">
-          Session is over
+          Thank you!
         </h1>
         <div
           class="bg-teal-100 border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5"
         >
-          <h1 class="font-bold text-2xl mb-4">Congratulations!</h1>
+          <h1 class="font-bold text-2xl mb-4">The programming sessions are over.</h1>
           <p class="font-medium" v-html="finishMessage">
           </p>
         </div>
         <div class="text-center">
           <p class="text-grey-dark text-sm inline">
-            Universidad de Sevilla
+            Universidad de Seville 
           </p>
           <p class="text-grey-dark text-sm inline font-hairline mr-1 ml-1">|</p>
           <p class="text-grey-dark text-sm inline">
-            University of California, Berkeley
+            University of California, Berkeley 
           </p>
         </div>
       </div>
@@ -294,8 +312,11 @@
 import Vue from "vue";
 import Message from "../components/Message";
 import { codemirror } from "vue-codemirror";
-import "codemirror/mode/javascript/javascript.js";
+import "codemirror/mode/python/python.js";
+//import "codemirror/mode/javascript/javascript.js";
 import "codemirror/lib/codemirror.css";
+import Onboard from "../components/Onboard";
+import Start from "../components/Start";
 
 function dbg(msg, obj, fields) {
   
@@ -332,16 +353,231 @@ function dbg(msg, obj, fields) {
 export default {
   components: {
     codemirror,
+    Onboard,
+    Start,
   },
   data() {
     return {
-      code: ``,
+      code: "# Replace the line below.\n# It currently sets output equal to the function input: \noutput = inp",
       cmOption: {
         tabSize: 4,
         styleActiveLine: true,
         lineNumbers: true,
-        mode: "text/javascript",
+        matchBrackets: true,
+        showCursorWhenSelecting: true,
+        mode: "text/x-python",
       },
+      firstOptions: {
+        useKeyboardNavigation: false,
+        labels: {
+          buttonSkip: 'OKAY',
+          buttonPrevious: 'Back',
+          buttonNext: 'Next',
+          buttonStop: 'GOT IT.'
+        },
+
+      },
+      options: {
+        useKeyboardNavigation: false,
+        enabledButtons: {
+          buttonSkip: false
+        },
+        labels: {
+          buttonSkip: 'Exit Guide',
+          buttonPrevious: 'Back',
+          buttonNext: 'Next',
+          buttonStop: 'End'
+        },
+
+      },
+      firstSteps: [
+        {
+            target: "#introbox",  
+            content: `If you just joined your first session, welcome!! Click "START GUIDE" to continue.\
+            <br>~<br> This window may reappear if you refresh your browser. If you have already completed the guide in your first session, you don't need to view it again.`,
+            
+            params: {
+              placement: 'right' ,
+              enableScrolling: false,
+              highlight: true
+            }
+          }
+      ],
+      steps: [
+          { // STEP 1
+            target: "#introbox",  
+            header: {
+              title: 'Welcome to Twincode!',
+            },
+            content: `On this platform, you can collaborate remotely with a partner and work together on a programming task.<br><span>~</span><br>\
+            This guide introduces the platform features and goes over an example question. <br><span>~</span><br>\
+            You can view the instructions again by clicking the <b>"START GUIDE"</b> button.`,
+            
+            params: {
+              placement: 'bottom' ,
+              enableScrolling: false,
+              highlight: true
+            }
+            },
+          { //STEP 4
+            target: "#timebarbox",
+            header: { title: '1. Time Remaining'},
+            content: '<p> You see the remaining time on an exercise here. \
+            For example, you are given 5 minutes to go through this intro guide. <br><span>~</span><br>\
+             When timer runs out, you will move on to the real exercise of Session 1 and work in pairs for 15 minutes. \
+            <br><span>~</span><br> <u>Disclaimer:</u> We are not trying to measure your technical abilities. \
+            We are more interested in the pair programming process. \
+            To prevent idle time in programming sessions, we selected questions that are expected to take more \
+            than 15 minutes to solve. Don\'t worry about running out of time.',
+            
+            params: {
+              placement: 'bottom' ,
+              highlight: true,
+              enableScrolling: false,
+            }
+          },
+          { // STEP 2
+            target: "#chatbox",
+            header: { title: '2. Communicating with Your Partner'},
+            content: 'You will use this chat window to "talk" with your partner. <br><span>~</span><br> \
+            <u> Remember:</u><b> DO NOT </b> to share any personal information (i.e your name, year,\
+             the classes you are in etc). The anonymity of participants is very important for this study. We appreciate your cooperation!',
+            
+            params: {
+              placement: 'left' ,
+              enableScrolling: false,
+              highlight: true,
+            }
+          },
+          { // STEP 3
+            target: "#typingbox",
+            header: { title: '3. Say Hi!'},
+            content: 'Type "Hello" and press ENTER to send a message in the chat. Wait until your partner responds before clicking "Next." <br><br><hr> <u>\
+             <br>Tip #1:</u> Good communication is key for efficient pair programming. \
+             Start each paired session by first deciding the <b>navigator</b> (partner who edits the code on the IDE) and the <b>observer</b> (partner who monitors the edits and brainstorms next steps). Remember to switch roles regularly (i.e every 3-5 minutes).\
+             <br><span>~</span><br> <u>Tip #2:</u> Always first discuss what edits should be made, and decide who is editing (i.e the navigator) \
+             We encourage you to use the chat functionality to discuss your code \
+            with your partner, but feel free to use comments as you usually would to jot down the purpose of a certain piece of code. \
+            ',
+            params: {
+              placement: 'left' ,
+              enableScrolling: false,
+              highlight: true,
+            }
+          },
+          
+          
+          { // STEP 4
+            target: "#codemirror",
+            header: { title: '4. Shared Code Editor'},
+            content: 'You will be collaboratively editing code on this IDE window. \
+            <br>~</br> Try typing print("Hello World!") on line 2. You might see your partner\'s edits appearing. \
+            Coordinate with your partner and have a single print statement before you click "Next". \
+            <br><span>~</span><br> <u>Tip #3:</u> In this IDE, an indent is equivalent to 4 spaces.',
+            params: {
+              placement: 'right' ,
+              enableScrolling: false,
+              highlight: true,
+            }
+          },
+          { // STEP 5
+            target: "#runcode",
+            header: { title: '5. Running Code'},
+            content: 'Once your team is ready, click "Run Code!" and scroll down to see autograder results. Wait and press "Run Code!" again if clicking once doesn\'t work. <br>~<br>\
+            <u>Tip #4:</u> Each partner has to click the button to see the results. Once you see the autograder results below, click "Next". \
+            <br>~<br>Click "Back" if your code isn\'t ready to be run and needs further edits.'
+             ,
+            params: {
+              placement: 'right' ,
+              enableScrolling: false,
+              highlight: true,
+            }          
+          },
+          { // STEP 6
+            target: "#testsbox",
+            header: { title: '6. Tests Run'},
+            content: 'You can see how many test are run in the autograder, how many have passed and how many have failed here. Click "Next" to see details.\
+            <br>~<br>Click "Back" if you can\'t view autograder results. Run the tests again.'           
+          ,params: {
+              placement: 'top',
+              enableScrolling: false,
+              highlight: true,
+            }
+          },
+          { // STEP 7
+            target: "#outputbox",
+            header: { title: '7. Autograder Details'},
+            content: 'You can see inputs, expected outputs and print statements for each test case here.\
+            Notice currently we have <code> output = inp </code>, so we are setting function\'s output equal to its input.\
+            <br>~<br> Click "Next" to learn more about function input and outputs.\
+            <br>~<br>Click "Back" if you can\'t view output results. Run the tests again.'          
+          ,params: {
+              placement: 'right' ,
+              highlight: true,
+            }
+          },
+          { // STEP 8
+            target: "#clearbox",
+            header: { title: '8. Clear Test Results'},
+            content: 'You can use this button to clear test results in between running the autograder.<br>~<br> \
+            Click "Next" after clicking the button and clearing autograder results.\
+            <br>~<br>You won\'t see this button unless you run tests.',
+            params: {
+              placement: 'right' ,
+              highlight: true,
+            }
+          },
+          { // STEP 9
+            target: "#functbox",
+            header: { title: '9. Input, Output and Problem Definition'},
+            content: 'You can see the problem description, input and output types and an example doctest case here.\
+            <br>~<br> Note that you should use <code>inp</code> (inputs) to assign a value to <code>output</code> in order to pass autograder tests. \
+            You do not need to return <code>output</code> since a return statement is already given outside of the code editor.\
+            <br><br><hr><br> Now, copy the solution for the practice exercise and paste it on the code editor. \
+            Click "Next" when you are ready to run the tests.',
+            params: {
+              placement: 'right' ,
+            }
+          }, 
+          {//STEP 10
+            target: "#runcode",
+            header: { title: '10. Click "Run Code!"'},
+            content: 'Run the code by clicking "Run Code!" button and scroll down to see autograder results.\
+            Click "Next" when you see all tests pass. \
+            <br>~<br> Click "Back" if you need to edit your code before running tests. <br>~<br>\
+            <b><u>Disclaimer:</u></b> Do not hardwire autograder test results in your code.',
+            params: {
+              placement: 'right' ,
+              highlight: true,
+            }
+          },
+          { // STEP 11
+            target: "#greentestsbox",
+            header: { title: '11. Passing Tests'},
+            content: 'You will see the green "Congratulations!" box when all autograder tests are successfully passing.\
+            <br><br> If you don\'t see passing tests, click "Back" to run the tests again using our solution.\
+            <br>~<br> Click "Next" and scroll up to view the timer.',
+            params: {
+              placement: 'right' ,
+              highlight: true,
+              enableScrolling: false,
+              
+            }
+          },
+          { // STEP 12
+            target: "#timebarbox",
+            header: { title: 'Ready to Start Session 1 Exercise'},
+            content: 'We have reached the end of the intro guide and the practice exercise. \
+            When 5 minutes is done, Session 1 will automatically begin. <br>\
+            <br>~<br> Wait until the timer is reset to 15 minutes, then click "End." \
+            The problem description will be updated with the real exercise of Session 1. \
+            You will have <code> 15 minutes </code> in <code> Session 1 </code> to collaborate with a partner on the given exercise.',
+            params: {
+              placement: 'bottom' ,
+              highlight: true
+            }
+          }
+        ],
       firstLoad: true,
       awaiting: null,
       cursorLeftPosition: 0,
@@ -367,6 +603,11 @@ export default {
       excerciseErrorMessage: "",
       returnValue: "",
       token: localStorage.getItem("code"),
+      pronounReal: (JSON.parse(localStorage.getItem("user")).blind)? "" : (localStorage.getItem("pairedTo") === 'Female')? '(she/her)':'(he/him)',
+      pronounOpp: (JSON.parse(localStorage.getItem("user")).blind)? "" : (localStorage.getItem("pairedTo") === 'Female')? '(he/him)':'(she/her)',
+      printValue: "", /** NEW */
+      numCorrect:null, /** NEW */
+      numWrong: null, /** NEW */
       println: window.println,
       logs: window.logs,
       inputs: null,
@@ -474,11 +715,11 @@ export default {
       this.testIndex = pack.data.testIndex;
       if(this.language == "python") {
         this.text1codemirror = "def ";
-        this.text2codemirror = "main(input)";
+        this.text2codemirror = "main(inp):";
         this.text3codemirror = "output";
       } else {
         this.text1codemirror = "function ";
-        this.text2codemirror = "main(input) {";
+        this.text2codemirror = "main(inp) {";
         this.text3codemirror = "output;\n}";
       }
       this.clearResult();
@@ -629,6 +870,11 @@ export default {
      var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
      this.consoleValue = "";
      this.returnValue = "";
+     this.printValue = "";
+     this.numCorrect = null; /** NEW */
+     this.numWrong = null;
+     this.tot = null;
+     this.isExerciseCorrect = null;
      fetch("https://asliakalin.pythonanywhere.com/tester", {
           method: "POST",
           body: JSON.stringify({
@@ -640,11 +886,18 @@ export default {
             "Content-Type": "application/json",
           },
         }).then(response => response.json()).then(data => {
-              console.log("Data returned from tester:\n"+JSON.stringify(data,null,2));
+              console.log("Data returned from tester:\n"+JSON.stringify(this.returnValue,null,2));
               this.isExerciseCorrect = data.result;
-              this.twcc = "NO DATA"; //My API doesn't make an estimation on how good is the code compiled
+              
               this.consoleValue = data.console;
               this.returnValue = data.solution;
+              this.consoleValue = data.console;
+              this.returnValue = data.solution;
+              this.printValue = data.prints;
+              this.numCorrect = data.correct;
+              this.numWrong = data.wrong;
+              this.tot = data.tot;
+              //this.hasExerciseErrors = data.errors;
               
               
               if (this.isExerciseCorrect == true) {
@@ -657,6 +910,10 @@ export default {
               }
               
         });
+    },
+    seeInstructions() {
+      this.$tours["firstQ"].stop();
+      this.$tours["myTour"].start();
     },
     clearResult() {
       dbg("method clearResult - init");
@@ -898,7 +1155,7 @@ export default {
 .CodeMirror {
   border: 1px solid, rgb(8,8,8);
   height: 60vh !important;
-  font-size:12px;
+  font-size:16px;
 }
 #pairCursor {
   width: 2px;
