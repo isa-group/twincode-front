@@ -360,7 +360,7 @@ export default {
     return {
       code: "# Replace the line below.\n# It currently sets output equal to the function input: \noutput = inp",
       cmOption: {
-        tabSize: 4,
+        tabSize: 2,
         styleActiveLine: true,
         lineNumbers: true,
         matchBrackets: true,
@@ -368,7 +368,7 @@ export default {
         mode: "text/x-python",
       },
       firstOptions: {
-        useKeyboardNavigation: false,
+        useKeyboardNavigation: true,
         labels: {
           buttonSkip: 'OKAY',
           buttonPrevious: 'Back',
@@ -378,9 +378,9 @@ export default {
 
       },
       options: {
-        useKeyboardNavigation: false,
+        useKeyboardNavigation: true,
         enabledButtons: {
-          buttonSkip: false
+          buttonSkip: true
         },
         labels: {
           buttonSkip: 'Exit Guide',
@@ -393,8 +393,7 @@ export default {
       firstSteps: [
         {
             target: "#introbox",  
-            content: `If you just joined your first session, welcome!! Click "START GUIDE" to continue.\
-            <br>~<br> This window may reappear if you refresh your browser. If you have already completed the guide in your first session, you don't need to view it again.`,
+            content: `Welcome to Twincode! Click "Instructions" to see the platform guide. <br><br> You can use your key arrows to quickly skip the guide steps.`,
             
             params: {
               placement: 'right' ,
@@ -1155,7 +1154,7 @@ export default {
 .CodeMirror {
   border: 1px solid, rgb(8,8,8);
   height: 60vh !important;
-  font-size:16px;
+  font-size:13px;
 }
 #pairCursor {
   width: 2px;

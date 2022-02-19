@@ -21,12 +21,12 @@ export default {
   },
   methods: {
     getImages() {
-      const images = require.context("@/assets/", false, /\.png$/);
+      const images = require.context("@/assets/", false, /\.svg$/);
       let image = "";
       if (this.girl) {
-        image = images("./girl2.png");
+        image = images("./girl2.svg");
       } else {
-        image = images("./boy2.png");
+        image = images("./boy2.svg");
       }
       return image;
     },
