@@ -370,7 +370,7 @@ export default {
         labels: {
           buttonStop: 'Exit Guide',
           buttonPrevious: 'Back',
-          buttonNext: 'Next',
+          buttonNext: 'Next', 
           buttonSkip: 'Exit Guide',
         },
 
