@@ -91,7 +91,7 @@
                       @click="validate()"
                       v-if="language == 'javascript'"
                     >
-                      Validate
+                      Run Code!
                     </button>
                   <button id="runcode"
                       class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
@@ -786,9 +786,11 @@ export default {
     valid(v) {
       dbg("method valid - init",v);
       if (this.exerciseType != 'DEMO') {
+        console.log(v);
         fetch(process.env.VUE_APP_TC_API + "/verify", {
           method: "POST",
           body: JSON.stringify({
+            exerciseDescription: this.exerciseDescription,
             solutions: v,
             user: localStorage.token,
             source: "function main(input) { "+
@@ -805,6 +807,9 @@ export default {
               this.isExerciseCorrect = data.result;
               this.twcc = data.twcc;
               this.returnValue = v;
+              this.numCorrect = data.numCorrect; /** NEW */
+              this.numWrong = data.numWrong;
+              this.tot = data.tot;
               
               if (this.isExerciseCorrect == true) {
                 dbg("validateJavascript - Correct Exercise - Chhanging Exercise...");
