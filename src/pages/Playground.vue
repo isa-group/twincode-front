@@ -150,7 +150,7 @@
               </p> -->
               <b> Autograder Results: </b>
                     <p class="mt-1 text-black-900">
-                      {{ tot }} test cases: {{ numCorrect }} tests passed. {{ numWrong }} tests failed.
+                      {{ tot }} test cases: {{ numCorrect }} tests passed. {{ numWrong }} tests failed. The rest errored or didn't run.
                     </p>
                     <p class="mt-1 text-red-900">
                       <pre>{{printValue}} </pre>
@@ -209,10 +209,10 @@
             <div class="order-4 h-2/6">
               <img class="w-10 inline" src="@/assets/chat.png" />
               
-              <p v-if="exerciseType == 'PAIR' & peerChange" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
+              <p v-if="exerciseType == 'PAIR' & (peerChange | this.testIndex == 2)" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
                     Your partner {{pronounOpp}} is connected:
                     </p>
-                    <p v-if="exerciseType == 'PAIR' & !peerChange" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
+                    <p v-if="exerciseType == 'PAIR' & (!peerChange | this.testIndex != 2)" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
                     Your partner {{pronounReal}} is connected:
                     </p>
                     <p v-if="exerciseType != 'PAIR'" class="text-lg inline pl-3 mt-2 text-teal-900">
@@ -685,7 +685,7 @@ export default {
         propsData: {
           mine: mine,
           message: msg,
-          girl: gender, // if true -- gets woman avatar
+          girl: gender, // if true -- gets woman avatar, if false --gets man avatar, if null --no avatar
         },
       });
 
