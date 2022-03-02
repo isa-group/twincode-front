@@ -209,10 +209,10 @@
             <div class="order-4 h-2/6">
               <img class="w-10 inline" src="@/assets/chat.png" />
               
-              <p v-if="exerciseType == 'PAIR' & (peerChange | this.testIndex == 2)" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
+              <p v-if="exerciseType == 'PAIR' & (this.testIndex == 2)" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
                     Your partner {{pronounOpp}} is connected:
                     </p>
-                    <p v-if="exerciseType == 'PAIR' & (!peerChange | this.testIndex != 2)" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
+                    <p v-if="exerciseType == 'PAIR' & (this.testIndex == 0)" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
                     Your partner {{pronounReal}} is connected:
                     </p>
                     <p v-if="exerciseType != 'PAIR'" class="text-lg inline pl-3 mt-2 text-teal-900">
