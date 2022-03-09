@@ -89,14 +89,14 @@
                       </button>-->
                     <button class="bg-teal-600 hover:bg-teal-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                       @click="validate()"
-                      v-if="language == 'javascript'"
+                      v-if="language == 'javascript' && canSubmit"
                     >
                       Run Code!
                     </button>
                   <button id="runcode"
                       class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                       @click="validatePython()"
-                      v-if="language == 'python'"
+                      v-if="language == 'python' && canSubmit"
                     > Run Code!
                   </button>
                   <!--
@@ -481,6 +481,7 @@ export default {
       standardSession: false,
       testIndex: 0,
       testCounter: 0,
+      canSubmit: true
     };
   },
   filters: {
@@ -546,6 +547,7 @@ export default {
       localStorage.sessionIsStandard = pack.data.isStandard;
       localStorage.testCounterS = pack.data.testCounterS; 
       this.testCounter = pack.data.testCounterS; 
+      this.canSubmit = true;
       this.clearResult();
     },
     cursorActivity(data) {
@@ -590,6 +592,11 @@ export default {
       var el = document.createElement("div");
       el.setAttribute("style","position:absolute;top:30%;left:40%;width: 20%;height: 20%; font-weight: bold; font-size: large; text-align: center;background-color: white; border-radius: 15px;line-height: 650%; box-shadow: 0px 0px 10px #666;");
       el.innerHTML = pack.data.message;
+      if (pack.data.message == "There are no more exercises left on this test") {
+        this.canSubmit = false;
+      } else {
+        this.canSubmit = true;
+      }
       setTimeout(function(){
         el.parentNode.removeChild(el);
       }, 3000);
