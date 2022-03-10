@@ -87,6 +87,7 @@
                       >
                         Give control
                       </button>-->
+                    <p v-if="!canSubmit" style="color: red; text-decoration: underline; text-decoration-style: double; text-transform: uppercase; font-size: 20px;">{{validMessage}}</p>
                     <button class="bg-teal-600 hover:bg-teal-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                       @click="validate()"
                       v-if="language == 'javascript' && canSubmit"
@@ -481,7 +482,8 @@ export default {
       standardSession: false,
       testIndex: 0,
       testCounter: 0,
-      canSubmit: true
+      canSubmit: true,
+      validMessage: "",
     };
   },
   filters: {
@@ -589,18 +591,19 @@ export default {
       this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
     },
     customAlert(pack) {
-      var el = document.createElement("div");
-      el.setAttribute("style","position:absolute;top:30%;left:40%;width: 20%;height: 20%; font-weight: bold; font-size: large; text-align: center;background-color: white; border-radius: 15px;line-height: 650%; box-shadow: 0px 0px 10px #666;");
-      el.innerHTML = pack.data.message;
+      this.validMessage = pack.data.message;
       if (pack.data.message == "There are no more exercises left on this test") {
         this.canSubmit = false;
       } else {
         this.canSubmit = true;
+        var el = document.createElement("div");
+        el.setAttribute("style","position:absolute;top:30%;left:40%;width: 20%;height: 20%; font-weight: bold; font-size: large; text-align: center;background-color: white; border-radius: 15px;line-height: 650%; box-shadow: 0px 0px 10px #666;");
+        el.innerHTML = pack.data.message;
+        setTimeout(function(){
+          el.parentNode.removeChild(el);
+        }, 3000);
+        document.body.appendChild(el);
       }
-      setTimeout(function(){
-        el.parentNode.removeChild(el);
-      }, 3000);
-      document.body.appendChild(el);
 
       dbg("method customAlert - init ");
     },
