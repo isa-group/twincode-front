@@ -744,7 +744,7 @@ export default {
      this.numWrong = null;
      this.tot = null;
      this.isExerciseCorrect = null;
-     fetch("https://asliakalin.pythonanywhere.com/tester", {
+     fetch("https://twincode-python-engine.herokuapp.com/tester", {
           method: "POST",
           body: JSON.stringify({
             inputs: this.inputs,
