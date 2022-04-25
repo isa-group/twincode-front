@@ -538,6 +538,7 @@ export default {
     },
     loadTest(pack) {
       dbg("EVENT loadTest",pack);
+      this.canSubmit = true;
       this.finished = false;
       this.loadingTest = true;
       this.starting = false;
@@ -771,6 +772,7 @@ export default {
               this.tot = data.tot;
               //this.hasExerciseErrors = data.errors;
               
+              this.canSubmit = true;
               
               if (this.isExerciseCorrect == true) {
                 dbg("validatePython - Correct Exercise - Changing Exercise...");
@@ -817,6 +819,7 @@ export default {
         }).then((response) => {
           if (response.status == 200) {
             response.json().then((data) => {
+              this.canSubmit = true;
               this.isExerciseCorrect = data.result;
               this.twcc = data.twcc;
               this.returnValue = v;
