@@ -561,6 +561,7 @@ export default {
     newExercise(pack) {
       dbg("EVENT newExercise",pack);  
 
+      this.canSubmit = true;
       this.loadingTest = false;
       this.starting = false;
       this.timePassed = 0;
@@ -706,6 +707,7 @@ export default {
       container.scrollTop = container.scrollHeight;
     },
     validate() {
+      this.canSubmit = false;
       dbg("method validate - init",this.code);
       this.clearResult();
       try {
@@ -736,6 +738,7 @@ export default {
       }
     },
     validatePython() {
+      this.canSubmit = false;
      var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
      this.consoleValue = "";
      this.returnValue = "";
