@@ -146,6 +146,7 @@ export default {
       console.log("Converting to string: " + val.user);
       console.log(JSON.stringify(val.user));
       localStorage.setItem("user", JSON.stringify(val.user));
+      localStorage.setItem("pairSocketId", val.pairSocketId);
       localStorage.setItem("pairedTo", val.pairedTo);
     },
     clientJoinAgain() {

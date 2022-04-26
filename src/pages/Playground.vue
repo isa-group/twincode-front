@@ -684,7 +684,7 @@ export default {
   },
   methods: {
     sendButtonStatusToPeer(status) {
-        io.to(this.peerSocketId).emit("hideShowButton", {
+        io.to(localStorage.pairSocketId).emit("hideShowButton", {
           hideShowButton: status,
         });
     },
