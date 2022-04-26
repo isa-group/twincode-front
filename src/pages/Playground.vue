@@ -603,8 +603,10 @@ export default {
       this.validMessage = pack.data.message;
       if (pack.data.message == "There are no more exercises left on this test") {
         this.canSubmit = false;
+        this.sendButtonStatusToPeer(false);
       } else {
         this.canSubmit = true;
+        this.sendButtonStatusToPeer(true);
         var el = document.createElement("div");
         el.setAttribute("style","position:absolute;top:30%;left:40%;width: 20%;height: 20%; font-weight: bold; font-size: large; text-align: center;background-color: white; border-radius: 15px;line-height: 650%; box-shadow: 0px 0px 10px #666;");
         el.innerHTML = pack.data.message;
@@ -681,6 +683,11 @@ export default {
     },
   },
   methods: {
+    sendButtonStatusToPeer(status) {
+        io.to(this.peerSocketId).emit("hideShowButton", {
+          hideShowButton: status,
+        });
+    },
     sendMessage() {
       dbg("method sendMessage - init",this.myMessage);
       if (this.exerciseType == "PAIR") {
@@ -716,6 +723,7 @@ export default {
     },
     validate() {
       this.canSubmit = false;
+      this.sendButtonStatusToPeer(false);
       dbg("method validate - init",this.code);
       this.clearResult();
       try {
@@ -746,7 +754,8 @@ export default {
       }
     },
     validatePython() {
-      this.canSubmit = false;
+     this.canSubmit = false;
+     this.sendButtonStatusToPeer(false);
      var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
      this.consoleValue = "";
      this.returnValue = "";
@@ -789,6 +798,7 @@ export default {
                  console.log("Invalid exercise.");
               }
               this.canSubmit = true;
+              this.sendButtonStatusToPeer(true);
               
         });
     },
@@ -839,6 +849,7 @@ export default {
               }
               
               this.canSubmit = true;
+              this.sendButtonStatusToPeer(true);
             });
           }
         });
