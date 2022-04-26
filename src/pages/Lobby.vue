@@ -147,8 +147,8 @@ export default {
       console.log(JSON.stringify(val.user));
       localStorage.setItem("user", JSON.stringify(val.user));
       console.log("Session Start - val: " + JSON.stringify(val));
-      localStorage.setItem("pairSocketId", val.pairSocketId);
       localStorage.setItem("pairedTo", val.pairedTo);
+      localStorage.pairSocketId = val.pairSocketId;
     },
     clientJoinAgain() {
       this.performConnection();
