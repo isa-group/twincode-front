@@ -147,6 +147,7 @@ export default {
       console.log(JSON.stringify(val.user));
       localStorage.setItem("user", JSON.stringify(val.user));
       localStorage.setItem("pairedTo", val.pairedTo);
+      localStorage.setItem("pairSocketId", val.pairSocketId);
     },
     clientJoinAgain() {
       this.performConnection();

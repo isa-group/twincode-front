@@ -87,7 +87,7 @@
                       >
                         Give control
                       </button>-->
-                    <p v-if="!canSubmit" style="color: red; text-decoration: underline; text-decoration-style: double; text-transform: uppercase; font-size: 20px;">{{validMessage}}</p>
+                    <!--<p v-if="!canSubmit" style="color: red; text-decoration: underline; text-decoration-style: double; text-transform: uppercase; font-size: 20px;">{{validMessage}}</p>-->
                     <button class="bg-teal-600 hover:bg-teal-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                       @click="validate()"
                       v-if="language == 'javascript' && canSubmit"
@@ -151,7 +151,7 @@
               </p> -->
               <b> Autograder Results: </b>
                     <p class="mt-1 text-black-900">
-                      {{ tot }} test cases: {{ numCorrect }} tests passed. {{ numWrong }} tests failed.
+                      {{ tot }} test cases: {{ numCorrect }} tests passed. {{ numWrong }} tests failed. The rest errored or didn't run.
                     </p>
                     <p class="mt-1 text-red-900">
                       <pre>{{printValue}} </pre>
@@ -210,10 +210,10 @@
             <div class="order-4 h-2/6">
               <img class="w-10 inline" src="@/assets/chat.png" />
               
-              <p v-if="exerciseType == 'PAIR' & peerChange" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
+              <p v-if="exerciseType == 'PAIR' & (this.testIndex == 2)" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
                     Your partner {{pronounOpp}} is connected:
                     </p>
-                    <p v-if="exerciseType == 'PAIR' & !peerChange" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
+                    <p v-if="exerciseType == 'PAIR' & (this.testIndex == 0)" id="chattingbox" class="text-lg inline pl-3 mt-2 text-teal-900">
                     Your partner {{pronounReal}} is connected:
                     </p>
                     <p v-if="exerciseType != 'PAIR'" class="text-lg inline pl-3 mt-2 text-teal-900">
@@ -561,6 +561,7 @@ export default {
     newExercise(pack) {
       dbg("EVENT newExercise",pack);  
 
+      this.canSubmit = true;
       this.loadingTest = false;
       this.starting = false;
       this.timePassed = 0;
@@ -590,12 +591,22 @@ export default {
       dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: true");
       this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
     },
+    hideShowButton(pack) {
+      dbg("method hideShowButton - init");
+      if (pack.data.hideShowButton) {
+        this.canSubmit = true;
+      } else {
+        this.canSubmit = false;
+      }
+    },
     customAlert(pack) {
       this.validMessage = pack.data.message;
       if (pack.data.message == "There are no more exercises left on this test") {
         this.canSubmit = false;
+        this.sendButtonStatusToPeer(false);
       } else {
         this.canSubmit = true;
+        this.sendButtonStatusToPeer(true);
         var el = document.createElement("div");
         el.setAttribute("style","position:absolute;top:30%;left:40%;width: 20%;height: 20%; font-weight: bold; font-size: large; text-align: center;background-color: white; border-radius: 15px;line-height: 650%; box-shadow: 0px 0px 10px #666;");
         el.innerHTML = pack.data.message;
@@ -672,6 +683,11 @@ export default {
     },
   },
   methods: {
+    sendButtonStatusToPeer(status) {
+        io.to(localStorage.pairSocketId).emit("hideShowButton", {
+          hideShowButton: status,
+        });
+    },
     sendMessage() {
       dbg("method sendMessage - init",this.myMessage);
       if (this.exerciseType == "PAIR") {
@@ -695,7 +711,7 @@ export default {
         propsData: {
           mine: mine,
           message: msg,
-          girl: gender, // if true -- gets woman avatar
+          girl: gender, // if true -- gets woman avatar, if false --gets man avatar, if null --no avatar
         },
       });
 
@@ -706,6 +722,8 @@ export default {
       container.scrollTop = container.scrollHeight;
     },
     validate() {
+      this.canSubmit = false;
+      this.sendButtonStatusToPeer(false);
       dbg("method validate - init",this.code);
       this.clearResult();
       try {
@@ -736,6 +754,8 @@ export default {
       }
     },
     validatePython() {
+     this.canSubmit = false;
+     this.sendButtonStatusToPeer(false);
      var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
      this.consoleValue = "";
      this.returnValue = "";
@@ -777,6 +797,8 @@ export default {
               }else{
                  console.log("Invalid exercise.");
               }
+              this.canSubmit = true;
+              this.sendButtonStatusToPeer(true);
               
         });
     },
@@ -825,6 +847,9 @@ export default {
                 dbg("validateJavascript - Correct Exercise - Chhanging Exercise...");
                 setTimeout(() => { this.changeExercise(); }, 2000);
               }
+              
+              this.canSubmit = true;
+              this.sendButtonStatusToPeer(true);
             });
           }
         });
