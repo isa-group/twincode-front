@@ -24,7 +24,7 @@
     <div v-if="!loggedIn">
       <div class="flex flex-col items-center justify-center mt-6">
         <img src="@/assets/tc_white_color.png" class="w-56" />
-        <h1 class="font-light mt-2 text-white">Administration console PRUEBA</h1>
+        <h1 class="font-light mt-2 text-white">Administration console</h1>
       </div>
       <div class="container mx-auto max-w-sm px-3 mt-24">
         <div

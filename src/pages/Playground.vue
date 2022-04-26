@@ -593,7 +593,7 @@ export default {
     },
     hideShowButton(pack) {
       dbg("method hideShowButton - init");
-      if (pack.data.hideShowButton) {
+      if (pack.hideShowButton) {
         this.canSubmit = true;
       } else {
         this.canSubmit = false;
@@ -686,11 +686,6 @@ export default {
     sendButtonStatusToPeer(status) {
       console.log(status);
       this.$socket.client.emit("sendButtonStatusToPeer", { status: status });
-      /*
-        io.to(localStorage.pairSocketId).emit("hideShowButton", {
-          hideShowButton: status,
-        });
-      */
     },
     sendMessage() {
       dbg("method sendMessage - init",this.myMessage);
