@@ -34,7 +34,7 @@
             class="w-20 md:w-48 md:float-left inline md:mr-20 "
           />
           <h1 class="inline md:float-right md:mr-10 text-white font-thin text-sm md:text-xl order-last">
-            Your Login ID: {{ token }}
+            Your Login ID: {{ token }} PRUEBA
           </h1> 
         </div> 
       
