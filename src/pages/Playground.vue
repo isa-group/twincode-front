@@ -591,6 +591,14 @@ export default {
       dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: true");
       this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
     },
+    hideShowButton(pack) {
+      dbg("method hideShowButton - init");
+      if (pack.data.hideShowButton) {
+        this.canSubmit = true;
+      } else {
+        this.canSubmit = false;
+      }
+    },
     customAlert(pack) {
       this.validMessage = pack.data.message;
       if (pack.data.message == "There are no more exercises left on this test") {
