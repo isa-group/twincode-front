@@ -779,7 +779,6 @@ export default {
               this.tot = data.tot;
               //this.hasExerciseErrors = data.errors;
               
-              this.canSubmit = true;
               
               if (this.isExerciseCorrect == true) {
                 dbg("validatePython - Correct Exercise - Changing Exercise...");
@@ -789,6 +788,7 @@ export default {
               }else{
                  console.log("Invalid exercise.");
               }
+              this.canSubmit = true;
               
         });
     },
@@ -826,7 +826,6 @@ export default {
         }).then((response) => {
           if (response.status == 200) {
             response.json().then((data) => {
-              this.canSubmit = true;
               this.isExerciseCorrect = data.result;
               this.twcc = data.twcc;
               this.returnValue = v;
@@ -838,6 +837,8 @@ export default {
                 dbg("validateJavascript - Correct Exercise - Chhanging Exercise...");
                 setTimeout(() => { this.changeExercise(); }, 2000);
               }
+              
+              this.canSubmit = true;
             });
           }
         });
