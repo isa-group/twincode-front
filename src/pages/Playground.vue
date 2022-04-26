@@ -87,7 +87,7 @@
                       >
                         Give control
                       </button>-->
-                    <p v-if="!canSubmit" style="color: red; text-decoration: underline; text-decoration-style: double; text-transform: uppercase; font-size: 20px;">{{validMessage}}</p>
+                    <!--<p v-if="!canSubmit" style="color: red; text-decoration: underline; text-decoration-style: double; text-transform: uppercase; font-size: 20px;">{{validMessage}}</p>-->
                     <button class="bg-teal-600 hover:bg-teal-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                       @click="validate()"
                       v-if="language == 'javascript' && canSubmit"
@@ -538,7 +538,6 @@ export default {
     },
     loadTest(pack) {
       dbg("EVENT loadTest",pack);
-      this.canSubmit = true;
       this.finished = false;
       this.loadingTest = true;
       this.starting = false;
