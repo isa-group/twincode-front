@@ -596,7 +596,9 @@ export default {
       if (pack.hideShowButton) {
         this.canSubmit = true;
       } else {
-        if (this.testIndex != 1) this.canSubmit = false;
+        if (this.testIndex != 1)  {
+          this.canSubmit = false;
+        }
       }
     },
     customAlert(pack) {
