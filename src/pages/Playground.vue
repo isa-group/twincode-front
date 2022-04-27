@@ -598,6 +598,8 @@ export default {
       } else {
         if (this.testIndex != 1)  {
           this.canSubmit = false;
+        } else {
+          this.canSubmit = true;
         }
       }
     },
