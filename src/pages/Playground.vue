@@ -605,8 +605,10 @@ export default {
         this.canSubmit = false;
         this.sendButtonStatusToPeer(false);
       } else {
-        this.canSubmit = true;
-        this.sendButtonStatusToPeer(true);
+        setTimeout(() => { 
+          this.canSubmit = true;
+          this.sendButtonStatusToPeer(true);
+        }, 3000);
         var el = document.createElement("div");
         el.setAttribute("style","position:absolute;top:30%;left:40%;width: 20%;height: 20%; font-weight: bold; font-size: large; text-align: center;background-color: white; border-radius: 15px; box-shadow: 0px 0px 10px #666;");
         el.innerHTML = pack.data.message;
@@ -796,8 +798,10 @@ export default {
               }else{
                  console.log("Invalid exercise.");
               }
+            setTimeout(() => { 
               this.canSubmit = true;
               this.sendButtonStatusToPeer(true);
+            }, 3000);
               
         });
     },
@@ -846,9 +850,12 @@ export default {
                 dbg("validateJavascript - Correct Exercise - Chhanging Exercise...");
                 setTimeout(() => { this.changeExercise(); }, 2000);
               }
+
+              setTimeout(() => { 
+                this.canSubmit = true;
+                this.sendButtonStatusToPeer(true);
+              }, 3000);
               
-              this.canSubmit = true;
-              this.sendButtonStatusToPeer(true);
             });
           }
         });
