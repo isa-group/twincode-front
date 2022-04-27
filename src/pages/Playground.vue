@@ -608,7 +608,7 @@ export default {
         this.canSubmit = true;
         this.sendButtonStatusToPeer(true);
         var el = document.createElement("div");
-        el.setAttribute("style","position:absolute;top:30%;left:40%;width: 20%;height: 20%; font-weight: bold; font-size: large; text-align: center;background-color: white; border-radius: 15px;line-height: 650%; box-shadow: 0px 0px 10px #666;");
+        el.setAttribute("style","position:absolute;top:30%;left:40%;width: 20%;height: 20%; font-weight: bold; font-size: large; text-align: center;background-color: white; border-radius: 15px; box-shadow: 0px 0px 10px #666;");
         el.innerHTML = pack.data.message;
         setTimeout(function(){
           el.parentNode.removeChild(el);
