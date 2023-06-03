@@ -123,7 +123,13 @@
         </div>
 
         <div class="text-center">
-          <p class="text-grey-dark text-sm">Universidad de Sevilla</p>
+          <p class="text-grey-dark text-sm inline">
+            Universidad de Sevilla
+          </p>
+          <p class="text-grey-dark text-sm inline font-hairline mr-1 ml-1">|</p>
+          <p class="text-grey-dark text-sm inline">
+            University of California, Berkeley
+          </p>
         </div>
       </div>
     </div>
