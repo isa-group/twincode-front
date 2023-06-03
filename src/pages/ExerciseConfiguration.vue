@@ -112,20 +112,6 @@
               />
               <p class="inline text-gray-700 font-light mx-3">seconds</p>
             </div>
-            <div class="mt-4 max-w-xl mx-auto">
-              <label
-                class="align-middle text-gray-700 text-sm font-bold mb-2"
-                for="peerChange"
-              >
-                Change gender:
-              </label>
-              <input
-                class="ml-2"
-                id="peerChange"
-                type="checkbox"
-                v-model="tests[selectedTest].peerChange"
-              />
-            </div>
           </div>
         </div>
         <div
@@ -514,7 +500,7 @@ export default {
           name: "New Test",
           description: "A new test begins",
           time: 5,
-          peerChange: false,
+          peerChange: true,
           orderNumber: this.orderedTests.length,
           exercises: [exercisesBody],
           language: "javascript"
