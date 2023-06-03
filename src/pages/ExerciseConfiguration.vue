@@ -455,11 +455,13 @@ export default {
 
 
           this.inputsSolutions = []
-          for (let i = 0; i < this.tests[this.selectedTest].exercises.length; i++) {
+          if(this.tests != undefined && this.tests.length > 0) {
+            for (let i = 0; i < this.tests[this.selectedTest].exercises.length; i++) {
             this.inputsSolutions.push(this.tests[this.selectedTest].exercises[i].solutions);
-          }
+            }
           this.inputsType = typeof this.inputsSolutions[0][0];
           this.solutionsType = typeof this.inputsSolutions[0][1];
+          }
         });
           
     },
