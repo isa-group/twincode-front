@@ -121,6 +121,7 @@ export default {
       session.tokens = this.newSession.tokens.split(",");
       session.name = this.newSession.name;
       session.tokenPairing = false;
+      session.isStandard = true;
       console.log(session);
       fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
         method: "POST",

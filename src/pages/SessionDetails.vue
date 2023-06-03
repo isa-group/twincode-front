@@ -48,16 +48,6 @@
             >
           </div>
 
-          <div class="mt-5">
-            <input
-              v-model="session.isStandard"
-              type="checkbox"
-              class="border rounded-sm mr-2"
-            />
-            <label
-              >Standard Session</label
-            >
-          </div>
           <button
             class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
             type="button"
@@ -412,12 +402,12 @@ export default {
       });
     },
     deleteSession() {
-      var r = confirm(
-        "You are going to delete session " +
+      var r = prompt(
+        "You are going to delete '" +
           this.$route.params.sessionName +
-          ". This action cannot be undone. Are you sure?"
+          "' session and all tests attached. This action cannot be undone.\n\nType the session name to confirm."
       );
-      if (r) {
+      if (r === this.$route.params.sessionName) {
         fetch(
           `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
           {
