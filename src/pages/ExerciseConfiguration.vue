@@ -23,12 +23,14 @@
             v-model="selectedTest"
           />
           <button
+            v-if="tests != undefined && tests.length < 2"
             class="mt-3 p-1 rounded-md bg-gray-100 border px-5 text-gray-800 hover:bg-green-200 hover:border-green-300 hover:text-green-800"
             @click="createTest()"
           >
             + Add test
           </button>
           <button
+            v-if="tests != undefined && tests.length > 0"
             class="mt-3 ml-2 p-1 rounded-md bg-gray-100 border px-5 text-red-800 hover:bg-red-200 hover:border-red-300"
             @click="removeTest()"
           >
@@ -436,10 +438,12 @@ export default {
               orderedTestsE.push(orderedTest);
             });
             this.orderedTests = orderedTestsE;
+            this.tests = testsE;
+          } else {
+            this.tests = [];
+            this.orderedTests = [];
           }
-          this.tests = testsE;
-
-
+          
           this.inputsSolutions = []
           if(this.tests != undefined && this.tests.length > 0) {
             for (let i = 0; i < this.tests[this.selectedTest].exercises.length; i++) {
@@ -480,6 +484,10 @@ export default {
       this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions.splice(index, 1);
     },
     createTest() {
+      if(this.tests != undefined && this.tests.length > 2) {
+        window.alert("You can't create more than 2 tests in a standard session");
+        return;
+      }
       var exercisesBody = JSON.parse(JSON.stringify({
             name: "New Exercise",
             description: "",
