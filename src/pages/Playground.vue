@@ -33,7 +33,7 @@
             src="@/assets/tc_white_color.png"
             class="w-20 md:w-48 md:float-left inline md:mr-20 "
           />
-          <h1 class="inline md:float-right md:mr-10 text-white font-thin text-sm md:text-xl order-last">
+          <h1 v-if="token" class="inline md:float-right md:mr-10 text-white font-thin text-sm md:text-xl order-last">
             Your Login ID: {{ token }}
           </h1> 
         </div> 
@@ -280,20 +280,20 @@
       </div>
     </div>
     
-    <div v-if="starting && (standardSession == true && testCounter != 3 || standardSession == false)"
+    <div v-if="starting && testCounter != 3"
       class="fixed h-full w-full top-0 z-50 flex justify-center items-center"
       style="backdrop-filter: blur(2px);"
     >
       <img src="@/assets/tc_color.png" class="w-48" />
     </div>
     
-    <div v-if="loadingTest && (standardSession == true && testCounter != 3 || standardSession == false)"
+    <div v-if="loadingTest && testCounter != 3"
       class="fixed h-full w-full top-0 z-50 flex justify-center items-center"
       style="backdrop-filter: blur(2px);"
     >
       <div
         class="border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5 w-2/3"
-        v-if="standardSession == true && testCounter != 3 || standardSession == false"
+        v-if="testCounter != 3"
       >
         <h1 class="font-bold text-2xl mb-4">A new test begins!</h1>
         <h2 class="font-bold text-xl text-gray-600">
@@ -479,7 +479,6 @@ export default {
       text2codemirror: "",
       text3codemirror: "",
       consoleValue: "",
-      standardSession: false,
       testIndex: 0,
       testCounter: 0,
       canSubmit: true,
@@ -545,9 +544,6 @@ export default {
       this.peerChange = pack.data.peerChange;
       this.$refs.messageContainer.innerHTML = "";
       this.code = "";
-      this.standardSession = pack.data.isStandard;
-      localStorage.sessionIsStandard = pack.data.isStandard;
-      localStorage.testCounterS = pack.data.testCounterS; 
       this.testCounter = pack.data.testCounterS; 
       this.canSubmit = true;
       this.clearResult();
@@ -752,10 +748,18 @@ export default {
           this.excerciseErrorMessage = "You should return the solution.";
         }*/
       } catch (e) {
+        this.returnValue = "Error";
+        this.tot = this.inputs.length;
+        this.numCorrect = 0;
+        this.numWrong = this.inputs.length;
         this.isExerciseCorrect = false;
         this.hasExerciseErrors = true;
         this.excerciseErrorMessage = e;
-        console.log("ERROR HERE: ", e);
+        this.logs.push(e);
+        setTimeout(() => { 
+              this.canSubmit = true;
+              this.sendButtonStatusToPeer(true);
+            }, 3000);
       }
     },
     validatePython() {
@@ -810,6 +814,7 @@ export default {
         });
     },
     seeInstructions() {
+      dbg("method seeInstructions - init");
       this.$tours["myTour"].start();
     },
     clearResult() {
@@ -825,7 +830,6 @@ export default {
     valid(v) {
       dbg("method valid - init",v);
       if (this.exerciseType != 'DEMO') {
-        console.log(v);
         fetch(process.env.VUE_APP_TC_API + "/verify", {
           method: "POST",
           body: JSON.stringify({
