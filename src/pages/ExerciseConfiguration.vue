@@ -96,8 +96,7 @@
               />
               <p class="inline text-gray-700 font-light mx-3">seconds</p>
             </div>
-            <div class="mt-4 max-w-xl mx-auto"
-            v-if="standardSession">
+            <div class="mt-4 max-w-xl mx-auto">
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
                 for="time"
@@ -243,23 +242,6 @@
               </button>
             </div>
 
-            <div class="mt-4 max-w-xl mx-auto" v-if="!standardSession">
-              <label
-                class="align-middle text-gray-700 text-sm font-bold mb-2"
-                for="time"
-              >
-                Available time to complete the exercise:
-              </label>
-              <input
-                class="ml-2 appearance-none border rounded py-2 px-3 w-20 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="time"
-                type="number"
-                v-model.number="
-                  tests[selectedTest].exercises[selectedExerciseIndex].time
-                "
-              />
-              <p class="inline text-gray-700 font-light mx-3">seconds</p>
-            </div>
             <div class="mt-4 max-w-xl mx-auto">
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
@@ -341,7 +323,6 @@ export default {
       selectedExerciseIndex: 0,
       selectedExercise: {},
       language: "",
-      standardSession: false,
     };
   },
   methods: {
@@ -351,8 +332,16 @@ export default {
       });
     },
     playDemoExercise() {
-      localStorage.demoExercise = JSON.stringify(
-        this.tests[this.selectedTest].exercises[this.selectedExerciseIndex]
+      var selectedExercise = this.tests[this.selectedTest].exercises[this.selectedExerciseIndex];
+      localStorage.demoExercise = JSON.stringify( {
+        name: selectedExercise.name,
+        description: selectedExercise.description,
+        inputs: selectedExercise.inputs,
+        solutions: selectedExercise.solutions,
+        time: selectedExercise.time,
+        type: selectedExercise.type,
+        language: this.tests[this.selectedTest].language
+      }
       );
       this.$router.push({
         path: `/playground`,
@@ -371,16 +360,6 @@ export default {
         .then((response) => {
           if (response.status == 200) {
             return response.json();
-          }
-        })
-        .then((retrievedSession) => {
-          if (retrievedSession) {
-            /*
-            this.session.name = retrievedSession.name;
-            this.session.tokens = retrievedSession.tokens;
-            this.session.tokenPairing = retrievedSession.tokenPairing;
-            */
-            this.standardSession = retrievedSession.isStandard;
           }
         });
     },

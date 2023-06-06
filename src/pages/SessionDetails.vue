@@ -219,7 +219,6 @@ export default {
         active: null,
         running: null,
         pairingMode: null,
-        isStandard: null,
       },
       participants: [],
       tests: [],
@@ -332,7 +331,6 @@ export default {
             this.session.active = retrievedSession.active;
             this.session.running = retrievedSession.running;
             this.session.pairingMode = retrievedSession.pairingMode;
-            this.session.isStandard = retrievedSession.isStandard;
           }
           this.waitingStartResponse = false;
         });
