@@ -122,7 +122,7 @@ export default {
       session.name = this.newSession.name;
       session.tokenPairing = false;
       session.isStandard = true;
-      console.log(session);
+
       fetch(`${process.env.VUE_APP_TC_API}/sessions`, {
         method: "POST",
         headers: {
@@ -135,6 +135,7 @@ export default {
           if (response.status == 200) {
             alert("Session created successfully");
             this.showModal = false;
+            this.addExampleTests(session);
           }
           this.logIn();
           return response.json();
@@ -145,6 +146,73 @@ export default {
             this.newSession.errors = null;
           }, 5000);
         });
+    },
+    addExampleTests(session) {
+      var pairExercise = JSON.parse(JSON.stringify({
+            name: "Lucas Number",
+            description: "<h1 style='color:blue'>EXERCISE W: <strong>LUCAS NUMBER</strong></h1><br/>"+
+            "The Lucas number or Lucas series is a sequence of integers named in honor of the mathematician François Édouard Anatole Lucas."+
+            " The Lucas series is closely related to the Fibonacci series but has different properties. "+
+            "It can be defined as: L(0) = 2; L(1) = 1; L(n) = L(n-1) + L(n-2) for n > 1. "+
+            "We ask to make an implementation that takes as input an integer N and returns the value of the Lucas series for that number L( N).",
+            inputs: [0,1,5,10],
+            solutions: [2,1,11,123],
+            time: 300,
+            type: "PAIR"
+      }));
+
+      var test1 = JSON.stringify({
+          session: session.name,
+          name: "Excersises in pairs",
+          description: "We start a part where you will have to solve exercises as a couple",
+          time: 10,
+          peerChange: true,
+          orderNumber: 0,
+          exercises: [pairExercise],
+          language: "python"
+        })
+
+      var individualExercise = JSON.parse(JSON.stringify({
+            name: "Three adds to zero",
+            description: "<h1 style='color:red'>EXERCISE B: <strong>THREE ADDS TO 0</strong></h1><br/>Given a list of distinct integers,"+
+            " find if there are 3 integers in the list whose sum is 0. For example, for the list [-1, 5, 7, 6, -4], "+
+            "true should be returned because -1, -5, and 6 add to 0. In contrast, false should be returned for [-1, 5, 6, 4, 3] "+
+            "because there is no triplet that satisfies it.",
+            inputs: [[-1,5,7,6,-4],[-1,5,6,4,3]],
+            solutions: [true,false],
+            time: 300,
+            type: "INDIVIDUAL"
+      }));
+
+      var test2 = JSON.stringify({
+          session: session.name,
+          name: "Excersises individually",
+          description: "We start a part where you will have to solve exercises individually",
+          time: 10,
+          peerChange: false,
+          orderNumber: 1,
+          exercises: [individualExercise],
+          language: "javascript"
+      })
+
+      fetch(`${process.env.VUE_APP_TC_API}/tests`, {
+      method: "POST",
+      headers: {
+        Authorization: localStorage.adminSecret,
+        "Content-Type": "application/json",
+      },
+      body: test1,
+      })
+
+      fetch(`${process.env.VUE_APP_TC_API}/tests`, {
+      method: "POST",
+      headers: {
+        Authorization: localStorage.adminSecret,
+        "Content-Type": "application/json",
+      },
+      body: test2,
+      })
+
     },
     onSubmit() {
       localStorage.adminSecret = this.secret;
