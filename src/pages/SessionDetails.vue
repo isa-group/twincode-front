@@ -48,16 +48,6 @@
             >
           </div>
 
-          <div class="mt-5">
-            <input
-              v-model="session.isStandard"
-              type="checkbox"
-              class="border rounded-sm mr-2"
-            />
-            <label
-              >Standard Session</label
-            >
-          </div>
           <button
             class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
             type="button"
@@ -136,12 +126,33 @@
           </button>
           <button
             class="mt-3 ml-2 p-3 rounded-md bg-gray-100 border px-5 text-gray-800 hover:bg-red-200 hover:border-red-300 hover:text-red-800"
-            @click="deleteSession()"
+            @click="showModal = true"
           >
             Delete session
           </button>
         </div>
-        
+        <Modal v-model="showModal" title="Delete session">
+            <p class="mb-5">
+              Are you sure you want to delete this session? <b style="color:red">This action cannot
+              be undone.</b>
+            </p>
+            <b class="mb-5">
+              Please type the name of the session to confirm:
+            </b>
+            <input
+              v-model="sessionToDelete"
+              type="text"
+              class="border rounded-sm ml-2 p-1"
+            />
+            <template v-slot:actionButtons v-if="sessionToDelete === this.session.name">
+              <button
+                @click="deleteSession()"
+                class="px-4 bg-transparent p-3 rounded-lg bg-orange-400 hover:bg-orange-300 mr-2 focus:outline-none focus:shadow-outline"
+              >
+                Delete
+              </button>
+            </template>
+        </Modal>
           <button
             class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
             type="button"
@@ -187,12 +198,14 @@ import Table from "../components/Table";
 import ToggleSwitch from "../components/ToggleSwitch";
 import deleteIcon from "@/assets/icons/delete_bin.png";
 import reloadIcon from "@/assets/icons/reload.png";
+import Modal from "../components/Modal";
 
 export default {
   components: {
     Header,
     Table,
     ToggleSwitch,
+    Modal,
   },
   data() {
     return {
@@ -206,13 +219,14 @@ export default {
         active: null,
         running: null,
         pairingMode: null,
-        isStandard: null,
       },
       participants: [],
       tests: [],
       deleteIconUrl: deleteIcon,
       reloadIconUrl: reloadIcon,
       waitingStartResponse: false,
+      showModal: false,
+      sessionToDelete: ""
     };
   },
   sockets: {
@@ -317,7 +331,6 @@ export default {
             this.session.active = retrievedSession.active;
             this.session.running = retrievedSession.running;
             this.session.pairingMode = retrievedSession.pairingMode;
-            this.session.isStandard = retrievedSession.isStandard;
           }
           this.waitingStartResponse = false;
         });
@@ -412,28 +425,21 @@ export default {
       });
     },
     deleteSession() {
-      var r = confirm(
-        "You are going to delete session " +
-          this.$route.params.sessionName +
-          ". This action cannot be undone. Are you sure?"
-      );
-      if (r) {
-        fetch(
-          `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: localStorage.adminSecret,
-            },
-          }
-        ).then((response) => {
-          if (response.status == 200) {
-            this.$router.push({
-              path: `/administration`,
-            });
-          }
-        });
-      }
+      fetch(
+        `${process.env.VUE_APP_TC_API}/sessions/${this.$route.params.sessionName}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      ).then((response) => {
+        if (response.status == 200) {
+          this.$router.push({
+            path: `/administration`,
+          });
+        }
+      });
     },
     updateSession() {
       console.log("Updating session... " + this.$route.params.sessionName);

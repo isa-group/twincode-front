@@ -22,18 +22,20 @@
             :body="orderedTests"
             v-model="selectedTest"
           />
-          <button
+          <!-- <button
+            v-if="tests != undefined && tests.length < 2"
             class="mt-3 p-1 rounded-md bg-gray-100 border px-5 text-gray-800 hover:bg-green-200 hover:border-green-300 hover:text-green-800"
             @click="createTest()"
           >
             + Add test
           </button>
           <button
+            v-if="tests != undefined && tests.length > 0"
             class="mt-3 ml-2 p-1 rounded-md bg-gray-100 border px-5 text-red-800 hover:bg-red-200 hover:border-red-300"
             @click="removeTest()"
           >
             - Remove test
-          </button>
+          </button> -->
         </div>
         <div v-if="tests != undefined && tests.length > 0" class="mt-10">
           <h2 class="mb-3 text-md font-light">Test:</h2>
@@ -96,8 +98,7 @@
               />
               <p class="inline text-gray-700 font-light mx-3">seconds</p>
             </div>
-            <div class="mt-4 max-w-xl mx-auto"
-            v-if="standardSession">
+            <div class="mt-4 max-w-xl mx-auto">
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
                 for="time"
@@ -111,20 +112,6 @@
                 v-model="tests[selectedTest].testTime"
               />
               <p class="inline text-gray-700 font-light mx-3">seconds</p>
-            </div>
-            <div class="mt-4 max-w-xl mx-auto">
-              <label
-                class="align-middle text-gray-700 text-sm font-bold mb-2"
-                for="peerChange"
-              >
-                Change gender:
-              </label>
-              <input
-                class="ml-2"
-                id="peerChange"
-                type="checkbox"
-                v-model="tests[selectedTest].peerChange"
-              />
             </div>
           </div>
         </div>
@@ -257,23 +244,6 @@
               </button>
             </div>
 
-            <div class="mt-4 max-w-xl mx-auto" v-if="!standardSession">
-              <label
-                class="align-middle text-gray-700 text-sm font-bold mb-2"
-                for="time"
-              >
-                Available time to complete the exercise:
-              </label>
-              <input
-                class="ml-2 appearance-none border rounded py-2 px-3 w-20 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="time"
-                type="number"
-                v-model.number="
-                  tests[selectedTest].exercises[selectedExerciseIndex].time
-                "
-              />
-              <p class="inline text-gray-700 font-light mx-3">seconds</p>
-            </div>
             <div class="mt-4 max-w-xl mx-auto">
               <label
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
@@ -355,7 +325,6 @@ export default {
       selectedExerciseIndex: 0,
       selectedExercise: {},
       language: "",
-      standardSession: false,
     };
   },
   methods: {
@@ -365,8 +334,16 @@ export default {
       });
     },
     playDemoExercise() {
-      localStorage.demoExercise = JSON.stringify(
-        this.tests[this.selectedTest].exercises[this.selectedExerciseIndex]
+      var selectedExercise = this.tests[this.selectedTest].exercises[this.selectedExerciseIndex];
+      localStorage.demoExercise = JSON.stringify( {
+        name: selectedExercise.name,
+        description: selectedExercise.description,
+        inputs: selectedExercise.inputs,
+        solutions: selectedExercise.solutions,
+        time: selectedExercise.time,
+        type: selectedExercise.type,
+        language: this.tests[this.selectedTest].language
+      }
       );
       this.$router.push({
         path: `/playground`,
@@ -385,16 +362,6 @@ export default {
         .then((response) => {
           if (response.status == 200) {
             return response.json();
-          }
-        })
-        .then((retrievedSession) => {
-          if (retrievedSession) {
-            /*
-            this.session.name = retrievedSession.name;
-            this.session.tokens = retrievedSession.tokens;
-            this.session.tokenPairing = retrievedSession.tokenPairing;
-            */
-            this.standardSession = retrievedSession.isStandard;
           }
         });
     },
@@ -450,16 +417,20 @@ export default {
               orderedTestsE.push(orderedTest);
             });
             this.orderedTests = orderedTestsE;
+            this.tests = testsE;
+          } else {
+            this.tests = [];
+            this.orderedTests = [];
           }
-          this.tests = testsE;
-
-
+          
           this.inputsSolutions = []
-          for (let i = 0; i < this.tests[this.selectedTest].exercises.length; i++) {
+          if(this.tests != undefined && this.tests.length > 0) {
+            for (let i = 0; i < this.tests[this.selectedTest].exercises.length; i++) {
             this.inputsSolutions.push(this.tests[this.selectedTest].exercises[i].solutions);
-          }
+            }
           this.inputsType = typeof this.inputsSolutions[0][0];
           this.solutionsType = typeof this.inputsSolutions[0][1];
+          }
         });
           
     },
@@ -492,6 +463,10 @@ export default {
       this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions.splice(index, 1);
     },
     createTest() {
+      if(this.tests != undefined && this.tests.length > 2) {
+        window.alert("You can't create more than 2 tests in a standard session");
+        return;
+      }
       var exercisesBody = JSON.parse(JSON.stringify({
             name: "New Exercise",
             description: "",
@@ -512,7 +487,7 @@ export default {
           name: "New Test",
           description: "A new test begins",
           time: 5,
-          peerChange: false,
+          peerChange: true,
           orderNumber: this.orderedTests.length,
           exercises: [exercisesBody],
           language: "javascript"
