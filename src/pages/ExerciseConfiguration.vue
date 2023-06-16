@@ -22,7 +22,7 @@
             :body="orderedTests"
             v-model="selectedTest"
           />
-          <button
+          <!-- <button
             v-if="tests != undefined && tests.length < 2"
             class="mt-3 p-1 rounded-md bg-gray-100 border px-5 text-gray-800 hover:bg-green-200 hover:border-green-300 hover:text-green-800"
             @click="createTest()"
@@ -35,7 +35,7 @@
             @click="removeTest()"
           >
             - Remove test
-          </button>
+          </button> -->
         </div>
         <div v-if="tests != undefined && tests.length > 0" class="mt-10">
           <h2 class="mb-3 text-md font-light">Test:</h2>
