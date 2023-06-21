@@ -437,18 +437,19 @@ export default {
     createExercise() {
       var exercisesBody = JSON.parse(JSON.stringify({
             name: "New Exercise",
-            description: "",
-            inputs: [""],
-            solutions: [""],
+            description: "New Exercise",
+            inputs: [0],
+            solutions: [0],
             time: 300,
             type: "PAIR"
           }));
 
       this.tests[this.selectedTest].exercises.push(exercisesBody);
       this.selectedExercise = this.tests[this.selectedTest].exercises[this.tests[this.selectedTest].exercises.length-1];
+      this.selectedExerciseIndex = this.tests[this.selectedTest].exercises.length-1;
+      this.inputsSolutions.push(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions);
     },
     addEntrance() {
-      
       var bodyJson = JSON.parse(JSON.stringify(this.tests[this.selectedTest]));
       console.log(bodyJson);
 
@@ -552,6 +553,8 @@ export default {
         this.selectedExerciseIndex,
         1
       );
+      this.inputsSolutions.splice(this.selectedExerciseIndex, 1);
+      this.selectedExerciseIndex = 0;
     },
     removeTest() {
       console.log(`${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}/${this.selectedTest}`);
