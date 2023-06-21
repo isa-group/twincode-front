@@ -81,12 +81,13 @@
 
               <!-- RUN CODE BUTTONS: -->
              <div class="mt-2">
-                    <!--<button
-                        class="bg-yellow-800 hover:bg-yellow-700 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
-                        onClick="toggleControlMode();"
+                    <button
+                        v-if="exerciseType == 'PAIR' && cmOption.readOnly"
+                        class="bg-green-600 hover:bg-green-300 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+                        @click="takeControl();"
                       >
-                        Give control
-                      </button>-->
+                        Take Control
+                      </button>
                     <!--<p v-if="!canSubmit" style="color: red; text-decoration: underline; text-decoration-style: double; text-transform: uppercase; font-size: 20px;">{{validMessage}}</p>-->
                     <button class="bg-teal-600 hover:bg-teal-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                       @click="validate()"
@@ -362,6 +363,7 @@ export default {
         matchBrackets: true,
         showCursorWhenSelecting: true,
         mode: "text/x-python",
+        readOnly: true,
       },
       options: {
         useKeyboardNavigation: true,
@@ -582,6 +584,12 @@ export default {
         this.text2codemirror = "main(input) {";
         this.text3codemirror = "output;\n}";
       }
+      this.code = "";
+      if (this.exerciseType == "PAIR") {
+        this.cmOption.readOnly = true;
+      } else if (this.exerciseType == "INDIVIDUAL") {
+        this.cmOption.readOnly = false;
+      }
       this.clearResult();
 
       dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: true");
@@ -598,6 +606,10 @@ export default {
           this.canSubmit = true;
         }
       }
+    },
+    receiveControlStatus(pack) {
+      console.log("Receiving control status: "+pack.status);
+      this.cmOption.readOnly = pack.status;
     },
     customAlert(pack) {
       this.validMessage = pack.data.message;
@@ -981,6 +993,21 @@ export default {
           this.$socket.client.emit("updateCode", this.pack(changeObj));
       }
       this.firstLoad = false;
+    },
+    takeControl() {
+      this.cmOption.readOnly = false;
+      dbg("method takeControl - init readOnly = false" );
+
+      dbg("method takeControl - init Emiting event sendControlStatusToPeer with status: true" );
+      this.$socket.client.emit("sendControlStatusToPeer", {
+        status: true,
+      });
+
+      dbg("method takeControl - init Sending message to peer: I have taken Control!");
+      if (this.exerciseType == "PAIR") {
+        this.newMessage("I have taken Control!", true);
+        this.$socket.client.emit("msg", this.pack("I have taken Control!"));
+      }
     },
     updateCursorLocation() {
       const cmWidth = document.getElementById("codemirror").offsetWidth;
