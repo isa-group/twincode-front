@@ -240,7 +240,7 @@
                 class="mt-3 rounded-full bg-green-400 p-2 px-5 focus:outline-none focus:shadow-outline"
                 @click="addEntrance()"
               >
-                Add Entrance
+                Add Input/Solution
               </button>
             </div>
 
