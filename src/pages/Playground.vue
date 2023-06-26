@@ -89,16 +89,16 @@
                         Take Control
                       </button>
                     <!--<p v-if="!canSubmit" style="color: red; text-decoration: underline; text-decoration-style: double; text-transform: uppercase; font-size: 20px;">{{validMessage}}</p>-->
-                    <button class="bg-teal-600 hover:bg-teal-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+                    <button class="bg-teal-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                       @click="validate()"
-                      v-if="language == 'javascript' && canSubmit"
+                      v-if="language == 'javascript' && canSubmit && !cmOption.readOnly"
                     >
                       Run Code!
                     </button>
                   <button id="runcode"
                       class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                       @click="validatePython()"
-                      v-if="language == 'python' && canSubmit"
+                      v-if="language == 'python' && canSubmit && !cmOption.readOnly"
                     > Run Code!
                   </button>
                   <!--
