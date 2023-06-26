@@ -113,6 +113,15 @@
               />
               <p class="inline text-gray-700 font-light mx-3">seconds</p>
             </div>
+            <div class="mt-4 max-w-xl mx-auto">
+              <label
+                class="align-middle text-gray-700 text-sm font-bold mb-2"
+                for="testType"
+              >
+                Test type:
+              </label>
+              <p class="inline text-gray-700 font-light mx-3">{{ tests[selectedTest].type }}</p>
+            </div>
           </div>
         </div>
         <div
@@ -243,7 +252,7 @@
                 Add Input/Solution
               </button>
             </div>
-            
+
             <div class="mt-4 max-w-xl mx-auto relative">
               <button
                 class="mt-3 mr-3 rounded-full bg-gray-200 p-2 px-5 hover:bg-gray-300 focus:outline-none focus:shadow-outline"
