@@ -243,24 +243,7 @@
                 Add Input/Solution
               </button>
             </div>
-
-            <div class="mt-4 max-w-xl mx-auto">
-              <label
-                class="align-middle text-gray-700 text-sm font-bold mb-2"
-                for="type"
-              >
-                Type of exercise:
-              </label>
-              <select
-                class="border rounded-sm ml-2 p-1"
-                v-model="
-                  tests[selectedTest].exercises[selectedExerciseIndex].type
-                "
-              >
-                <option value="INDIVIDUAL">INDIVIDUAL</option>
-                <option value="PAIR">PAIR</option>
-              </select>
-            </div>
+            
             <div class="mt-4 max-w-xl mx-auto relative">
               <button
                 class="mt-3 mr-3 rounded-full bg-gray-200 p-2 px-5 hover:bg-gray-300 focus:outline-none focus:shadow-outline"
