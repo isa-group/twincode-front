@@ -11,12 +11,12 @@
       </div>
       <div class="p-3 text-left max-w-4xl mx-auto mb-20">
         <div class="mt-5">
-          <h2 class="font-bold text-xl">
-            {{ this.$route.params.sessionName }} session
+          <h2 class="text-2xl">
+            <b>{{ this.$route.params.sessionName }}</b> session
           </h2>
         </div>
         <div class="mt-5">
-          <h2 class="mb-3 text-md font-light">Tests list:</h2>
+          <h2 class="font-bold text-lg">Tests list:</h2>
           <Table
             :head="['Test', 'Number of exercises', 'Total time (seconds)']"
             :body="orderedTests"
@@ -38,7 +38,7 @@
           </button> -->
         </div>
         <div v-if="tests != undefined && tests.length > 0" class="mt-10">
-          <h2 class="mb-3 text-md font-light">Test:</h2>
+          <h2 class="font-bold text-lg">Test:</h2>
           <div class="border items-center py-6 mt-6">
             <div class="mt-4 max-w-xl mx-auto">
               <label
@@ -118,7 +118,7 @@
                 class="align-middle text-gray-700 text-sm font-bold mb-2"
                 for="testType"
               >
-                Test type:
+                Exercises type:
               </label>
               <p class="inline text-gray-700 font-light mx-3">{{ tests[selectedTest].type }}</p>
             </div>
@@ -128,7 +128,7 @@
           v-if="tests != undefined && tests.length > 0"
           class="mt-10 relative"
         >
-          <h2 class="mb-3 text-md font-light">Exercises:</h2>
+          <h2 class="font-bold text-lg">Exercises:</h2>
           <ButtonSelector
             v-model="selectedExerciseIndex"
             :listOfValues="tests[selectedTest].exercises"
@@ -267,12 +267,6 @@
                 </p>
               </button>
               <button
-                class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
-                @click="updateTest()"
-              >
-                Update exercise
-              </button>
-              <button
                 class="mt-3 rounded-full bg-gray-100 hover:bg-red-200 border hover:border-red-300 p-2 px-5 absolute right-0 bottom-0 focus:outline-none focus:shadow-outline"
                 @click="removeExercise()"
               >
@@ -282,11 +276,17 @@
           </div>
         </div>
           <button
-            class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline mr-3"
             type="button"
             @click="goBack()"
           >
             Go Back
+          </button>
+          <button
+            class="mt-3 rounded-full bg-blue-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            @click="updateTest()"
+            >
+            Update Test
           </button>
       </div>
     </div>
