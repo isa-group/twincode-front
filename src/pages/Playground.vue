@@ -85,6 +85,7 @@
                         v-if="exerciseType == 'PAIR' && cmOption.readOnly"
                         class="bg-green-600 hover:bg-green-300 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                         @click="takeControl();"
+                        id = "takeControl"
                       >
                         Take Control
                       </button>
@@ -418,6 +419,16 @@ export default {
             target: "#codemirror",
             header: { title: 'Shared Code Editor'},
             content: 'Collaboratively edit code on the IDE.',
+            params: {
+              placement: 'right' ,
+              enableScrolling: false,
+              highlight: true,
+            }
+          },
+          {
+            target: "#takeControl",
+            header: { title: 'Taking Control'},
+            content: 'Click here to take control of the code editor. You will be able to edit the code, and your partner will be able to see your changes.',
             params: {
               placement: 'right' ,
               enableScrolling: false,
