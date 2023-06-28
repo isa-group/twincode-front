@@ -158,7 +158,6 @@ export default {
             inputs: [0,1,5,10],
             solutions: [2,1,11,123],
             time: 300,
-            type: "PAIR"
       }));
 
       var test1 = JSON.stringify({
@@ -169,7 +168,8 @@ export default {
           peerChange: true,
           orderNumber: 0,
           exercises: [pairExercise],
-          language: "python"
+          language: "python",
+          type: "PAIR"
         })
 
       var individualExercise = JSON.parse(JSON.stringify({
@@ -181,7 +181,6 @@ export default {
             inputs: [[-1,5,7,6,-4],[-1,5,6,4,3]],
             solutions: [true,false],
             time: 300,
-            type: "INDIVIDUAL"
       }));
 
       var test2 = JSON.stringify({
@@ -192,7 +191,8 @@ export default {
           peerChange: false,
           orderNumber: 1,
           exercises: [individualExercise],
-          language: "javascript"
+          language: "javascript",
+          type: "INDIVIDUAL"
       })
 
       fetch(`${process.env.VUE_APP_TC_API}/tests`, {

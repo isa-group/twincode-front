@@ -11,12 +11,12 @@
       </div>
       <div class="p-3 text-left max-w-4xl mx-auto mb-20">
         <div class="mt-5">
-          <h2 class="font-bold text-xl">
-            {{ this.$route.params.sessionName }} session
+          <h2 class="text-2xl">
+            <b>{{ this.$route.params.sessionName }}</b> session
           </h2>
         </div>
         <div class="mt-5">
-          <h2 class="mb-3 text-md font-light">Tests list:</h2>
+          <h2 class="font-bold text-lg">Tests list:</h2>
           <Table
             :head="['Test', 'Number of exercises', 'Total time (seconds)']"
             :body="orderedTests"
@@ -38,7 +38,7 @@
           </button> -->
         </div>
         <div v-if="tests != undefined && tests.length > 0" class="mt-10">
-          <h2 class="mb-3 text-md font-light">Test:</h2>
+          <h2 class="font-bold text-lg">Test:</h2>
           <div class="border items-center py-6 mt-6">
             <div class="mt-4 max-w-xl mx-auto">
               <label
@@ -113,13 +113,22 @@
               />
               <p class="inline text-gray-700 font-light mx-3">seconds</p>
             </div>
+            <div class="mt-4 max-w-xl mx-auto">
+              <label
+                class="align-middle text-gray-700 text-sm font-bold mb-2"
+                for="testType"
+              >
+                Exercises type:
+              </label>
+              <p class="inline text-gray-700 font-light mx-3">{{ tests[selectedTest].type }}</p>
+            </div>
           </div>
         </div>
         <div
           v-if="tests != undefined && tests.length > 0"
           class="mt-10 relative"
         >
-          <h2 class="mb-3 text-md font-light">Exercises:</h2>
+          <h2 class="font-bold text-lg">Exercises:</h2>
           <ButtonSelector
             v-model="selectedExerciseIndex"
             :listOfValues="tests[selectedTest].exercises"
@@ -240,27 +249,10 @@
                 class="mt-3 rounded-full bg-green-400 p-2 px-5 focus:outline-none focus:shadow-outline"
                 @click="addEntrance()"
               >
-                Add Entrance
+                Add Input/Solution
               </button>
             </div>
 
-            <div class="mt-4 max-w-xl mx-auto">
-              <label
-                class="align-middle text-gray-700 text-sm font-bold mb-2"
-                for="type"
-              >
-                Type of exercise:
-              </label>
-              <select
-                class="border rounded-sm ml-2 p-1"
-                v-model="
-                  tests[selectedTest].exercises[selectedExerciseIndex].type
-                "
-              >
-                <option value="INDIVIDUAL">INDIVIDUAL</option>
-                <option value="PAIR">PAIR</option>
-              </select>
-            </div>
             <div class="mt-4 max-w-xl mx-auto relative">
               <button
                 class="mt-3 mr-3 rounded-full bg-gray-200 p-2 px-5 hover:bg-gray-300 focus:outline-none focus:shadow-outline"
@@ -275,12 +267,6 @@
                 </p>
               </button>
               <button
-                class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
-                @click="updateTest()"
-              >
-                Update exercise
-              </button>
-              <button
                 class="mt-3 rounded-full bg-gray-100 hover:bg-red-200 border hover:border-red-300 p-2 px-5 absolute right-0 bottom-0 focus:outline-none focus:shadow-outline"
                 @click="removeExercise()"
               >
@@ -290,11 +276,17 @@
           </div>
         </div>
           <button
-            class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline mr-3"
             type="button"
             @click="goBack()"
           >
             Go Back
+          </button>
+          <button
+            class="mt-3 rounded-full bg-blue-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            @click="updateTest()"
+            >
+            Update Test
           </button>
       </div>
     </div>
@@ -437,18 +429,19 @@ export default {
     createExercise() {
       var exercisesBody = JSON.parse(JSON.stringify({
             name: "New Exercise",
-            description: "",
-            inputs: [""],
-            solutions: [""],
+            description: "New Exercise",
+            inputs: [0],
+            solutions: [0],
             time: 300,
             type: "PAIR"
           }));
 
       this.tests[this.selectedTest].exercises.push(exercisesBody);
       this.selectedExercise = this.tests[this.selectedTest].exercises[this.tests[this.selectedTest].exercises.length-1];
+      this.selectedExerciseIndex = this.tests[this.selectedTest].exercises.length-1;
+      this.inputsSolutions.push(this.tests[this.selectedTest].exercises[this.selectedExerciseIndex].solutions);
     },
     addEntrance() {
-      
       var bodyJson = JSON.parse(JSON.stringify(this.tests[this.selectedTest]));
       console.log(bodyJson);
 
@@ -552,6 +545,8 @@ export default {
         this.selectedExerciseIndex,
         1
       );
+      this.inputsSolutions.splice(this.selectedExerciseIndex, 1);
+      this.selectedExerciseIndex = 0;
     },
     removeTest() {
       console.log(`${process.env.VUE_APP_TC_API}/tests/${this.$route.params.sessionName}/${this.selectedTest}`);

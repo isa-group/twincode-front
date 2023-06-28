@@ -81,23 +81,25 @@
 
               <!-- RUN CODE BUTTONS: -->
              <div class="mt-2">
-                    <!--<button
-                        class="bg-yellow-800 hover:bg-yellow-700 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
-                        onClick="toggleControlMode();"
+                    <button
+                        v-if="exerciseType == 'PAIR' && cmOption.readOnly"
+                        class="bg-green-600 hover:bg-green-300 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+                        @click="takeControl();"
+                        id = "takeControl"
                       >
-                        Give control
-                      </button>-->
+                        Take Control
+                      </button>
                     <!--<p v-if="!canSubmit" style="color: red; text-decoration: underline; text-decoration-style: double; text-transform: uppercase; font-size: 20px;">{{validMessage}}</p>-->
-                    <button class="bg-teal-600 hover:bg-teal-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
+                    <button class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                       @click="validate()"
-                      v-if="language == 'javascript' && canSubmit"
+                      v-if="language == 'javascript' && canSubmit && !cmOption.readOnly"
                     >
                       Run Code!
                     </button>
                   <button id="runcode"
                       class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                       @click="validatePython()"
-                      v-if="language == 'python' && canSubmit"
+                      v-if="language == 'python' && canSubmit && !cmOption.readOnly"
                     > Run Code!
                   </button>
                   <!--
@@ -110,7 +112,7 @@
                   </button>
                   -->
                   </div>
-                  
+
           <!-- CASE 1: AUTOGRADER TESTS PASSING: --> 
           <div id="greentestsbox">
             <div v-if="isExerciseCorrect == true" class="flex bg-green-200 p-3 mt-5 rounded-md border text-gray-800">
@@ -248,11 +250,14 @@
       </div>
     </div>
 
-
-
-
-
-
+    <div class="fixed h-full w-full top-0 z-50 flex justify-center items-center"
+      style="backdrop-filter: blur(2px);"
+      v-if="runningTest"
+      >
+      <div class="d-inline-flex border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5 w-2/3 text-center">
+        <h1 class="font-bold text-2xl mb-4">Running tests...</h1>
+      </div>
+    </div>
 
     <div v-if="finished"
       class="container mx-auto h-screen flex justify-center items-center"
@@ -362,6 +367,7 @@ export default {
         matchBrackets: true,
         showCursorWhenSelecting: true,
         mode: "text/x-python",
+        readOnly: true,
       },
       options: {
         useKeyboardNavigation: true,
@@ -413,6 +419,16 @@ export default {
             target: "#codemirror",
             header: { title: 'Shared Code Editor'},
             content: 'Collaboratively edit code on the IDE.',
+            params: {
+              placement: 'right' ,
+              enableScrolling: false,
+              highlight: true,
+            }
+          },
+          {
+            target: "#takeControl",
+            header: { title: 'Taking Control'},
+            content: 'Click here to take control of the code editor. You will be able to edit the code, and your partner will be able to see your changes.',
             params: {
               placement: 'right' ,
               enableScrolling: false,
@@ -483,6 +499,7 @@ export default {
       testCounter: 0,
       canSubmit: true,
       validMessage: "",
+      runningTest: false,
     };
   },
   filters: {
@@ -582,6 +599,17 @@ export default {
         this.text2codemirror = "main(input) {";
         this.text3codemirror = "output;\n}";
       }
+      this.code = "";
+      if (this.exerciseType == "PAIR") {
+        const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
+        elemento.style.background = "#dddddd";
+        this.cmOption.readOnly = true;
+      } else if (this.exerciseType == "INDIVIDUAL") {
+        this.cmOption.readOnly = false;
+        const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
+        elemento.style.background = "#ffffff";
+      }
+      
       this.clearResult();
 
       dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: true");
@@ -598,6 +626,14 @@ export default {
           this.canSubmit = true;
         }
       }
+    },
+    receiveControlStatus(pack) {
+      console.log("Receiving control status: "+pack.status);
+      this.cmOption.readOnly = pack.status;
+      if (pack.status) {
+        const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
+        elemento.style.background = "#dddddd";
+            }
     },
     customAlert(pack) {
       this.validMessage = pack.data.message;
@@ -723,6 +759,7 @@ export default {
       container.scrollTop = container.scrollHeight;
     },
     validate() {
+      this.runningTest = true;
       this.canSubmit = false;
       this.sendButtonStatusToPeer(false);
       dbg("method validate - init",this.code);
@@ -740,7 +777,7 @@ export default {
         console.log(solutions);
 
         this.valid(solutions);
-
+        this.runningTest = false;
         /*if (ret) {
           this.valid(ret);
         } else {
@@ -756,6 +793,7 @@ export default {
         this.hasExerciseErrors = true;
         this.excerciseErrorMessage = e;
         this.logs.push(e);
+        this.runningTest = false;
         setTimeout(() => { 
               this.canSubmit = true;
               this.sendButtonStatusToPeer(true);
@@ -764,6 +802,7 @@ export default {
     },
     validatePython() {
      this.canSubmit = false;
+     this.runningTest = true;
      this.sendButtonStatusToPeer(false);
      var codeToSend = "" + this.$refs.cmEditor.codemirror.getValue();
      this.consoleValue = "";
@@ -806,6 +845,7 @@ export default {
               }else{
                  console.log("Invalid exercise.");
               }
+              this.runningTest = false;
             setTimeout(() => { 
               this.canSubmit = true;
               this.sendButtonStatusToPeer(true);
@@ -982,6 +1022,24 @@ export default {
       }
       this.firstLoad = false;
     },
+    takeControl() {
+      this.cmOption.readOnly = false;
+      dbg("method takeControl - init readOnly = false" );
+
+      dbg("method takeControl - init Emiting event sendControlStatusToPeer with status: true" );
+      this.$socket.client.emit("sendControlStatusToPeer", {
+        status: true,
+      });
+      
+      dbg("method takeControl - init Sending message to peer: I have taken Control!");
+      if (this.exerciseType == "PAIR") {
+        const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
+        elemento.style.background = "#ffffff";
+
+        this.newMessage("I have taken Control!", true);
+        this.$socket.client.emit("msg", this.pack("I have taken Control!"));
+      }
+    },
     updateCursorLocation() {
       const cmWidth = document.getElementById("codemirror").offsetWidth;
       const cmHeight = document.getElementById("codemirror").offsetHeight;
@@ -1068,6 +1126,7 @@ export default {
   border: 1px solid, rgb(8,8,8);
   height: 60vh !important;
   font-size:13px;
+  background-color: white;
 }
 #pairCursor {
   width: 2px;
