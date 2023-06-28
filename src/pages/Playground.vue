@@ -590,10 +590,15 @@ export default {
       }
       this.code = "";
       if (this.exerciseType == "PAIR") {
+        const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
+        elemento.style.background = "#dddddd";
         this.cmOption.readOnly = true;
       } else if (this.exerciseType == "INDIVIDUAL") {
         this.cmOption.readOnly = false;
+        const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
+        elemento.style.background = "#ffffff";
       }
+      
       this.clearResult();
 
       dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: true");
@@ -614,6 +619,10 @@ export default {
     receiveControlStatus(pack) {
       console.log("Receiving control status: "+pack.status);
       this.cmOption.readOnly = pack.status;
+      if (pack.status) {
+        const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
+        elemento.style.background = "#dddddd";
+            }
     },
     customAlert(pack) {
       this.validMessage = pack.data.message;
@@ -1010,9 +1019,12 @@ export default {
       this.$socket.client.emit("sendControlStatusToPeer", {
         status: true,
       });
-
+      
       dbg("method takeControl - init Sending message to peer: I have taken Control!");
       if (this.exerciseType == "PAIR") {
+        const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
+        elemento.style.background = "#ffffff";
+
         this.newMessage("I have taken Control!", true);
         this.$socket.client.emit("msg", this.pack("I have taken Control!"));
       }
