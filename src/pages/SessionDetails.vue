@@ -80,7 +80,53 @@
           <p class="mt-3 font-bold">
             Total: {{ this.participants.length }} participants.
           </p>
+          <button 
+            class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            @click="showImportModal = true">
+            Import from CSV
+          </button>
         </div>
+        <Modal v-model="showImportModal" title="Import Users">
+          <div class="mb-5">
+            <b class="mb-5">
+              Please upload a .CSV file with the following information: <b style="color:rgb(78, 109, 138)">&#10;name,surname,email,gender,birthday,&#10;studyStartYear,subjectsNumber,knownLanguages</b>
+            </b>
+          </div>
+          <div class="mb-5">
+            <p class="mb-5">
+              &#8226; The first line of the file must contain specified headers in the same order.
+            </p>
+          </div>
+          <div class="mb-5">
+            <p class="mb-5">
+              &#8226; The date format must be: <b>YYYY-MM-DD</b>
+            </p>
+          </div>
+          <div class="mb-5">
+              <p class="mb-5">
+                &#8226; Known languages format must be: <b>language1;language2;language3;</b>
+              </p>
+          </div>
+          <div class="mb-5">
+            <p class="mb-5">
+              &#8226; Gender must be <b>"Male"</b> or <b>"Female"</b>
+            </p>
+          </div>
+            <input
+              v-on:change="importCsv($event)"
+              type="file"
+              accept=".csv"
+              class="border rounded-sm ml-2 p-1"
+            />
+            <template v-slot:actionButtons>
+              <button
+                @click="importUsers()"
+                class="px-4 bg-transparent p-3 rounded-lg bg-green-400 hover:bg-green-300 mr-2 focus:outline-none focus:shadow-outline"
+              >
+                Upload
+              </button>
+            </template>
+        </Modal>
         <div class="mt-10">
           <h2 class="mb-3 text-md font-light">Tests &amp; exercises:</h2>
           <Table
@@ -226,6 +272,8 @@ export default {
       reloadIconUrl: reloadIcon,
       waitingStartResponse: false,
       showModal: false,
+      showImportModal: false,
+      csvFile: null,
       sessionToDelete: ""
     };
   },
@@ -244,6 +292,81 @@ export default {
     },
   },
   methods: {
+    importCsv(event) {
+      this.csvFile = event.target.files[0];
+    },
+    importUsers() {
+      if (this.csvFile) {
+        console.log("csv file: " + this.csvFile.name);
+        const users = [];
+        const subject = this.$route.params.sessionName;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result;
+          const allLines = result.split(/\r\n|\n/).filter(line => line.trim() != "");
+          const headers = allLines[0].split(",");
+          const expectedHeaders = ["name","surname","email","gender","birthday","studyStartYear","subjectsNumber","knownLanguages"];
+          if (headers.length != expectedHeaders.length) {
+            alert("The number of columns do not match the expected number of columns. Check the csv file and try again.");
+            return;
+          } else {
+            for (let i = 0; i < headers.length; i++) {
+              if (headers[i] != expectedHeaders[i]) {
+                alert("The headers do not match the expected headers. Your colum: " + headers[i] + " Expected column: " + expectedHeaders[i] + ". Check the csv file and try again.");
+                return;
+              }
+            }
+            console.log("headers match");
+          }
+          try {
+            for (let i = 1; i < allLines.length; i++) {
+              const user = {};
+              const values = allLines[i].split(",");
+              for (let j = 0; j < values.length; j++) {
+                if(j == 4) {
+                  user[headers[j]] = new Date(values[j]);
+                } else if (j == 5 || j == 6) {
+                  user[headers[j]] = parseInt(values[j]);
+                } else {
+                  user[headers[j]] = values[j];
+                }
+              }
+              user["shown_gender"] = user.gender;
+              user["subject"] = subject;
+              users.push(user);
+            }
+          } catch (error) {
+            alert("There was an error parsing the csv file. Check the csv file and try again.");
+            console.log(error);
+            return;
+          }
+          if(users.length == 0) {
+            alert("There are no users in the csv file. Check the csv file and try again.");
+            return;
+          }
+          console.log("Users parsed: " + JSON.stringify(users, null, 2));
+          fetch(`${process.env.VUE_APP_TC_API}/participants/${subject}/import`, {
+            method: "POST",
+            body: JSON.stringify(users),
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: localStorage.adminSecret,
+            },
+          }).then((response) => {
+            if (response.status == 200) {
+              this.showImportModal = false;
+              this.loadParticipants();
+              alert("Users imported successfully!");
+            } else {
+              alert("There was an error importing the users. Check the csv file and try again.");
+            }
+          });
+        }
+        reader.readAsText(this.csvFile);
+      } else {
+        alert("Please select a valid .csv file before uploading.");
+      }
+    },
     goBack() {
       this.$router.push({
         path: `/administration`,
