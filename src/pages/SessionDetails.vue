@@ -67,20 +67,82 @@
               'Status',
               'Rejoin',
               'Delete',
+              'Send email',
             ]"
             :body="participants"
             :actions="[
               { eventName: 'rejoin', icon: reloadIconUrl, key: 'socketId' },
               { eventName: 'delete', icon: deleteIconUrl, key: 'mail' },
+              { eventName: 'sendEmail', icon: emailIconUrl, key: 'mail' },
             ]"
             :invisible="['socketId']"
             @delete="deleteUser($event)"
             @rejoin="rejoinUser($event)"
+            @sendEmail="sendEmail($event)"
           />
           <p class="mt-3 font-bold">
             Total: {{ this.participants.length }} participants.
           </p>
+          <button 
+            class="mt-3 mr-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            @click="showImportModal = true">
+            Import from CSV
+          </button>
+          <button
+            class="mt-3 mr-3 rounded-full bg-green-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            @click="exportParticipants()"
+            v-if="this.participants.length > 0"
+          >
+            Export participants
+          </button>
+          <button
+            class="mt-3 mr-3 rounded-full bg-blue-300 p-2 px-5 focus:outline-none focus:shadow-outline"
+            @click="downloadCsv()"
+          >
+            Download example CSV
+          </button>
         </div>
+        <Modal v-model="showImportModal" title="Import Users">
+          <div class="mb-5">
+            <b class="mb-5">
+              Please upload a .CSV file with the following information: <b style="color:rgb(78, 109, 138)">&#10;name,surname,email,gender,birthday,&#10;studyStartYear,subjectsNumber,knownLanguages</b>
+            </b>
+          </div>
+          <div class="mb-5">
+            <p class="mb-5">
+              &#8226; The first line of the file must contain specified headers in the same order.
+            </p>
+          </div>
+          <div class="mb-5">
+            <p class="mb-5">
+              &#8226; The Birthday format: <b>YYYY-MM-DD</b>
+            </p>
+          </div>
+          <div class="mb-5">
+              <p class="mb-5">
+                &#8226; Known languages format: <b>language1;language2;language3;</b>
+              </p>
+          </div>
+          <div class="mb-5">
+            <p class="mb-5">
+              &#8226; Gender: <b>"Male"</b> or <b>"Female"</b>
+            </p>
+          </div>
+            <input
+              v-on:change="importCsv($event)"
+              type="file"
+              accept=".csv"
+              class="border rounded-sm ml-2 p-1"
+            />
+            <template v-slot:actionButtons>
+              <button
+                @click="importUsers()"
+                class="px-4 bg-transparent p-3 rounded-lg bg-green-400 hover:bg-green-300 mr-2 focus:outline-none focus:shadow-outline"
+              >
+                Upload
+              </button>
+            </template>
+        </Modal>
         <div class="mt-10">
           <h2 class="mb-3 text-md font-light">Tests &amp; exercises:</h2>
           <Table
@@ -126,12 +188,48 @@
           </button>
           <button
             class="mt-3 ml-2 p-3 rounded-md bg-gray-100 border px-5 text-gray-800 hover:bg-red-200 hover:border-red-300 hover:text-red-800"
-            @click="showModal = true"
+            @click="showDeleteModal = true"
           >
             Delete session
           </button>
         </div>
-        <Modal v-model="showModal" title="Delete session">
+        <div class="fixed h-full w-full top-0 left-0 flex items-center justify-center"
+          style="backdrop-filter: blur(2px); backdrop-filter: brightness(50%);"
+          v-if="showDeleteModal"
+          >
+          <div class="border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5">
+            <h1 class="text-2xl font-semibold mb-5 align-self-xl-center">Delete session</h1>
+            <p class="mb-5">
+              Are you sure you want to delete this session? <b style="color:red">This action cannot
+              be undone.</b>
+            </p>
+            <b class="mb-5">
+              Please type the name of the session to confirm:
+            </b>
+            <input
+            v-model="sessionToDelete"
+            type="text"
+            class="border rounded-sm ml-2 p-1"
+            />
+            <div class="flex justify-end mt-5">
+              <button
+                @click="sessionToDelete = ''; showDeleteModal = false"
+                class="px-4 bg-transparent p-3 rounded-lg hover:bg-gray-100 hover:text-orange-400 mr-2 focus:outline-none focus:shadow-outline"
+              >
+                Cancel
+              </button>
+              
+              <button
+                @click="deleteSession()"
+                v-if="sessionToDelete === this.session.name"
+                class="px-4 bg-transparent p-3 rounded-lg bg-orange-400 hover:bg-orange-300 mr-2 focus:outline-none focus:shadow-outline"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+        <!-- <Modal v-model="showDeleteModal" title="Delete session">
             <p class="mb-5">
               Are you sure you want to delete this session? <b style="color:red">This action cannot
               be undone.</b>
@@ -152,7 +250,7 @@
                 Delete
               </button>
             </template>
-        </Modal>
+        </Modal> -->
           <button
             class="mt-3 rounded-full bg-orange-400 p-2 px-5 focus:outline-none focus:shadow-outline"
             type="button"
@@ -198,6 +296,7 @@ import Table from "../components/Table";
 import ToggleSwitch from "../components/ToggleSwitch";
 import deleteIcon from "@/assets/icons/delete_bin.png";
 import reloadIcon from "@/assets/icons/reload.png";
+import emailIcon from "@/assets/icons/email.png";
 import Modal from "../components/Modal";
 
 export default {
@@ -224,8 +323,11 @@ export default {
       tests: [],
       deleteIconUrl: deleteIcon,
       reloadIconUrl: reloadIcon,
+      emailIconUrl: emailIcon,
       waitingStartResponse: false,
-      showModal: false,
+      showDeleteModal: false,
+      showImportModal: false,
+      csvFile: null,
       sessionToDelete: ""
     };
   },
@@ -244,6 +346,121 @@ export default {
     },
   },
   methods: {
+    importCsv(event) {
+      this.csvFile = event.target.files[0];
+    },
+    downloadCsv() {
+      const link = document.createElement("a");
+      link.href = "/csv/example-users-twincode.csv";
+      link.setAttribute("download", "example-users-twincode.csv");
+      link.click();
+    },
+    exportParticipants() {
+      fetch(
+        `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/export`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      ).then((response) => {
+        if (response.status == 200) {
+          return response.json();
+          
+        } else {
+          alert("There was an error exporting the users. Try again.");
+        }
+      }).then((response) => {
+        console.log(response);
+        const filename = this.session.name + "-participants.csv";
+        const data = this.$papa.unparse(response);
+
+        const element = document.createElement("a");
+        element.setAttribute(
+          "href",
+          "data:text/csv;charset=utf-8," + encodeURIComponent(data)
+        );
+        element.setAttribute("download", filename);
+        element.style.display = "none";
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+      })
+      ;
+    },
+    importUsers() {
+      if (this.csvFile) {
+        console.log("csv file: " + this.csvFile.name);
+        const users = [];
+        const subject = this.$route.params.sessionName;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result;
+          const allLines = result.split(/\r\n|\n/).filter(line => line.trim() != "");
+          const headers = allLines[0].split(",");
+          const expectedHeaders = ["name","surname","email","gender","birthday","studyStartYear"];
+          if (headers.length != expectedHeaders.length) {
+            alert("The number of columns do not match the expected number of columns. Check the csv file and try again.");
+            return;
+          } else {
+            for (let i = 0; i < headers.length; i++) {
+              if (headers[i] != expectedHeaders[i]) {
+                alert("The headers do not match the expected headers. Your colum: " + headers[i] + " Expected column: " + expectedHeaders[i] + ". Check the csv file and try again.");
+                return;
+              }
+            }
+            console.log("headers match");
+          }
+          try {
+            for (let i = 1; i < allLines.length; i++) {
+              const user = {};
+              const values = allLines[i].split(",");
+              for (let j = 0; j < values.length; j++) {
+                if(j == 4) {
+                  user[headers[j]] = new Date(values[j]);
+                } else if (j == 5 || j == 6) {
+                  user[headers[j]] = parseInt(values[j]);
+                } else {
+                  user[headers[j]] = values[j];
+                }
+              }
+              user["shown_gender"] = user.gender;
+              user["subject"] = subject;
+              users.push(user);
+            }
+          } catch (error) {
+            alert("There was an error parsing the csv file. Check the csv file and try again.");
+            console.log(error);
+            return;
+          }
+          if(users.length == 0) {
+            alert("There are no users in the csv file. Check the csv file and try again.");
+            return;
+          }
+          console.log("Users parsed: " + JSON.stringify(users, null, 2));
+          fetch(`${process.env.VUE_APP_TC_API}/participants/${subject}/import`, {
+            method: "POST",
+            body: JSON.stringify(users),
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: localStorage.adminSecret,
+            },
+          }).then((response) => {
+            if (response.status == 200) {
+              this.showImportModal = false;
+              this.loadParticipants();
+              alert("Users imported successfully!");
+            } else {
+              alert("There was an error importing the users. Check the csv file and try again.");
+            }
+          });
+        }
+        reader.readAsText(this.csvFile);
+      } else {
+        alert("Please select a valid .csv file before uploading.");
+      }
+    },
     goBack() {
       this.$router.push({
         path: `/administration`,
@@ -276,6 +493,23 @@ export default {
         console.log("Asking " + socketId + " to rejoin.");
         this.$socket.client.emit("requestToJoinAgain", socketId);
       }
+    },
+    sendEmail(userEmail) {
+      fetch(
+        `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/${userEmail}/send`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      ).then((response) => {
+        if (response.status == 200) {
+          alert("Email sent successfully!");
+        } else {
+          alert("There was an error sending the email. Try again later.");
+        }
+      });
     },
     toggleSessionMethod() {
       if (!this.waitingStartResponse) {
@@ -435,6 +669,7 @@ export default {
         }
       ).then((response) => {
         if (response.status == 200) {
+          alert(`Session deleted successfully!`);
           this.$router.push({
             path: `/administration`,
           });
