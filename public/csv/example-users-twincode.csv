@@ -1,0 +1,3 @@
+name,surname,email,gender,birthday,studyStartYear
+TestName1,Surname,testName@us.es,Male,2000-08-24,2018
+TestName2,Surname,testSurname@us.es,Female,2002-03-03,2018
