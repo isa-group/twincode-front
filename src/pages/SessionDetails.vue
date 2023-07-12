@@ -457,7 +457,17 @@ export default {
               const values = allLines[i].split(",");
               for (let j = 0; j < values.length; j++) {
                 if(j == 4) {
-                  user[headers[j]] = new Date(values[j]);
+                  //check if date is valid
+                  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+                  const date = new Date(values[j]);
+                  if(date instanceof Date && !isNaN(date) && dateRegex.test(values[j])) {
+                    user[headers[j]] = values[j];
+                  } else {
+                    this.popUpMessage = "The date " + values[j] + " is not valid. Check the csv file and try again.";
+                    this.popUpTitle = "Error";
+                    this.showPopUp = true;
+                    return;
+                  }
                 } else if (j == 5) {
                   user[headers[j]] = parseInt(values[j]);
                 } else if (j == 2) {
