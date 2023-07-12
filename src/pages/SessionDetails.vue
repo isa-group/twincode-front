@@ -95,17 +95,11 @@
           >
             Export participants
           </button>
-          <button
-            class="mt-3 mr-3 rounded-full bg-blue-300 p-2 px-5 focus:outline-none focus:shadow-outline"
-            @click="downloadCsv()"
-          >
-            Download example CSV
-          </button>
         </div>
         <Modal v-model="showImportModal" title="Import Users">
           <div class="mb-5">
             <b class="mb-5">
-              Please upload a .CSV file with the following information: <b style="color:rgb(78, 109, 138)">&#10;name,surname,email,gender,birthday,&#10;studyStartYear,subjectsNumber,knownLanguages</b>
+              Please upload a .CSV file with the following information: <b style="color:rgb(78, 109, 138)">&#10;name,surname,email,gender,birthday,studyStartYear</b>
             </b>
           </div>
           <div class="mb-5">
@@ -128,12 +122,25 @@
               &#8226; Gender: <b>"Male"</b> or <b>"Female"</b>
             </p>
           </div>
+          <div class="mb-5">
+            <p class="mb-5">
+              &#8226; File encoding: <b>UTF-8</b>
+            </p>
+          </div>
             <input
               v-on:change="importCsv($event)"
               type="file"
               accept=".csv"
               class="border rounded-sm ml-2 p-1"
             />
+            <template v-slot:footer>
+              <button
+                @click="downloadCsv()"
+                class="px-4 bg-transparent p-3 rounded-lg hover:bg-gray-300 mr-2 focus:outline-none focus:shadow-outline text-blue-500"
+              >
+                Download example
+              </button>
+            </template>
             <template v-slot:actionButtons>
               <button
                 @click="importUsers()"
@@ -372,7 +379,6 @@ export default {
           alert("There was an error exporting the users. Try again.");
         }
       }).then((response) => {
-        console.log(response);
         const filename = this.session.name + "-participants.csv";
         const data = this.$papa.unparse(response);
 
@@ -391,7 +397,6 @@ export default {
     },
     importUsers() {
       if (this.csvFile) {
-        console.log("csv file: " + this.csvFile.name);
         const users = [];
         const subject = this.$route.params.sessionName;
         const reader = new FileReader();
@@ -410,7 +415,6 @@ export default {
                 return;
               }
             }
-            console.log("headers match");
           }
           try {
             for (let i = 1; i < allLines.length; i++) {
@@ -431,14 +435,12 @@ export default {
             }
           } catch (error) {
             alert("There was an error parsing the csv file. Check the csv file and try again.");
-            console.log(error);
             return;
           }
           if(users.length == 0) {
             alert("There are no users in the csv file. Check the csv file and try again.");
             return;
           }
-          console.log("Users parsed: " + JSON.stringify(users, null, 2));
           fetch(`${process.env.VUE_APP_TC_API}/participants/${subject}/import`, {
             method: "POST",
             body: JSON.stringify(users),
@@ -448,9 +450,11 @@ export default {
             },
           }).then((response) => {
             if (response.status == 200) {
-              this.showImportModal = false;
-              this.loadParticipants();
-              alert("Users imported successfully!");
+              response.json().then((response) => {
+                this.showImportModal = false;
+                this.loadParticipants();
+                alert(`${response.success} Users imported successfully\n${response.errors} Users not imported due to errors\n${response.exists} Users already existed.\n\nIf errors occurred, check the csv file and try again. If they persist, please contact the developers.`);
+              });
             } else {
               alert("There was an error importing the users. Check the csv file and try again.");
             }

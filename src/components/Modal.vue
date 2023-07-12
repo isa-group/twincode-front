@@ -50,14 +50,19 @@
         <slot></slot>
 
         <!--Footer-->
-        <div class="flex justify-end pt-2">
-          <button
-            class="px-4 bg-transparent p-3 rounded-lg hover:bg-gray-100 hover:text-orange-400 mr-2 focus:outline-none focus:shadow-outline"
-            @click="closeModal()"
-          >
-            {{ cancelTitle }}
-          </button>
-          <slot name="actionButtons"></slot>
+        <div class="flex pt-2">
+          <div class="justify-start flex-1">
+            <slot name="footer"></slot>
+          </div>
+          <div class="justify-end">
+            <button
+              class="px-4 bg-transparent p-3 rounded-lg hover:bg-gray-300 hover:text-orange-400 mr-2 focus:outline-none focus:shadow-outline"
+              @click="closeModal()"
+            >
+              {{ cancelTitle }}
+            </button>
+            <slot name="actionButtons"></slot>
+          </div>
         </div>
       </div>
     </div>
