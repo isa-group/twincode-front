@@ -458,8 +458,28 @@ export default {
               for (let j = 0; j < values.length; j++) {
                 if(j == 4) {
                   user[headers[j]] = new Date(values[j]);
-                } else if (j == 5 || j == 6) {
+                } else if (j == 5) {
                   user[headers[j]] = parseInt(values[j]);
+                } else if (j == 2) {
+                  // Check if email is valid
+                  const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+                  if (emailRegex.test(values[j])) {
+                    user[headers[j]] = values[j];
+                  } else {
+                    this.popUpMessage = "The email " + values[j] + " is not valid. Check the csv file and try again.";
+                    this.popUpTitle = "Error";
+                    this.showPopUp = true;
+                    return;
+                  }
+                } else if( j == 3) {
+                  if(["Male","Female"].includes(values[j])) {
+                    user[headers[j]] = values[j];
+                  } else {
+                    this.popUpMessage = "Gender value " + values[j] + " is not valid. Check the csv file and try again.";
+                    this.popUpTitle = "Error";
+                    this.showPopUp = true;
+                    return;
+                  }
                 } else {
                   user[headers[j]] = values[j];
                 }
