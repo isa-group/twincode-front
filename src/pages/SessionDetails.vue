@@ -95,17 +95,11 @@
           >
             Export participants
           </button>
-          <button
-            class="mt-3 mr-3 rounded-full bg-blue-300 p-2 px-5 focus:outline-none focus:shadow-outline"
-            @click="downloadCsv()"
-          >
-            Download example CSV
-          </button>
         </div>
         <Modal v-model="showImportModal" title="Import Users">
           <div class="mb-5">
             <b class="mb-5">
-              Please upload a .CSV file with the following information: <b style="color:rgb(78, 109, 138)">&#10;name,surname,email,gender,birthday,&#10;studyStartYear,subjectsNumber,knownLanguages</b>
+              Please upload a .CSV file with the following information: <b style="color:rgb(78, 109, 138)">&#10;name,surname,email,gender,birthday,studyStartYear</b>
             </b>
           </div>
           <div class="mb-5">
@@ -128,12 +122,25 @@
               &#8226; Gender: <b>"Male"</b> or <b>"Female"</b>
             </p>
           </div>
+          <div class="mb-5">
+            <p class="mb-5">
+              &#8226; File encoding: <b>UTF-8</b>
+            </p>
+          </div>
             <input
               v-on:change="importCsv($event)"
               type="file"
               accept=".csv"
               class="border rounded-sm ml-2 p-1"
             />
+            <template v-slot:footer>
+              <button
+                @click="downloadCsv()"
+                class="px-4 bg-transparent p-3 rounded-lg hover:bg-gray-300 mr-2 focus:outline-none focus:shadow-outline text-blue-500"
+              >
+                Download example
+              </button>
+            </template>
             <template v-slot:actionButtons>
               <button
                 @click="importUsers()"
@@ -225,6 +232,27 @@
                 class="px-4 bg-transparent p-3 rounded-lg bg-orange-400 hover:bg-orange-300 mr-2 focus:outline-none focus:shadow-outline"
               >
                 Delete
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="fixed h-full w-full top-0 left-0 flex items-center justify-center"
+          @wheel.prevent
+          @scroll.prevent
+          @touchmove.prevent
+          style="backdrop-filter: blur(2px); backdrop-filter: brightness(50%);"
+          v-if="showPopUp"
+          >
+          <div class="border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5" style="width: 40%;">
+            <h1 class="text-2xl font-semibold mb-5 align-self-xl-center">{{ popUpTitle }}</h1>
+            <p class="mb-5" v-html="popUpMessage">
+            </p>
+            <div class="flex justify-end mt-5">
+              <button
+                @click="closePopUp()"
+                class="px-4 bg-transparent p-3 rounded-lg hover:bg-gray-100 hover:text-orange-400 mr-2 focus:outline-none focus:shadow-outline"
+              >
+                Close
               </button>
             </div>
           </div>
@@ -328,7 +356,10 @@ export default {
       showDeleteModal: false,
       showImportModal: false,
       csvFile: null,
-      sessionToDelete: ""
+      sessionToDelete: "",
+      showPopUp: false,
+      popUpTitle: "",
+      popUpMessage: "",
     };
   },
   sockets: {
@@ -346,6 +377,11 @@ export default {
     },
   },
   methods: {
+    closePopUp() {
+      this.showPopUp = false;
+      this.popUpMessage = "";
+      this.popUpTitle = "";
+    },
     importCsv(event) {
       this.csvFile = event.target.files[0];
     },
@@ -369,10 +405,11 @@ export default {
           return response.json();
           
         } else {
-          alert("There was an error exporting the users. Try again.");
+          this.popUpMessage = "There was an error exporting the participants. Try again later.";
+          this.popUpTitle = "Error";
+          this.showPopUp = true;
         }
       }).then((response) => {
-        console.log(response);
         const filename = this.session.name + "-participants.csv";
         const data = this.$papa.unparse(response);
 
@@ -391,7 +428,6 @@ export default {
     },
     importUsers() {
       if (this.csvFile) {
-        console.log("csv file: " + this.csvFile.name);
         const users = [];
         const subject = this.$route.params.sessionName;
         const reader = new FileReader();
@@ -401,16 +437,19 @@ export default {
           const headers = allLines[0].split(",");
           const expectedHeaders = ["name","surname","email","gender","birthday","studyStartYear"];
           if (headers.length != expectedHeaders.length) {
-            alert("The number of columns do not match the expected number of columns. Check the csv file and try again.");
+            this.popUpMessage = "The headers do not match the expected headers. Check the csv file and try again.";
+            this.popUpTitle = "Error";
+            this.showPopUp = true;
             return;
           } else {
             for (let i = 0; i < headers.length; i++) {
               if (headers[i] != expectedHeaders[i]) {
-                alert("The headers do not match the expected headers. Your colum: " + headers[i] + " Expected column: " + expectedHeaders[i] + ". Check the csv file and try again.");
+                this.popUpMessage = "The headers do not match the expected headers. Your colum: " + headers[i] + " Expected column: " + expectedHeaders[i] + ". Check the csv file and try again.";
+                this.popUpTitle = "Error";
+                this.showPopUp = true;
                 return;
               }
             }
-            console.log("headers match");
           }
           try {
             for (let i = 1; i < allLines.length; i++) {
@@ -418,9 +457,39 @@ export default {
               const values = allLines[i].split(",");
               for (let j = 0; j < values.length; j++) {
                 if(j == 4) {
-                  user[headers[j]] = new Date(values[j]);
-                } else if (j == 5 || j == 6) {
+                  //check if date is valid
+                  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+                  const date = new Date(values[j]);
+                  if(date instanceof Date && !isNaN(date) && dateRegex.test(values[j])) {
+                    user[headers[j]] = values[j];
+                  } else {
+                    this.popUpMessage = "The date " + values[j] + " is not valid. Check the csv file and try again.";
+                    this.popUpTitle = "Error";
+                    this.showPopUp = true;
+                    return;
+                  }
+                } else if (j == 5) {
                   user[headers[j]] = parseInt(values[j]);
+                } else if (j == 2) {
+                  // Check if email is valid
+                  const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
+                  if (emailRegex.test(values[j])) {
+                    user[headers[j]] = values[j];
+                  } else {
+                    this.popUpMessage = "The email " + values[j] + " is not valid. Check the csv file and try again.";
+                    this.popUpTitle = "Error";
+                    this.showPopUp = true;
+                    return;
+                  }
+                } else if( j == 3) {
+                  if(["Male","Female"].includes(values[j])) {
+                    user[headers[j]] = values[j];
+                  } else {
+                    this.popUpMessage = "Gender value " + values[j] + " is not valid. Check the csv file and try again.";
+                    this.popUpTitle = "Error";
+                    this.showPopUp = true;
+                    return;
+                  }
                 } else {
                   user[headers[j]] = values[j];
                 }
@@ -430,15 +499,17 @@ export default {
               users.push(user);
             }
           } catch (error) {
-            alert("There was an error parsing the csv file. Check the csv file and try again.");
-            console.log(error);
+            this.popUpMessage = "There was an error parsing the csv file. Check the csv file and try again.";
+            this.popUpTitle = "Error";
+            this.showPopUp = true;
             return;
           }
           if(users.length == 0) {
-            alert("There are no users in the csv file. Check the csv file and try again.");
+            this.popUpMessage = "There are no users in the csv file. Check the csv file and try again.";
+            this.popUpTitle = "Error";
+            this.showPopUp = true;
             return;
           }
-          console.log("Users parsed: " + JSON.stringify(users, null, 2));
           fetch(`${process.env.VUE_APP_TC_API}/participants/${subject}/import`, {
             method: "POST",
             body: JSON.stringify(users),
@@ -448,17 +519,29 @@ export default {
             },
           }).then((response) => {
             if (response.status == 200) {
-              this.showImportModal = false;
-              this.loadParticipants();
-              alert("Users imported successfully!");
+              response.json().then((response) => {
+                this.showImportModal = false;
+                this.loadParticipants();
+                if(response.errors > 0) {
+                  this.popUpMessage = `<div><div><b style="color:green">${response.success}</b> participants imported successfully!</div><div><b style="color:red">${response.errors}</b> participants not imported due to errors.</div><div><b style="color:blue">${response.exists}</b> already existing participants.</div><div style="margin-top: 10px;"><b>Errors ocurred:</b><p>Please try again, if errors persist contact the development team...</p></div></div>`;
+                } else {
+                  this.popUpMessage = `<div><b style="color:green">${response.success}</b> participants imported successfully!</div><div><b style="color:blue">${response.exists}</b> already existing participants.</div>`;
+                }
+                this.popUpTitle = "Import results";
+                this.showPopUp = true;
+              });
             } else {
-              alert("There was an error importing the users. Check the csv file and try again.");
+              this.popUpMessage = "There was an error importing the users. Check the csv file and try again.";
+              this.popUpTitle = "Error";
+              this.showPopUp = true;
             }
           });
         }
         reader.readAsText(this.csvFile);
       } else {
-        alert("Please select a valid .csv file before uploading.");
+        this.popUpMessage = "Please select a valid csv file.";
+        this.popUpTitle = "Error";
+        this.showPopUp = true;
       }
     },
     goBack() {
@@ -505,9 +588,13 @@ export default {
         }
       ).then((response) => {
         if (response.status == 200) {
-          alert("Email sent successfully!");
+          this.popUpMessage = "Email sent successfully!";
+          this.popUpTitle = "Success";
+          this.showPopUp = true;
         } else {
-          alert("There was an error sending the email. Try again later.");
+          this.popUpMessage = "There was an error sending the email. Try again later.";
+          this.popUpTitle = "Error";
+          this.showPopUp = true;
         }
       });
     },
@@ -669,10 +756,16 @@ export default {
         }
       ).then((response) => {
         if (response.status == 200) {
-          alert(`Session deleted successfully!`);
+          this.popUpMessage = "Session deleted successfully!";
+          this.popUpTitle = "Success";
+          this.showPopUp = true;
           this.$router.push({
             path: `/administration`,
           });
+        } else {
+          this.popUpMessage = "There was an error deleting the session. Try again later.";
+          this.popUpTitle = "Error";
+          this.showPopUp = true;
         }
       });
     },
@@ -691,7 +784,9 @@ export default {
         }
       ).then((response) => {
         if (response.status == 200) {
-          alert(`Session Updated!`);
+          this.popUpMessage = "Session updated successfully!";
+          this.popUpTitle = "Success";
+          this.showPopUp = true;
         }
       });
     },
@@ -706,9 +801,9 @@ export default {
         }
       ).then((response) => {
         if (response.status == 200) {
-          alert(
-            `Session is now ${this.session.active ? "active!" : "inactive!"}`
-          );
+          this.popUpMessage = "Session is now " + (this.session.active ? "active!" : "inactive!");
+          this.popUpTitle = this.session.active ? "Active" : "Inactive";
+          this.showPopUp = true;
         }
       });
     },
@@ -727,4 +822,6 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+
+</style>

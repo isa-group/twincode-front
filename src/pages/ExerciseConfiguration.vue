@@ -433,7 +433,7 @@ export default {
             inputs: [0],
             solutions: [0],
             time: 300,
-            type: "PAIR"
+            type: this.tests[this.selectedTest].type,
           }));
 
       this.tests[this.selectedTest].exercises.push(exercisesBody);

@@ -158,6 +158,7 @@ export default {
             inputs: [0,1,5,10],
             solutions: [2,1,11,123],
             time: 300,
+            type: "PAIR"
       }));
 
       var test1 = JSON.stringify({
@@ -181,6 +182,7 @@ export default {
             inputs: [[-1,5,7,6,-4],[-1,5,6,4,3]],
             solutions: [true,false],
             time: 300,
+            type: "INDIVIDUAL"
       }));
 
       var test2 = JSON.stringify({
