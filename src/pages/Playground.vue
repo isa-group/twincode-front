@@ -794,6 +794,22 @@ export default {
         this.excerciseErrorMessage = e;
         this.logs.push(e);
         this.runningTest = false;
+        fetch(process.env.VUE_APP_TC_API+"/verify/log",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              user: localStorage.token,
+              status: true,
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          })
+        .then((response) => {
+          if(response.status == 200){
+          console.log("Log saved.");
+          }
+        });
         setTimeout(() => { 
               this.canSubmit = true;
               this.sendButtonStatusToPeer(true);
@@ -840,10 +856,40 @@ export default {
               if (this.isExerciseCorrect == true) {
                 dbg("validatePython - Correct Exercise - Changing Exercise...");
                 console.log("Valid exercise.");
+                fetch(process.env.VUE_APP_TC_API+"/verify/log",
+                {
+                  method: "POST",
+                  body: JSON.stringify({
+                    user: localStorage.token,
+                    status: true,
+                  }),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }).then((response) => {
+                  if(response.status == 200){
+                  console.log("Log saved.");
+                  }
+                });
 
                 setTimeout(() => { this.changeExercise(); }, 2000);
               }else{
-                 console.log("Invalid exercise.");
+                fetch(process.env.VUE_APP_TC_API+"/verify/log",
+                {
+                  method: "POST",
+                  body: JSON.stringify({
+                    user: localStorage.token,
+                    status: false,
+                  }),
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                }).then((response) => {
+                  if(response.status == 200){
+                  console.log("Log saved.");
+                  }
+                });
+                console.log("Invalid exercise.");
               }
               this.runningTest = false;
             setTimeout(() => { 

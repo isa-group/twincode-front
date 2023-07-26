@@ -110,7 +110,7 @@
               hover:border-indigo-400
               mx-2
             "
-            @click="loadDataset()"
+            @click="loadAnalitycs()"
           >
             Load statistics
             <img
@@ -381,6 +381,39 @@ export default {
           return response;
         });
     },
+    loadAnalitycs() {
+      fetch(
+        `${process.env.VUE_APP_TC_API}/analytics/` +
+          this.$route.params.sessionName,
+        {
+          method: "GET",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      ).then((response) => {
+        return response.json();
+      }
+      ).then((response) => {
+        console.log(response);
+        let filename = this.$route.params.sessionName+"-analytics.csv";
+        let text = this.$papa.unparse(response);
+
+        let element = document.createElement("a");
+        element.setAttribute(
+          "href",
+          "data:text/csv;charset=utf-8," + encodeURIComponent(text)
+        );
+        element.setAttribute("download", filename);
+
+        element.style.display = "none";
+        document.body.appendChild(element);
+
+        element.click();
+        document.body.removeChild(element);
+        return response;
+      });
+    }
   },
   mounted() {
     this.loadTests();
