@@ -148,6 +148,7 @@ import Header from "../components/Header";
 import VueApexCharts from "vue-apexcharts";
 import Vue from 'vue'
 import VuePapaParse from 'vue-papa-parse'
+import { Console } from "console";
 Vue.use(VuePapaParse)
 
 export default {
@@ -392,9 +393,15 @@ export default {
           },
         }
       ).then((response) => {
-        return response.json();
+        if(response.status == 200) {
+          return response.json();
+        } else {
+          Console.log("ERROR, MESSAGE: " + response.message);
+          return null;
+        }
       }
       ).then((response) => {
+        if(response == null) return;
         console.log(response);
         let filename = this.$route.params.sessionName+"-analytics.csv";
         let text = this.$papa.unparse(response);
