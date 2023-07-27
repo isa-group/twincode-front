@@ -148,7 +148,6 @@ import Header from "../components/Header";
 import VueApexCharts from "vue-apexcharts";
 import Vue from 'vue'
 import VuePapaParse from 'vue-papa-parse'
-import { Console } from "console";
 Vue.use(VuePapaParse)
 
 export default {
@@ -396,7 +395,7 @@ export default {
         if(response.status == 200) {
           return response.json();
         } else {
-          Console.log("ERROR, MESSAGE: " + response.message);
+          console.log("ERROR, MESSAGE: " + response.message);
           return null;
         }
       }
