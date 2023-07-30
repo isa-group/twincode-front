@@ -95,6 +95,13 @@
           >
             Export participants
           </button>
+          <button 
+            class="mt-3 mr-3 rounded-full bg-blue-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            @click="sendEmailAll()"
+            v-if="this.participants.length > 0"
+          >
+            Send emails
+          </button>
         </div>
         <Modal v-model="showImportModal" title="Import Users">
           <div class="mb-5">
@@ -587,6 +594,7 @@ export default {
           },
         }
       ).then((response) => {
+        console.log(response);
         if (response.status == 200) {
           this.popUpMessage = "Email sent successfully!";
           this.popUpTitle = "Success";
@@ -597,6 +605,39 @@ export default {
           this.showPopUp = true;
         }
       });
+    },
+    sendEmailAll() {
+      this.popUpMessage = "Emails are being sent to all users, please wait..."
+      this.popUpTitle = "Sending in process..."
+      this.showPopUp = true;
+      fetch(
+        `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/send`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      ).then((response) => {
+        this.closePopUp()
+        if (response.status == 200) {
+          response.json().then((response) => {
+            if (response.errors>0) {
+              this.popUpTitle = "Emails partially sent..."
+              this.popUpMessage = `<div><div><b style="color:green">${response.success}</b> emails sent successfully!</div><div><b style="color:red">${response.errors}</b> emails not sent because of errors.</div><div style="margin-top: 10px;"><b>Errors ocurred:</b><p>You can send an email to especific participants or you can try again. If errors persist please contact the development team...</p></div></div>`;
+              this.showPopUp = true;
+            } else {
+              this.popUpTitle = "Emails sent successfully!"
+              this.popUpMessage = `<div><div><b style="color:green">${response.success}</b> emails sent successfully!</div></div>`;
+              this.showPopUp = true;
+            }
+          })
+        } else {
+          this.popUpMessage = "An error ocurred while sending emails, try again. If error persists, comunicate with the development team.";
+          this.popUpTitle = "Error";
+          this.showPopUp = true;
+        }
+      })
     },
     toggleSessionMethod() {
       if (!this.waitingStartResponse) {

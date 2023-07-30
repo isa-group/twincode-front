@@ -81,6 +81,7 @@
 
               <!-- RUN CODE BUTTONS: -->
              <div class="mt-2">
+                  <div>
                     <button
                         v-if="exerciseType == 'PAIR' && cmOption.readOnly"
                         class="bg-green-600 hover:bg-green-300 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
@@ -88,7 +89,12 @@
                         id = "takeControl"
                       >
                         Take Control
-                      </button>
+                    </button>
+                    <div class="speech-bubble" v-if="showBubble && exerciseType == 'PAIR' && cmOption.readOnly">
+                      <b> {{ this.bubbleText }} </b>
+                    </div>
+                  </div>
+                    
                     <!--<p v-if="!canSubmit" style="color: red; text-decoration: underline; text-decoration-style: double; text-transform: uppercase; font-size: 20px;">{{validMessage}}</p>-->
                     <button class="bg-orange-600 hover:bg-orange-500 p-3 text-white shadow-md focus:outline-none focus:shadow-outline m-1"
                       @click="validate()"
@@ -500,6 +506,8 @@ export default {
       canSubmit: true,
       validMessage: "",
       runningTest: false,
+      showBubble: false,
+      bubbleText: "Click here to start editing the code",
     };
   },
   filters: {
@@ -590,6 +598,8 @@ export default {
       this.solutions = pack.data.solutions;
       this.language = pack.data.testLanguage.toLowerCase();
       this.testIndex = pack.data.testIndex;
+      this.bubbleText = "Click here to start editing the code!";
+      this.showControlBubble();
       if(this.language == "python") {
         this.text1codemirror = "def ";
         this.text2codemirror = "main(inp):";
@@ -633,7 +643,9 @@ export default {
       if (pack.status) {
         const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
         elemento.style.background = "#dddddd";
-            }
+        this.bubbleText = "Your partner is now in control!";
+        this.showControlBubble();
+        }
     },
     customAlert(pack) {
       this.validMessage = pack.data.message;
@@ -721,6 +733,12 @@ export default {
     },
   },
   methods: {
+    showControlBubble() {
+      this.showBubble = true;
+      setTimeout(() => { 
+        this.showBubble = false;
+      }, 4500);
+    },
     sendButtonStatusToPeer(status) {
       console.log(status);
       this.$socket.client.emit("sendButtonStatusToPeer", { status: status });
@@ -1057,6 +1075,12 @@ export default {
         doc.cursorCoords(false, "relative")
       );
     },
+    editorClick() {
+      dbg("method editorClick - init");
+      if (this.exerciseType == "PAIR" && !this.showBubble && this.cmOption.readOnly) {
+        this.showControlBubble();
+      }
+    },
     onCmCodeChange(e, c) {
       const changeObj = {
         author: this.$socket.client.id,
@@ -1077,13 +1101,9 @@ export default {
         status: true,
       });
       
-      dbg("method takeControl - init Sending message to peer: I have taken Control!");
       if (this.exerciseType == "PAIR") {
         const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
         elemento.style.background = "#ffffff";
-
-        this.newMessage("I have taken Control!", true);
-        this.$socket.client.emit("msg", this.pack("I have taken Control!"));
       }
     },
     updateCursorLocation() {
@@ -1123,6 +1143,7 @@ export default {
 
     this.$refs.cmEditor.codemirror.on("change", this.onCmCodeChange);
     this.$refs.cmEditor.codemirror.on("cursorActivity", this.cursorActivity);
+    this.$refs.cmEditor.codemirror.on("mousedown", this.editorClick)
     const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
     elemento.addEventListener("scroll", this.handleScroll);
 
@@ -1168,6 +1189,35 @@ export default {
 </script>
 
 <style>
+
+.speech-bubble {
+  position: absolute;
+  background: #D4EFDF;
+  border-radius: .4em;
+  padding: 1em;
+  min-width: 110px;
+  min-height: 90px;
+  width: 20%;
+  float: right;
+  box-shadow: 0px 0px 10px #666;
+  margin-top: 1em;
+}
+/* creates the arrow in the left side of the bubble */
+.speech-bubble:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border: 1em solid transparent;
+  border-top-color: #D4EFDF;
+  border-bottom: 0;
+  margin-left: -0.9em;
+  margin-bottom: 6.3em;
+  rotate: 180deg;
+}
+
 .CodeMirror {
   border: 1px solid, rgb(8,8,8);
   height: 60vh !important;
