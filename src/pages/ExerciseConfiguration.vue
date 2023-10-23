@@ -432,7 +432,7 @@ export default {
             description: "New Exercise",
             inputs: [0],
             solutions: [0],
-            time: 300,
+            time: this.tests[this.selectedTest].testTime,
             type: this.tests[this.selectedTest].type,
           }));
 
@@ -493,6 +493,11 @@ export default {
     },
     updateTest() {
       var bodyJson = JSON.parse(JSON.stringify(this.tests[this.selectedTest]));
+      
+      // update all exercises times to match the test time
+      bodyJson.exercises.forEach((exercise) => {
+        exercise.time = bodyJson.testTime;
+      });
 
         const inputsExercise = bodyJson.exercises[this.selectedExerciseIndex].inputs;
         for (let inputIndex = 0; inputIndex < inputsExercise.length; inputIndex++) {
