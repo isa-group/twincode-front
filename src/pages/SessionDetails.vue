@@ -693,6 +693,7 @@ export default {
             this.session.active = retrievedSession.active;
             this.session.running = retrievedSession.running;
             this.session.pairingMode = retrievedSession.pairingMode;
+            this.session.isStandard = retrievedSession.isStandard ?? true;
           }
           this.waitingStartResponse = false;
         });
