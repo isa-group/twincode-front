@@ -496,9 +496,9 @@ export default {
       
       // update all exercises times to match the test time
       bodyJson.exercises.forEach((exercise) => {
-        exercise.time = bodyJson.testTime;
+        exercise.time = Number(bodyJson.testTime);
       });
-
+      console.log(bodyJson);
         const inputsExercise = bodyJson.exercises[this.selectedExerciseIndex].inputs;
         for (let inputIndex = 0; inputIndex < inputsExercise.length; inputIndex++) {
           if (this.inputsType == "number") {
