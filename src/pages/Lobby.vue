@@ -148,7 +148,7 @@ export default {
   sockets: {
     sessionStart(val) {
       console.log("Session started!");
-      window.location.href = "/rooms/controlled/" + val.room;
+      window.location.href = "/rooms/"+ val.user.code +"/controlled/" + val.room;
       console.log("Converting to string: " + val.user);
       console.log(JSON.stringify(val.user));
       localStorage.setItem("user", JSON.stringify(val.user));

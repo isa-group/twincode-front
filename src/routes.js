@@ -8,6 +8,7 @@ import ExerciseConfiguration from "./pages/ExerciseConfiguration";
 import Reports from "./pages/Reports";
 import IDE from "./pages/IDE";
 import PageNotFound from "./pages/PageNotFound";
+import Reconnect from "./pages/Reconnect";
 
 const routes = [
   {
@@ -53,7 +54,7 @@ const routes = [
     meta: { title: "Admin console - Twincode" },
   },
   {
-    path: "/rooms/:mode/:rid",
+    path: "/rooms/:code/:mode/:rid",
     component: Playground,
     name: "Playground",
     meta: { title: "Twincode" },
@@ -63,6 +64,12 @@ const routes = [
     component: Playground,
     name: "Playground",
     meta: { title: "Playground - Twincode" },
+  },
+  {
+    path: "/reconnect/:code",
+    component: Reconnect,
+    name: "Reconnect",
+    meta: { title: "Reconnect - Twincode" },
   },
   {
     path: "/ide",

@@ -314,6 +314,18 @@
         <p class="font-normal mt-1">Your ID: {{ token }}</p>
       </div>
     </div>
+
+    <div v-if="pairReconnecting"
+      class="fixed h-full w-full top-0 z-50 flex justify-center items-center"
+      style="backdrop-filter: blur(2px);"
+    >
+      <div
+        class="border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5 w-2/3"
+      >
+        <h1 class="font-bold text-2xl mb-4">Your partner has disconnected.</h1>
+        <p class="font-medium">Please wait while we try to reconnect...</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -484,7 +496,7 @@ export default {
       twcc:null,
       excerciseErrorMessage: "",
       returnValue: "",
-      token: localStorage.getItem("code"),
+      token: this.$route.params.code,
       pronounReal: (JSON.parse(localStorage.getItem("user")).blind)? "" : (localStorage.getItem("pairedTo") === 'Female')? '(she/her)':'(he/him)',
       pronounOpp: (JSON.parse(localStorage.getItem("user")).blind)? "" : (localStorage.getItem("pairedTo") === 'Female')? '(he/him)':'(she/her)',
       printValue: "", /** NEW */
@@ -508,6 +520,7 @@ export default {
       runningTest: false,
       showBubble: false,
       bubbleText: "Click here to start editing the code",
+      pairReconnecting: false,
     };
   },
   filters: {
@@ -533,20 +546,20 @@ export default {
 
       // Too expensive Debug log
       //console.log("text event triggered with data <" + this.toJSON(pack) + "> ");
-
-      this.$refs.cmEditor.codemirror.replaceRange(
+      if (!this.pairReconnecting) {
+        this.$refs.cmEditor.codemirror.replaceRange(
         pack.change.text,
         pack.change.from,
         pack.change.to,
         "server"
       );
-     
+      }  
     },
     finish() {
       dbg("EVENT finish");
       console.log("EVENT finish trigered!");
       fetch(
-        process.env.VUE_APP_TC_API + "/finishMessage?code=" + localStorage.code,
+        process.env.VUE_APP_TC_API + "/finishMessage?code=" + this.$route.params.code,
         {
           method: "GET",
         }
@@ -557,7 +570,7 @@ export default {
         .then((response) => {
           this.finished = true;
           this.finishMessage = response.finishMessage;
-          this.$socket.client.emit("clientFinished", {token: localStorage.token, code: localStorage.code});
+          this.$socket.client.emit("clientFinished", {token: this.$route.params.code, code: this.$route.params.code});
         });
     },
     loadTest(pack) {
@@ -613,6 +626,9 @@ export default {
       if (this.exerciseType == "PAIR") {
         const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
         elemento.style.background = "#dddddd";
+        if (!this.cmOption) {
+          this.cmOption = {};
+        }
         this.cmOption.readOnly = true;
       } else if (this.exerciseType == "INDIVIDUAL") {
         this.cmOption.readOnly = false;
@@ -623,7 +639,7 @@ export default {
       this.clearResult();
 
       dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: true");
-      this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: true});
+      this.$socket.client.emit("changeExercise", {code: this.$route.params.code, exercisedCharged: true});
     },
     hideShowButton(pack) {
       dbg("method hideShowButton - init");
@@ -670,7 +686,7 @@ export default {
     },
     reconnect() {
       dbg("EVENT reconnect");
-      this.$socket.client.emit("clientReconnection", localStorage.token);
+      this.$socket.client.emit("clientReconnection", this.$route.params.code);
     },
     countDown(pack) {
       //dbg("EVENT countDown",pack);
@@ -686,43 +702,61 @@ export default {
         this.$refs.timeBar.classList.add("bg-yellow-500");
       }
     },
+    userReconnectingEvent(status){
+      dbg("EVENT userReconnectingEvent",status);
+      if (!status) {
+        setTimeout(() => {
+          this.pairReconnecting = status;
+        }, 1000);
+      } else {
+        this.pairReconnecting = status;
+      }
+
+      if(status && !this.cmOption.readOnly){
+        this.cmOption.readOnly = true;
+        const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
+        elemento.style.background = "#dddddd";
+      }
+    },
     requestBulkCodeEvent(peerSocketId){
       dbg("EVENT requestBulkCodeEvent");
       var currentCode =  this.$refs.cmEditor.codemirror.getValue();
       dbg("EVENT requestBulkCodeEvent - code : \""+currentCode+"\"");
-      if(this.peerSocketId != peerSocketId){
-        this.peerSocketId = peerSocketId;
-        this.$socket.client.emit("bulkCode", this.pack({
-          peerSocketId:peerSocketId, 
-          code: currentCode
-        }));
 
-      }else{
-        dbg("EVENT requestBulkCodeEvent - IGNORED because peerSocketId didn't changed");
-      }
+      this.peerSocketId = peerSocketId;
+      this.$socket.client.emit("bulkCode", this.pack({
+        peerSocketId:peerSocketId,
+        socketId: this.$socket.client.id, 
+        code: currentCode
+      }));
     },
-    bulkCodeUpdate(code){
-      dbg("EVENT bulkCodeUpdate",code);
-      var currentCode =  this.$refs.cmEditor.codemirror.getValue();
-      console.log
-      if(currentCode != code){
-        this.updateCodeEventActive = false;
-        this.$refs.cmEditor.codemirror.setValue(code);
-        this.updateCodeEventActive = true;
-
-      }
+    bulkCodeUpdate(pack){
+      dbg("EVENT bulkCodeUpdate",pack);
+      //var currentCode =  this.$refs.cmEditor.codemirror.getValue();
+      this.$refs.cmEditor.codemirror.setValue(pack.code);
+      this.peerSocketId = pack.peerSocketId;
+      this.$socket.client.emit("userReconnectingEnd", this.pack({
+        peerSocketId: this.peerSocketId, 
+        status: false,
+      }));
     }
   },
-  created() {
-    dbg("created - init");
+  async created() {
+    console.log("created - init");
     var pathParams = window.location.pathname.split("/");
-    this.rid = pathParams[3] + ":" + pathParams[2];
+    this.rid = pathParams[4] + ":" + pathParams[3];
 
     this.uid = new String(
       new Date().getTime() + new Date().getUTCMilliseconds()
     ).substr(8, 13);
 
-    this.$socket.client.emit("clientReconnection", localStorage.token);
+    if(!localStorage.getItem("user") || !localStorage.getItem("pairedTo")){
+      console.log("Error getting storage data");
+      // Redirige al usuario a la página de obtención del localStorage
+      this.$router.push('/reconnect/'+this.$route.params.code);
+    }
+    dbg("created - init - Emiting event clientConnection with code: "+this.$route.params.code);
+    this.$socket.client.emit("clientReconnection", this.$route.params.code);
   },
   watch: {
     cursorTopPosition: function(val) {
@@ -754,10 +788,11 @@ export default {
     },
     changeExercise() {
       dbg("method changeExercise - init - Emiting event changeExercise with exercisedCharged: false");
-      this.$socket.client.emit("changeExercise", {code: localStorage.code, exercisedCharged: false});
+      this.$socket.client.emit("changeExercise", {code: this.$route.params.code, exercisedCharged: false});
     },
     newMessage(msg, mine) {
       dbg("method newMessage - init",msg);
+      console.log("test index: ",this.testIndex)
       const MessageClass = Vue.extend(Message);
       let gender = localStorage.getItem("pairedTo") === 'Female';
       gender = (this.testIndex == 2) ? !gender : gender;
@@ -816,7 +851,7 @@ export default {
           {
             method: "POST",
             body: JSON.stringify({
-              user: localStorage.token,
+              user: this.$route.params.code,
               status: true,
             }),
             headers: {
@@ -878,7 +913,7 @@ export default {
                 {
                   method: "POST",
                   body: JSON.stringify({
-                    user: localStorage.token,
+                    user: this.$route.params.code,
                     status: true,
                   }),
                   headers: {
@@ -896,7 +931,7 @@ export default {
                 {
                   method: "POST",
                   body: JSON.stringify({
-                    user: localStorage.token,
+                    user: this.$route.params.code,
                     status: false,
                   }),
                   headers: {
@@ -939,7 +974,7 @@ export default {
           body: JSON.stringify({
             exerciseDescription: this.exerciseDescription,
             solutions: v,
-            user: localStorage.token,
+            user: this.$route.params.code,
             source: "function main(input) { "+
                         this.$refs.cmEditor.codemirror.getValue()+
                         "return output;"+
@@ -1020,7 +1055,7 @@ export default {
       return {
         rid: this.rid,
         uid: this.uid,
-        token: localStorage.token,
+        token: this.$route.params.code,
         data: data,
       };
     },

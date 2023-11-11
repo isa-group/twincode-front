@@ -771,11 +771,7 @@ export default {
               let orderedTest = {};
               orderedTest.name = test.name;
               orderedTest.excercises = test.exercises.length;
-              let totalTime = 0;
-              test.exercises.forEach((exercise) => {
-                totalTime += exercise.time;
-              });
-              orderedTest.totalTime = totalTime;
+              orderedTest.totalTime = test.exercises[0].time;
               orderedTests.push(orderedTest);
             });
             this.tests = orderedTests;
