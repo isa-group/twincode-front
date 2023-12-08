@@ -184,7 +184,7 @@
           <div id="outputbox">
             <div v-if="returnValue && language == 'javascript'" class="p-3 bg-black text-white mt-2 rounded-md">
               <p>Your console log:</p>
-              <p class="mt-1 text-black-900" v-for="log in logs" :key="log">
+              <p class="mt-1 text-black-900" v-for="(log, index) in logs" :key="index">
                 <pre>$> {{ log }} </pre>
               </p>
             </div>
@@ -667,6 +667,37 @@ export default {
         this.showControlBubble();
         }
     },
+    receiveValidation(data) {
+      console.log("Receiving validation: "+data);
+      if(data.language == "python") {
+        this.isExerciseCorrect = data.validation.isExerciseCorrect;
+        this.consoleValue = data.validation.consoleValue;
+        this.returnValue = data.validation.returnValue;
+        this.printValue = data.validation.printValue;
+        this.numCorrect = data.validation.numCorrect;
+        this.numWrong = data.validation.numWrong;
+        this.tot = data.validation.tot;
+      } else if(data.language == "javascript") {
+        if(data.validation.hasExerciseErrors) {
+          this.returnValue = "Error";
+          this.tot = data.validation.tot;
+          this.numCorrect = data.validation.numCorrect;
+          this.numWrong = data.validation.numWrong;
+          this.isExerciseCorrect = false;
+          this.hasExerciseErrors = true;
+          this.excerciseErrorMessage = data.validation.excerciseErrorMessage;
+          this.logs = data.validation.logs;
+        } else {
+          this.isExerciseCorrect = data.validation.isExerciseCorrect;
+          this.twcc = data.validation.twcc;
+          this.returnValue = data.validation.returnValue;
+          this.numCorrect = data.validation.numCorrect;
+          this.numWrong = data.validation.numWrong;
+          this.tot = data.validation.tot;
+          this.logs = data.validation.logs;
+        }
+      }
+    },
     customAlert(pack) {
       this.validMessage = pack.data.message;
       if (pack.data.message == "There are no more exercises left on this test") {
@@ -848,9 +879,23 @@ export default {
         this.numWrong = this.inputs.length;
         this.isExerciseCorrect = false;
         this.hasExerciseErrors = true;
-        this.excerciseErrorMessage = e;
-        this.logs.push(e);
+        this.excerciseErrorMessage = e.toString();
+        this.logs.push(e.toString());
         this.runningTest = false;
+        var validation = {
+          returnValue: this.returnValue,
+          tot: this.tot,
+          numCorrect: this.numCorrect,
+          numWrong: this.numWrong,
+          isExerciseCorrect: this.isExerciseCorrect,
+          hasExerciseErrors: this.hasExerciseErrors,
+          excerciseErrorMessage: this.excerciseErrorMessage,
+          logs: this.logs,
+        }
+        if(this.exerciseType == "PAIR"){
+          this.$socket.client.emit("sendValidation", { validation: validation, language: "javascript" });
+        }
+
         fetch(process.env.VUE_APP_TC_API+"/verify/log",
           {
             method: "POST",
@@ -897,10 +942,8 @@ export default {
           },
         }).then(response => response.json()).then(data => {
               console.log("Data returned from tester:\n"+JSON.stringify(this.returnValue,null,2));
+
               this.isExerciseCorrect = data.result;
-              
-              this.consoleValue = data.console;
-              this.returnValue = data.solution;
               this.consoleValue = data.console;
               this.returnValue = data.solution;
               this.printValue = data.prints;
@@ -908,6 +951,19 @@ export default {
               this.numWrong = data.wrong;
               this.tot = data.tot;
               //this.hasExerciseErrors = data.errors;
+
+              var validation = {
+                isExerciseCorrect: this.isExerciseCorrect,
+                consoleValue: this.consoleValue,
+                returnValue: this.returnValue,
+                printValue: this.printValue,
+                numCorrect: this.numCorrect,
+                numWrong: this.numWrong,
+                tot: this.tot,
+              }
+              if(this.exerciseType == "PAIR") {
+                this.$socket.client.emit("sendValidation", { validation: validation, language: "python" });
+              }
               
               
               if (this.isExerciseCorrect == true) {
@@ -996,6 +1052,19 @@ export default {
               this.numCorrect = data.numCorrect; /** NEW */
               this.numWrong = data.numWrong;
               this.tot = data.tot;
+
+              var validation = {
+                isExerciseCorrect: this.isExerciseCorrect,
+                twcc: this.twcc,
+                returnValue: this.returnValue,
+                numCorrect: this.numCorrect,
+                numWrong: this.numWrong,
+                tot: this.tot,
+                logs: this.logs,
+              }
+              if(this.exerciseType == "PAIR") {
+                this.$socket.client.emit("sendValidation", { validation: validation, language: "javascript" });
+              }
               
               if (this.isExerciseCorrect == true) {
                 dbg("validateJavascript - Correct Exercise - Chhanging Exercise...");
