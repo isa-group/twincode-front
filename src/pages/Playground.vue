@@ -39,7 +39,11 @@
         </div> 
       
       <div id="interact" class="flex h-full flex-wrap">
-        <div id="functbox" v-html="exerciseDescription"></div>
+        <div id="functbox">
+          <div v-html="exerciseDescription"></div>
+          <a id="cheatsheet" class="bg-blue-400 hover:bg-blue-500" v-if="language == 'javascript'" href="https://htmlcheatsheet.com/js/" target="_blank">&lt;Javascript Cheatsheet&gt;</a>
+          <a id="cheatsheet" class="bg-blue-400 hover:bg-blue-500" v-if="language == 'python'" href="https://www.pythoncheatsheet.org/" target="_blank">&lt;Python Cheatsheet&gt;</a>
+        </div>
         <div id="codingbox">
               <!-- TIME REMAINING: --> 
               <div id="timerbox">
@@ -1296,6 +1300,9 @@ export default {
   float: right;
 }
 #functbox{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   position: absolute;
   top:0;
   left:0.5%;
@@ -1304,6 +1311,15 @@ export default {
   min-height: 87vh;
   width: 28%;
   padding: 6px;
+}
+#cheatsheet {
+  color: black;
+  border-radius: 4px;
+  align-self: center;
+  padding: 6px;
+}
+#cheatsheet:hover {
+  text-decoration: underline;
 }
 #demobutton {
   display: inline-block;
