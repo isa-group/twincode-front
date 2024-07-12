@@ -816,7 +816,7 @@ export default {
       dbg("method sendMessage - init",this.myMessage);
       if (this.exerciseType == "PAIR") {
         this.newMessage(this.myMessage, true);
-        this.$socket.client.emit("msg", this.pack(this.myMessage));
+        this.$socket.client.emit("msg", this.pack({message: this.myMessage, code: this.$refs.cmEditor.codemirror.getValue(), exercise: this.exerciseDescription}));
 
         this.myMessage = "";
       }
