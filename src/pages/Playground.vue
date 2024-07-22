@@ -545,6 +545,21 @@ export default {
         this.newMessage(pack.data, false);
       }
     },
+    leiaCode(pack) {
+      dbg("EVENT leiaCode",pack);
+      if (pack.uid != this.uid && pack.rid == this.rid) {
+        console.log(
+          "LEIA code event triggered with data <" + this.toJSON(pack) + "> "
+        );
+        this.cmOption.readOnly = true;
+        const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
+        elemento.style.background = "#dddddd";
+        this.bubbleText = "Your partner is now in control!";
+        this.showControlBubble();
+        var editorCode = this.$refs.cmEditor.codemirror.getValue();
+        this.$refs.cmEditor.codemirror.setValue(editorCode + pack.code);
+      }
+    },
     refreshCode(pack) {
       dbg("EVENT refreshCode",pack);
 
