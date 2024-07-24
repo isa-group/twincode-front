@@ -104,11 +104,12 @@
           </button>
           <button
             class="mt-3 mr-3 rounded-full bg-purple-400 p-2 px-5 focus:outline-none focus:shadow-outline"
-            @click="addBot()"
+            @click="toggleNumBotsToAddAlert()"
           >
             Add Bot
           </button>
         </div>
+
         <Modal v-model="showImportModal" title="Import Users">
           <div class="mb-5">
             <b class="mb-5">
@@ -163,6 +164,9 @@
               </button>
             </template>
         </Modal>
+
+        <!-- AQUI iría el modal para escoger numBots a añadir en la session -->
+
         <div class="mt-10">
           <h2 class="mb-3 text-md font-light">Tests &amp; exercises:</h2>
           <Table
@@ -368,6 +372,7 @@ export default {
       waitingStartResponse: false,
       showDeleteModal: false,
       showImportModal: false,
+      // showAddBotsModal: false,
       csvFile: null,
       sessionToDelete: "",
       showPopUp: false,
@@ -645,19 +650,18 @@ export default {
         }
       })
     },
-    addBot() {
+    addBot(numBots) {
       fetch(
-        `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/BOT`,
+        `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/bot/${numBots}`,
         {
           method: "POST",
           headers: {
             Authorization: localStorage.adminSecret,
           },
-        }
-      )
+        })
       .then((response) => {
-        if (response.status == 200) {
-          this.popUpMessage = "Bot added successfully!";
+        if (response.status == 201) {
+          this.popUpMessage = "Bots added successfully!";
           this.popUpTitle = "Success";
           this.showPopUp = true;
           this.loadParticipants();
@@ -667,6 +671,12 @@ export default {
           this.showPopUp = true;
         }
       });
+    },
+    toggleNumBotsToAddAlert() {
+      let numBots = prompt("Please enter the number of bots", 0);
+      if (numBots != null || numBots >= 0) {
+        this.addBot(numBots);
+      }
     },
     toggleSessionMethod() {
       if (!this.waitingStartResponse) {
