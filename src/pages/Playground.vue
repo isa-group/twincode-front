@@ -542,22 +542,66 @@ export default {
         console.log(
           "newMsg event triggered with data <" + this.toJSON(pack) + "> "
         );
-        this.newMessage(pack.data, false);
+        this.newMessage(pack.data.message, false);
       }
     },
-    leiaCode(pack) {
+    async leiaCode(pack) {
       dbg("EVENT leiaCode",pack);
       if (pack.uid != this.uid && pack.rid == this.rid) {
         console.log(
           "LEIA code event triggered with data <" + this.toJSON(pack) + "> "
         );
+
         this.cmOption.readOnly = true;
         const elemento = document.getElementsByClassName("CodeMirror-scroll")[0];
         elemento.style.background = "#dddddd";
         this.bubbleText = "Your partner is now in control!";
         this.showControlBubble();
+
+        const takeControlButton = document.getElementById("takeControl");
+        if (takeControlButton) {
+          takeControlButton.disabled = true;
+        }
+
+        var newCode = pack.data.code;
         var editorCode = this.$refs.cmEditor.codemirror.getValue();
-        this.$refs.cmEditor.codemirror.setValue(editorCode + pack.code);
+
+        var lines = editorCode.split("\n");
+        var lastLine = lines.length - 1;
+        var lastChar = lines[lastLine].length;
+        
+        var change = {
+          fromTo: { line: lastLine, ch: lastChar },
+          text: "",
+        };
+
+        for (var i = 0; i < newCode.length; i++) {
+            
+            var char = newCode.charAt(i);
+            if (char == "\n") {
+                change.text = "";
+                change.fromTo.line++;
+                change.fromTo.ch = 0;
+            } else {
+                change.text = char;
+                change.fromTo.ch++;
+            }
+
+            var waitTime = Math.floor(Math.random() * (200 - 150 + 1)) + 40;
+            await  new Promise(resolve => setTimeout(resolve, waitTime));
+            
+            this.$refs.cmEditor.codemirror.replaceRange(
+                change.text,
+                change.fromTo,
+                change.fromTo,
+                "server"
+            );
+        }
+
+        if (takeControlButton) {
+          takeControlButton.disabled = false;
+        }
+        
       }
     },
     refreshCode(pack) {
@@ -567,11 +611,11 @@ export default {
       //console.log("text event triggered with data <" + this.toJSON(pack) + "> ");
       if (!this.pairReconnecting) {
         this.$refs.cmEditor.codemirror.replaceRange(
-        pack.change.text,
-        pack.change.from,
-        pack.change.to,
-        "server"
-      );
+            pack.change.text,
+            pack.change.from,
+            pack.change.to,
+            "server"
+        );
       }  
     },
     finish() {
@@ -1205,6 +1249,8 @@ export default {
       }
     },
     onCmCodeChange(e, c) {
+      dbg("method onCmCodeChange - init");
+      dbg("method onCmCodeChange - change: "+JSON.stringify(c));
       const changeObj = {
         author: this.$socket.client.id,
         change: c,
