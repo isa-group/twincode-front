@@ -72,7 +72,7 @@
             :body="participants"
             :actions="[
               { eventName: 'rejoin', icon: reloadIconUrl, key: 'socketId' },
-              { eventName: 'delete', icon: deleteIconUrl, key: 'mail' },
+              { eventName: 'delete', icon: deleteIconUrl, key: 'code' },
               { eventName: 'sendEmail', icon: emailIconUrl, key: 'mail' },
             ]"
             :invisible="['socketId']"
@@ -101,6 +101,12 @@
             v-if="this.participants.length > 0"
           >
             Send emails
+          </button>
+          <button
+            class="mt-3 mr-3 rounded-full bg-purple-400 p-2 px-5 focus:outline-none focus:shadow-outline"
+            @click="addBot()"
+          >
+            Add Bot
           </button>
         </div>
         <Modal v-model="showImportModal" title="Import Users">
@@ -556,15 +562,15 @@ export default {
         path: `/administration`,
       });
     },
-    deleteUser(userEmail) {
+    deleteUser(userCode) {
       var r = confirm(
         "You are going to remove the participant with email " +
-          userEmail +
+          userCode +
           ". This action cannot be undone. Are you sure?"
       );
       if (r) {
         fetch(
-          `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/${userEmail}`,
+          `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/${userCode}`,
           {
             method: "DELETE",
             headers: {
@@ -638,6 +644,29 @@ export default {
           this.showPopUp = true;
         }
       })
+    },
+    addBot() {
+      fetch(
+        `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/BOT`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      )
+      .then((response) => {
+        if (response.status == 200) {
+          this.popUpMessage = "Bot added successfully!";
+          this.popUpTitle = "Success";
+          this.showPopUp = true;
+          this.loadParticipants();
+        } else {
+          this.popUpMessage = "There was an error adding the bot. Try again later.";
+          this.popUpTitle = "Error";
+          this.showPopUp = true;
+        }
+      });
     },
     toggleSessionMethod() {
       if (!this.waitingStartResponse) {
