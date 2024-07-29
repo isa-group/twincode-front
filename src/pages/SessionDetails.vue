@@ -104,7 +104,7 @@
           </button>
           <button
             class="mt-3 mr-3 rounded-full bg-purple-400 p-2 px-5 focus:outline-none focus:shadow-outline"
-            @click="toggleNumBotsToAddAlert()"
+            @click="showAddBotsModal = true"
           >
             Add Bot
           </button>
@@ -165,7 +165,40 @@
             </template>
         </Modal>
 
-        <!-- AQUI iría el modal para escoger numBots a añadir en la session -->
+        <!-- vvv MODAL PROVISIONAL vvv -->
+
+        <div class="fixed h-full w-full top-0 left-0 flex items-center justify-center"
+          style="backdrop-filter: blur(2px); backdrop-filter: brightness(50%);"
+          v-if="showAddBotsModal"
+          >
+          <div class="border-teal-600 p-8 border-t-8 bg-white mb-6 rounded-md shadow-lg m-5">
+            <h1 class="text-2xl font-semibold mb-5 align-self-xl-center">Add bots</h1>
+            <p class="mb-5">
+              How many bots do you want to add?
+            </p>
+            <input
+              v-model="numBotsToAdd"
+              type="number"
+              class="border rounded-sm mx-4 p-1"
+            />
+
+            <div class="flex justify-end mt-5">
+              <button
+                @click="numBotsToAdd = 0; showAddBotsModal = false"
+                class="px-4 bg-transparent p-3 rounded-lg hover:bg-gray-100 hover:text-orange-400 mr-2 focus:outline-none focus:shadow-outline"
+              >
+                Cancel
+              </button>
+              
+              <button
+                class="px-4 bg-transparent p-3 rounded-lg bg-orange-400 hover:bg-orange-300 mr-2 focus:outline-none focus:shadow-outline"
+                @click="addBot(numBotsToAdd); showAddBotsModal = false"
+              >
+                Add bots
+              </button>
+            </div>
+          </div>
+        </div>
 
         <div class="mt-10">
           <h2 class="mb-3 text-md font-light">Tests &amp; exercises:</h2>
@@ -372,7 +405,8 @@ export default {
       waitingStartResponse: false,
       showDeleteModal: false,
       showImportModal: false,
-      // showAddBotsModal: false,
+      showAddBotsModal: false,
+      numBotsToAdd: 0,
       csvFile: null,
       sessionToDelete: "",
       showPopUp: false,
@@ -672,12 +706,12 @@ export default {
         }
       });
     },
-    toggleNumBotsToAddAlert() {
-      let numBots = prompt("Please enter the number of bots", 0);
-      if (numBots != null || numBots >= 0) {
-        this.addBot(numBots);
-      }
-    },
+    // toggleNumBotsToAddAlert() {
+    //   let numBots = prompt("Please enter the number of bots", 0);
+    //   if (numBots != null || numBots >= 0) {
+    //     this.addBot(numBots);
+    //   }
+    // },
     toggleSessionMethod() {
       if (!this.waitingStartResponse) {
         if (this.session.running) {
