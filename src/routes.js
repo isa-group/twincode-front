@@ -9,6 +9,7 @@ import Reports from "./pages/Reports";
 import IDE from "./pages/IDE";
 import PageNotFound from "./pages/PageNotFound";
 import Reconnect from "./pages/Reconnect";
+import SystemConfig from "./pages/SystemConfig"
 
 const routes = [
   {
@@ -34,6 +35,12 @@ const routes = [
     component: Admin,
     name: "Administration",
     meta: { title: "Admin console - Twincode" },
+  },
+  {
+    path: "/administration/config",
+    component: SystemConfig,
+    name: "System configuration",
+    meta: { title: "Admin console - Twincode"}
   },
   {
     path: "/administration/sessions/:sessionName",
