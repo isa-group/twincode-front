@@ -78,7 +78,6 @@
       },
       updateConfig() {
         if (this.config?.language) {
-            console.log(this.config.language)
             fetch(`${process.env.VUE_APP_TC_API}/systemconfig`, {
                 method: "PUT",
                 headers: {
