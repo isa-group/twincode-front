@@ -76,7 +76,7 @@
               { eventName: 'sendEmail', icon: emailIconUrl, key: 'mail' },
             ]"
             :invisible="['socketId']"
-            @delete="deleteUser($event)"
+            @delete="deleteUserAndLeia($event)"
             @rejoin="rejoinUser($event)"
             @sendEmail="sendEmail($event)"
           />
@@ -602,7 +602,7 @@ export default {
         path: `/administration`,
       });
     },
-    deleteUser(userCode) {
+    deleteUserAndLeia(userCode) {
       var r = confirm(
         "You are going to remove the participant with email " +
           userCode +
@@ -610,7 +610,7 @@ export default {
       );
       if (r) {
         fetch(
-          `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/${userCode}`,
+          `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/leia/${userCode}`,
           {
             method: "DELETE",
             headers: {
