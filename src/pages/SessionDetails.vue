@@ -76,7 +76,7 @@
               { eventName: 'sendEmail', icon: emailIconUrl, key: 'mail' },
             ]"
             :invisible="['socketId']"
-            @delete="deleteUser($event)"
+            @delete="deleteUserAndLeia($event)"
             @rejoin="rejoinUser($event)"
             @sendEmail="sendEmail($event)"
           />
@@ -104,7 +104,7 @@
           </button>
           <button
             class="mt-3 mr-3 rounded-full bg-purple-400 p-2 px-5 focus:outline-none focus:shadow-outline"
-            @click="showAddBotsModal = true"
+            @click="showAddBotsModal = true; findLeiaConfigs()"
           >
             Add Bot
           </button>
@@ -174,6 +174,18 @@
               type="number"
               class="border rounded-sm ml-2 p-1"
             />
+            <p class="my-5">
+              What type of configuration do you want them to have?
+            </p>
+            <select
+              v-model="leiaConfig"
+              class="border rounded-sm ml-2 p-1"
+              v-if="leiaConfigs.length > 0"
+            >
+              <option disabled>Select one</option>
+              <option v-for="config in leiaConfigs" :value="config.type" :key="config._id">{{ config.type }}</option>
+            </select>
+
             <template v-slot:actionButtons>
               <button
                 @click="addBots(numBotsToAdd); showAddBotsModal = false"
@@ -338,13 +350,13 @@
     typing 3s steps(50, end),
     blink-caret .75s step-end infinite;
 }
- 
+
 /* The typing effect */
 @keyframes typing {
   from { width: 0 }
   to { width: 100% }
 }
- 
+
 /* The typewriter cursor effect */
 @keyframes blink-caret {
   from, to { border-color: transparent }
@@ -390,7 +402,9 @@ export default {
       showDeleteModal: false,
       showImportModal: false,
       showAddBotsModal: false,
-      numBotsToAdd: 0,
+      numBotsToAdd: 1,
+      leiaConfigs: [],
+      leiaConfig: "Select one",
       csvFile: null,
       sessionToDelete: "",
       showPopUp: false,
@@ -413,6 +427,9 @@ export default {
     },
   },
   methods: {
+    logMessage(msg) {
+      console.log(msg);
+    },
     closePopUp() {
       this.showPopUp = false;
       this.popUpMessage = "";
@@ -585,7 +602,7 @@ export default {
         path: `/administration`,
       });
     },
-    deleteUser(userCode) {
+    deleteUserAndLeia(userCode) {
       var r = confirm(
         "You are going to remove the participant with email " +
           userCode +
@@ -593,7 +610,7 @@ export default {
       );
       if (r) {
         fetch(
-          `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/${userCode}`,
+          `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/leia/${userCode}`,
           {
             method: "DELETE",
             headers: {
@@ -668,9 +685,9 @@ export default {
         }
       })
     },
-    addBots(numBots) {
+    addBots(numLeias) {
       fetch(
-        `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/bot/${numBots}`,
+        `${process.env.VUE_APP_TC_API}/participants/${this.$route.params.sessionName}/leia/${numLeias}/${this.leiaConfig}`,
         {
           method: "POST",
           headers: {
@@ -689,6 +706,29 @@ export default {
           this.showPopUp = true;
         }
       });
+    },
+    findLeiaConfigs() {
+      fetch(
+        `${process.env.VUE_APP_TC_API}/leia/config`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: localStorage.adminSecret,
+          },
+        }
+      )
+      .then((response) => {
+        if (response.status == 200) {
+          return response.json();
+        }
+      })
+      .then((configs) => {
+        if (configs) {
+          this.leiaConfigs = configs;
+          
+        }
+      });
+      console.log('leiaConfigs actualizado:');
     },
     toggleSessionMethod() {
       if (!this.waitingStartResponse) {
