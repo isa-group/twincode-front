@@ -563,37 +563,18 @@ export default {
           takeControlButton.disabled = true;
         }
 
-        var newCode = pack.data.code;
-        var editorCode = this.$refs.cmEditor.codemirror.getValue();
+        // var newCode = pack.data.code;
+        var codeMirrorChanges = this.convertChangesCMFormat(pack.data.changes);
 
-        var lines = editorCode.split("\n");
-        var lastLine = lines.length - 1;
-        var lastChar = lines[lastLine].length;
-        
-        var change = {
-          fromTo: { line: lastLine, ch: lastChar },
-          text: "",
-        };
-
-        for (var i = 0; i < newCode.length; i++) {
-            
-            var char = newCode.charAt(i);
-            if (char == "\n") {
-                change.text = "";
-                change.fromTo.line++;
-                change.fromTo.ch = 0;
-            } else {
-                change.text = char;
-                change.fromTo.ch++;
-            }
+        for (const codeMirrorChange of codeMirrorChanges) {
 
             var waitTime = Math.floor(Math.random() * (200 - 150 + 1)) + 40;
             await  new Promise(resolve => setTimeout(resolve, waitTime));
             
             this.$refs.cmEditor.codemirror.replaceRange(
-                change.text,
-                change.fromTo,
-                change.fromTo,
+                codeMirrorChange.text,
+                codeMirrorChange.from,
+                codeMirrorChange.to,
                 "server"
             );
         }
@@ -861,6 +842,51 @@ export default {
     },
   },
   methods: {
+    convertChangesCMFormat(dmpCharByCharChanges) {
+        const cmChanges = [];
+        let line = 0;
+        let ch = 0;
+    
+        dmpCharByCharChanges.forEach(change => {
+            const [op, char] = change;
+
+            if (op === -1) { // Delete
+                cmChanges.push({
+                    from: { line, ch },
+                    to: { line, ch: ch + 1 },
+                    text: [""],
+                    removed: [char]
+                });
+            } else {
+                if (op === 1) { // Insert
+                    if (char === "\n") {
+                        // Cuando se encuentra un salto de línea
+                        cmChanges.push({
+                            from: { line, ch },
+                            to: { line, ch },
+                            text: ["", ""], // Esto representa una nueva línea
+                            removed: [""]
+                        });
+                    } else {
+                        cmChanges.push({
+                            from: { line, ch },
+                            to: { line, ch },
+                            text: [char],
+                            removed: [""]
+                        });
+                    }
+                }
+                if (char === "\n") {
+                    line++;
+                    ch = 0;
+                } else {
+                    ch++;
+                }
+            }
+        });
+    
+        return cmChanges;
+    },
     showControlBubble() {
       this.showBubble = true;
       setTimeout(() => { 
