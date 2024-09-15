@@ -568,7 +568,7 @@ export default {
 
         for (const codeMirrorChange of codeMirrorChanges) {
 
-            var waitTime = Math.floor(Math.random() * (1600 - 800 + 1)) + 800;
+            var waitTime = Math.floor(Math.random() * (900 - 200 + 1)) + 200;
             await  new Promise(resolve => setTimeout(resolve, waitTime));
             
             this.$refs.cmEditor.codemirror.replaceRange(
